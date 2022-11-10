@@ -26,8 +26,9 @@ extension Project {
                 product: .framework,
                 bundleId: "com.tnzkm.\(name)",
                 infoPlist: .default,
-                sources: ["Targets/\(name)/Sources/**"],
+                sources: ["\(name)/Sources/**"],
                 resources: [],
+                scripts: [.pre(path: "Scripts/SwiftLintRunScript.sh", arguments: [], name: "SwiftLint")],
                 dependencies: [])
 //        let tests = Target(name: "\(name)Tests",
 //                platform: platform,
@@ -56,8 +57,9 @@ extension Project {
             product: .app,
             bundleId: "com.tnzkm.\(name)",
             infoPlist: .extendingDefault(with: infoPlist),
-            sources: ["Targets/\(name)/Sources/**"],
-            resources: ["Targets/\(name)/Resources/**"],
+            sources: ["\(name)/Sources/**"],
+            resources: ["\(name)/Resources/**"],
+            scripts: [.pre(path: "Scripts/SwiftLintRunScript.sh", arguments: [], name: "SwiftLint")],
             dependencies: dependencies
         )
 
