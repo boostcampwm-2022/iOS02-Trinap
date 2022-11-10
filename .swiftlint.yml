@@ -15,8 +15,8 @@ disabled_rules:
   - discarded_notification_center_observer
   - notification_center_detachment
   - orphaned_doc_comment
-  - todo
   - unused_capture_list
+  - trailing_whitespace
 
 opt_in_rules:
   - array_init
@@ -56,7 +56,6 @@ opt_in_rules:
   - unneeded_parentheses_in_closure_argument
   - unused_import
   - vertical_whitespace_closing_braces
-  - vertical_whitespace_opening_braces
   - yoda_condition
 
 
@@ -76,8 +75,9 @@ attributes:
     - "@NSManaged"
     - "@objc"
 
-force_cast: warning
-force_try: warning
+force_cast: error
+force_try: error
+force_unwrapping: error
 function_body_length:
     warning: 60
 
@@ -92,7 +92,7 @@ identifier_name:
     - z
 
 indentation_width:
-  indentation_width: 2
+  indentation_width: 4
 
 line_length:
   ignores_urls: true
@@ -105,10 +105,6 @@ multiline_arguments:
   
 private_over_fileprivate:
   validate_extensions: true
-
-trailing_whitespace:
-  ignores_empty_lines: false
-  ignores_comments: true
 
 vertical_whitespace:
   max_empty_lines: 2
