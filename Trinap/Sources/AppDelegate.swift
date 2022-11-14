@@ -1,5 +1,7 @@
 import UIKit
-import RxSwift
+import FirebaseCore
+import FirebaseFirestore
+import Firebase
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {

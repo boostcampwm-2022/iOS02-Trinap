@@ -4,6 +4,7 @@
 .AppleDouble
 .LSOverride
 Signing/
+GoogleService-Info.plist
 
 # Icon must end with two
 Icon

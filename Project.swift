@@ -41,11 +41,10 @@ class BaseProjectFactory: ProjectFactory {
     ]
     
     func generateConfigurations() -> Settings {
-//        Settings.settings(configurations: [
-//            .debug(name: "Debug", xcconfig: .relativeToRoot("\(projectName)/Sources/Config/Debug.xcconfig")),
-//            .release(name: "Release", xcconfig: .relativeToRoot("\(projectName)/Sources/Config/Release.xcconfig")),
-//        ])
-        return .settings(defaultSettings: .recommended)
+        return Settings.settings(configurations: [
+            .debug(name: "Debug", xcconfig: .relativeToRoot("\(projectName)/Sources/Config/Debug.xcconfig")),
+            .release(name: "Release", xcconfig: .relativeToRoot("\(projectName)/Sources/Config/Release.xcconfig")),
+        ])
     }
     
     func generateTarget() -> [Target] {
