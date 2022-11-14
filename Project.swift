@@ -38,7 +38,32 @@ class BaseProjectFactory: ProjectFactory {
         .external(name: "Realm"),
         .external(name: "FirebaseAuth"),
         .external(name: "FirebaseDatabase"),
+        .external(name: "FirebaseFirestore")
     ]
+    
+    let infoPlist: [String: InfoPlist.Value] = [
+               "CFBundleShortVersionString": "1.0",
+               "CFBundleVersion": "1",
+               "UILaunchStoryboardName": "LaunchScreen",
+               "UIApplicationSceneManifest": [
+                   "UIApplicationSupportsMultipleScenes": false,
+                   "UISceneConfigurations": [
+                       "UIWindowSceneSessionRoleApplication": [
+                           [
+                               "UISceneConfigurationName": "Default Configuration",
+                               "UISceneDelegateClassName": "$(PRODUCT_MODULE_NAME).SceneDelegate"
+                           ],
+                       ]
+                   ]
+               ],
+               "UIAppFonts": [
+                   "Item 0": "Pretendard-Medium.otf",
+                   "Item 1": "Pretendard-Regular.otf",
+                   "Item 2": "Pretendard-SemiBold.otf",
+                   "Item 3": "Pretendard-Bold.otf"
+               ]
+           ]
+
     
     func generateConfigurations() -> Settings {
         return Settings.settings(configurations: [
@@ -55,7 +80,7 @@ class BaseProjectFactory: ProjectFactory {
                 product: .app,
                 bundleId: "com.tnzkm.\(projectName)",
                 deploymentTarget: .iOS(targetVersion: "14.0", devices: [.iphone]),
-                infoPlist: .default,
+                infoPlist: .extendingDefault(with: infoPlist),
                 sources: ["\(projectName)/Sources/**"],
                 resources: "\(projectName)/Resources/**",
 //                entitlements: "\(projectName).entitlements",
