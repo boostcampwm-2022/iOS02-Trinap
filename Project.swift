@@ -38,7 +38,9 @@ class BaseProjectFactory: ProjectFactory {
         .external(name: "Realm"),
         .external(name: "FirebaseAuth"),
         .external(name: "FirebaseDatabase"),
-        .external(name: "FirebaseFirestore")
+        .external(name: "FirebaseFirestore"),
+        .external(name: "RealmSwift"),
+        .external(name: "FirebaseStorage")
     ]
     
     let infoPlist: [String: InfoPlist.Value] = [
