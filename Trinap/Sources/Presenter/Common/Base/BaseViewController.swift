@@ -35,4 +35,8 @@ class BaseViewController: UIViewController {
     required init(coder: NSCoder) {
         fatalError("init(coder:) is called.")
     }
+    
+    init() {
+        super.init(nibName: nil, bundle: nil)
+    }
 }
