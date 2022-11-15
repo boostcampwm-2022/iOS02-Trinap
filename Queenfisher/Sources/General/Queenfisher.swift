@@ -34,7 +34,7 @@ extension QueenfisherCompatible {
     
     /// `QueenfisherCompatible` namespace입니다.
     public var qf: QueenfisherWrapper<Self> {
-        get { return QueenfisherWrapper(base: self) }
+        return QueenfisherWrapper(base: self)
     }
 }
 
