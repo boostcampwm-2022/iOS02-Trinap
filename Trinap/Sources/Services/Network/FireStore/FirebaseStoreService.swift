@@ -24,4 +24,5 @@ protocol FirebaseStoreService {
     func deleteDocument(collection: String, document: String, values: FirebaseData) -> Single<Void>
     func observer(collection: String, document: String) -> Observable<FirebaseData>
     func observer(documents: [String]) -> Observable<FirebaseData>
+    func uploadImage(imageData: Data) -> Single<String>
 }
