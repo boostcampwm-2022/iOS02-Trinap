@@ -14,14 +14,14 @@ import SnapKit
 final class SignInViewController: BaseViewController {
     
     // MARK: - UI
-    lazy private var logoImageView: UIImageView = {
+    private lazy var logoImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
         imageView.image = TrinapAsset.logoVertical.image
         return imageView
     }()
     
-    lazy private var appleSignInButton: ASAuthorizationAppleIDButton = {
+    private lazy var appleSignInButton: ASAuthorizationAppleIDButton = {
         let button = ASAuthorizationAppleIDButton(authorizationButtonType: .signIn, authorizationButtonStyle: .black)
         return button
     }()
