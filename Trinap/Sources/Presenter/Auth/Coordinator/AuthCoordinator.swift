@@ -22,6 +22,14 @@ final class AuthCoordinator: Coordinator {
     }
     
     func start() {
-        
+        showSignInViewController()
+    }
+}
+
+private extension AuthCoordinator {
+    func showSignInViewController() {
+        let viewController = SignInViewController()
+        self.navigationController.setNavigationBarHidden(true, animated: true)
+        self.navigationController.pushViewController(viewController, animated: false)
     }
 }
