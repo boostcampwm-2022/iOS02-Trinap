@@ -13,6 +13,7 @@ let spm = SwiftPackageManagerDependencies([
     .remote(url: "https://github.com/firebase/firebase-ios-sdk", requirement: .upToNextMajor(from: "8.10.0")),
     .remote(url: "https://github.com/realm/realm-swift", requirement: .upToNextMajor(from: "10.0.0")),
     .remote(url: "https://github.com/airbnb/lottie-ios", requirement: .branch("master")),
+    .remote(url: "https://github.com/SnapKit/SnapKit", requirement: .upToNextMajor(from: "5.0.0"))
 ])
 
 let dependencies = Dependencies(

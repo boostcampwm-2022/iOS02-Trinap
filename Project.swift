@@ -40,6 +40,7 @@ class BaseProjectFactory: ProjectFactory {
         .external(name: "FirebaseDatabase"),
         .external(name: "FirebaseFirestore"),
         .external(name: "FirebaseMessaging"),
+        .external(name: "SnapKit")
     ]
     
     let infoPlist: [String: InfoPlist.Value] = [
