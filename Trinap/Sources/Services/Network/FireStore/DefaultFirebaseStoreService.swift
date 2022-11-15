@@ -7,10 +7,11 @@
 //
 
 import Foundation
-import RxSwift
+
 import FirebaseCore
 import FirebaseFirestore
 import FirebaseStorage
+import RxSwift
 
 enum FireBaseStoreError: Error, LocalizedError {
     case unknown
@@ -20,8 +21,10 @@ final class DefaultFireBaseStoreService: FirebaseStoreService {
     
     typealias FirebaseData = [String: Any]
     
+    //MARK: Properties
     private let database = Firestore.firestore()
     
+    //MARK: Methods
     func getDocument(collection: String, document: String) -> Single<FirebaseData> {
         return Single<FirebaseData>.create { [weak self] single in
             guard let self else { return Disposables.create() }
