@@ -9,7 +9,7 @@
 import Foundation
 
 #if DEBUG
-final class Logger {
+enum Logger {
     
     static func print(_ items: Any, file: String = #file, function: String = #function, line: Int = #line) {
         Swift.print()
@@ -17,6 +17,17 @@ final class Logger {
         Swift.print("🟢 function: \(function), line: \(line)")
         Swift.print("🟢")
         Swift.print("🟢", items)
+        Swift.print()
+    }
+    
+    static func printArray(_ array: [Any], file: String = #file, function: String = #function, line: Int = #line) {
+        Swift.print()
+        Swift.print("🟢 Log at \(file.components(separatedBy: "/").last ?? "Some File")")
+        Swift.print("🟢 function: \(function), line: \(line)")
+        Swift.print("🟢")
+        for item in array {
+            Swift.print("🟢", item)
+        }
         Swift.print()
     }
 }
