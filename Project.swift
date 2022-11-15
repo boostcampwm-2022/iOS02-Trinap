@@ -42,6 +42,7 @@ class BaseProjectFactory: ProjectFactory {
         .external(name: "RealmSwift"),
         .external(name: "FirebaseStorage"),
         .external(name: "FirebaseMessaging"),
+        .external(name: "SnapKit")
     ]
     
     let infoPlist: [String: InfoPlist.Value] = [
