@@ -6,32 +6,52 @@
 //  Copyright © 2022 Trinap. All rights reserved.
 //
 
+import AuthenticationServices
 import UIKit
+
 import SnapKit
 
+
 final class SignInViewController: BaseViewController {
-    private var appleSignInButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("애플로 로그인 하기", for: .normal)
+    
+    // MARK: - UI
+    private var logoImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.image = TrinapAsset.logoVertical.image
+        return imageView
+    }()
+    
+    private var appleSignInButton: ASAuthorizationAppleIDButton = {
+        let button = ASAuthorizationAppleIDButton(authorizationButtonType: .signIn, authorizationButtonStyle: .black)
         return button
     }()
     
+    // MARK: - Properties
+    
+    // MARK: - Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemPink
     }
     
     override func configureHierarchy() {
-        [appleSignInButton].forEach { view.addSubview($0) }
+        [logoImageView, appleSignInButton].forEach { view.addSubview($0) }
     }
     
     override func configureConstraints() {
+        logoImageView.snp.makeConstraints {
+            $0.centerY.equalToSuperview().multipliedBy(0.8)
+            $0.centerX.equalToSuperview()
+            $0.horizontalEdges.equalToSuperview().inset(50)
+        }
+        
         appleSignInButton.snp.makeConstraints {
-            $0.centerX.centerY.equalToSuperview()
+            $0.centerX.equalToSuperview()
+            $0.horizontalEdges.equalToSuperview().inset(25)
+            $0.height.equalTo(48)
+            $0.top.equalTo(logoImageView.snp.centerY).multipliedBy(1.9)
         }
     }
     
-    override func configureAttributes() {
-        
-    }
+//    override func configureAttributes() { }
 }
