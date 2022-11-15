@@ -34,10 +34,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 extension AppDelegate : MessagingDelegate {
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         guard let fcmToken else {
-            print("?!")
+            Logger.print("fcm token not exists.")
             return
         }
-        print(fcmToken)
+        Logger.print(fcmToken)
     }
 }
 
