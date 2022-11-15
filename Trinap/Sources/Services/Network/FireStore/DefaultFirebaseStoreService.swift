@@ -10,6 +10,7 @@ import Foundation
 import RxSwift
 import FirebaseCore
 import FirebaseFirestore
+import FirebaseStorage
 
 enum FireBaseStoreError: Error, LocalizedError {
     case unknown
@@ -91,6 +92,27 @@ final class DefaultFireBaseStoreService: FirebaseStoreService {
         }
     }
     
+    func getDocument(documents: [String]) -> Single<[String: Any]> {
+        return Single.create { single in
+            self.database.document(documents.joined(separator: "/"))
+                .getDocument { snapshot, error in
+                    if let error = error {
+                        print(error)
+                        single(.failure(error))
+                    }
+                    guard let snapshot = snapshot else { single(.failure(FireBaseStoreError.unknown))
+                        return
+                    }
+                    guard let data = snapshot.data() else {
+                        single(.failure(FireBaseStoreError.unknown))
+                        return
+                    }
+                    single(.success(data))
+                }
+            return Disposables.create()
+        }
+    }
+    
     func createDocument(collection: String, document: String, values: FirebaseData) -> Single<Void> {
         
         return Single.create { [weak self] single in
@@ -107,6 +129,19 @@ final class DefaultFireBaseStoreService: FirebaseStoreService {
             return Disposables.create()
         }
     }
+    
+    func createDocument(documents: [String], values: FirebaseData) -> Single<Void> {
+        return Single.create { [weak self] single in
+            guard let self else { return Disposables.create() }
+            self.database.document(documents.joined(separator: "/"))
+                .setData(values) { error in
+                    if let error = error { single(.failure(error))}
+                    single(.success(()))
+                }
+            return Disposables.create()
+        }
+    }
+
     
     func updateDocument(collection: String, document: String, values: FirebaseData) -> Single<Void> {
         
@@ -161,6 +196,26 @@ final class DefaultFireBaseStoreService: FirebaseStoreService {
                         return
                     }
                     
+                    observable.onNext(data)
+                }
+            return Disposables.create()
+        }
+    }
+    
+    func observer(documents: [String]) -> Observable<FirebaseData> {
+        
+        return Observable<FirebaseData>.create { [weak self] observable in
+            guard let self else { return Disposables.create() }
+            self.database
+                .document(documents.joined(separator: "/"))
+                .addSnapshotListener { snapshot, error in
+                    if let error = error {
+                        observable.onError(error)
+                    }
+                    guard let snapshot = snapshot, let data = snapshot.data() else {
+                        observable.onError(FireBaseStoreError.unknown)
+                        return
+                    }
                     observable.onNext(data)
                 }
             return Disposables.create()
