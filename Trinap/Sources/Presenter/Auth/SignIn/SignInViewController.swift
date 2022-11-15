@@ -11,18 +11,17 @@ import UIKit
 
 import SnapKit
 
-
 final class SignInViewController: BaseViewController {
     
     // MARK: - UI
-    private var logoImageView: UIImageView = {
+    lazy private var logoImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
         imageView.image = TrinapAsset.logoVertical.image
         return imageView
     }()
     
-    private var appleSignInButton: ASAuthorizationAppleIDButton = {
+    lazy private var appleSignInButton: ASAuthorizationAppleIDButton = {
         let button = ASAuthorizationAppleIDButton(authorizationButtonType: .signIn, authorizationButtonStyle: .black)
         return button
     }()
@@ -39,17 +38,17 @@ final class SignInViewController: BaseViewController {
     }
     
     override func configureConstraints() {
-        logoImageView.snp.makeConstraints {
-            $0.centerY.equalToSuperview().multipliedBy(0.8)
-            $0.centerX.equalToSuperview()
-            $0.horizontalEdges.equalToSuperview().inset(50)
+        logoImageView.snp.makeConstraints { make in
+            make.centerY.equalToSuperview().multipliedBy(0.8)
+            make.centerX.equalToSuperview()
+            make.horizontalEdges.equalToSuperview().inset(50)
         }
         
-        appleSignInButton.snp.makeConstraints {
-            $0.centerX.equalToSuperview()
-            $0.horizontalEdges.equalToSuperview().inset(25)
-            $0.height.equalTo(48)
-            $0.top.equalTo(logoImageView.snp.centerY).multipliedBy(1.9)
+        appleSignInButton.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.horizontalEdges.equalToSuperview().inset(25)
+            make.height.equalTo(48)
+            make.top.equalTo(logoImageView.snp.centerY).multipliedBy(1.9)
         }
     }
     
