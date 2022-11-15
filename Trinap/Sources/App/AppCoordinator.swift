@@ -27,3 +27,23 @@ final class AppCoordinator: Coordinator {
         navigationController.pushViewController(splashViewController, animated: false)
     }
 }
+
+// MARK: - Private Methods
+private extension AppCoordinator {
+    
+    func connectAuthFlow() {
+        let authCoordinator = AuthCoordinator(self.navigationController)
+        authCoordinator.delegate = self
+        authCoordinator.start()
+        self.childCoordinators.append(authCoordinator)
+    }
+}
+
+// MARK: - Coodinator Delegate
+extension AppCoordinator: CoordinatorDelegate {
+    
+    func didFinish(childCoordinator: Coordinator) {
+        // TODO: AuthFlow <-> TabBarFlow로 전환 구현
+        Logger.print("끝")
+    }
+}
