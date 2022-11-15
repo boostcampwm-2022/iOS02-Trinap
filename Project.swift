@@ -39,6 +39,9 @@ class BaseProjectFactory: ProjectFactory {
         .external(name: "FirebaseAuth"),
         .external(name: "FirebaseDatabase"),
         .external(name: "FirebaseFirestore"),
+        .external(name: "RealmSwift"),
+        .external(name: "FirebaseStorage"),
+        .external(name: "FirebaseMessaging"),
         .target(name: "Queenfisher")
     ]
     
