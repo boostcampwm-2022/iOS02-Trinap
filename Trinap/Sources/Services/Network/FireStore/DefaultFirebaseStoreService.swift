@@ -13,11 +13,11 @@ import FirebaseFirestore
 import FirebaseStorage
 import RxSwift
 
-enum FireBaseStoreError: Error, LocalizedError {
+enum FireStoreError: Error, LocalizedError {
     case unknown
 }
 
-final class DefaultFireBaseStoreService: FirebaseStoreService {
+final class DefaultFireStoreService: FireStoreService {
     
     // MARK: Properties
     private let database = Firestore.firestore()
@@ -34,7 +34,7 @@ final class DefaultFireBaseStoreService: FirebaseStoreService {
                     single(.failure(error))
                 }
                 guard let snapshot = snapshot, let data = snapshot.data() else {
-                    single(.failure(FireBaseStoreError.unknown))
+                    single(.failure(FireStoreError.unknown))
                     return
                 }
                 single(.success(data))
@@ -57,7 +57,7 @@ final class DefaultFireBaseStoreService: FirebaseStoreService {
                         single(.failure(error))
                     }
                     
-                    guard let snapshot = snapshot else { single(.failure(FireBaseStoreError.unknown))
+                    guard let snapshot = snapshot else { single(.failure(FireStoreError.unknown))
                         return
                     }
                     
@@ -82,7 +82,7 @@ final class DefaultFireBaseStoreService: FirebaseStoreService {
                         single(.failure(error))
                     }
                     
-                    guard let snapshot = snapshot else { single(.failure(FireBaseStoreError.unknown))
+                    guard let snapshot = snapshot else { single(.failure(FireStoreError.unknown))
                         return
                     }
                     
@@ -105,7 +105,7 @@ final class DefaultFireBaseStoreService: FirebaseStoreService {
                     }
                     
                     guard let snapshot = snapshot, let data = snapshot.data() else {
-                        single(.failure(FireBaseStoreError.unknown))
+                        single(.failure(FireStoreError.unknown))
                         return
                     }
                     
@@ -195,6 +195,12 @@ final class DefaultFireBaseStoreService: FirebaseStoreService {
         }
     }
     
+    
+}
+
+// MARK: - Observe
+extension DefaultFireStoreService {
+    
     func observer(collection: FireStoreCollection, document: String) -> Observable<FirebaseData> {
         
         return Observable<FirebaseData>.create { [weak self] observable in
@@ -210,7 +216,7 @@ final class DefaultFireBaseStoreService: FirebaseStoreService {
                     }
                     
                     guard let snapshot = snapshot, let data = snapshot.data() else {
-                        observable.onError(FireBaseStoreError.unknown)
+                        observable.onError(FireStoreError.unknown)
                         return
                     }
                     
@@ -235,7 +241,7 @@ final class DefaultFireBaseStoreService: FirebaseStoreService {
                     }
                     
                     guard let snapshot = snapshot, let data = snapshot.data() else {
-                        observable.onError(FireBaseStoreError.unknown)
+                        observable.onError(FireStoreError.unknown)
                         return
                     }
                     
@@ -244,6 +250,9 @@ final class DefaultFireBaseStoreService: FirebaseStoreService {
             return Disposables.create()
         }
     }
+}
+// MARK: - ImageUpload
+extension DefaultFireStoreService {
     
     func uploadImage(imageData: Data) -> Single<String> {
         
@@ -264,7 +273,7 @@ final class DefaultFireBaseStoreService: FirebaseStoreService {
                 
                 firebaseReference.downloadURL { url, _ in
                     guard let url = url else {
-                        single(.failure(FireBaseStoreError.unknown))
+                        single(.failure(FireStoreError.unknown))
                         return
                     }
                     single(.success(url.absoluteString))
