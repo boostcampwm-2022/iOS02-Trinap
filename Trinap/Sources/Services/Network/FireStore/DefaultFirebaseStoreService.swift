@@ -61,6 +61,26 @@ final class DefaultFireBaseStoreService: FirebaseStoreService {
         }
     }
     
+    func getDocument(collection: String, field: String, in values: [Any]) -> Single<[FirebaseData]> {
+        return Single.create { [weak self] single in
+            guard let self else { return Disposables.create() }
+            self.database.collection(collection)
+                .whereField(field, in: values)
+                .getDocuments { snapshot, error in
+                    if let error = error {
+                        single(.failure(error))
+                    }
+                    guard let snapshot = snapshot else {
+                        single(.failure(FireBaseStoreError.unknown))
+                        return
+                    }
+                    let data = snapshot.documents.map { $0.data() }
+                    single(.success(data))
+                }
+            return Disposables.create()
+        }
+    }
+    
     /// collection의 모든 값 가져올 때
     func getDocument(collection: String) -> Single<[FirebaseData]> {
         return Single.create { [weak self] single in

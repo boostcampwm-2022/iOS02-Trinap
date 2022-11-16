@@ -18,6 +18,7 @@ protocol FirebaseStoreService {
     func getDocument(collection: String) -> Single<[FirebaseData]>
     func getDocument(collection: String, document: String) -> Single<FirebaseData>
     func getDocument(collection: String, field: String, condition: [String]) -> Single<[FirebaseData]>
+    func getDocument(collection: String, field: String, in values: [Any]) -> Single<[FirebaseData]>
     func getDocument(documents: [String]) -> Single<FirebaseData>
     func createDocument(collection: String, document: String, values: FirebaseData) -> Single<Void>
     func createDocument(documents: [String], values: FirebaseData) -> Single<Void>
