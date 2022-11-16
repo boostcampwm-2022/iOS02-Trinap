@@ -9,28 +9,24 @@
 import Foundation
 
 struct ReservationDTO: Codable {
-    let customerserId: String
-    let photographerUserId: String
-    let reservationEndDate: String
+    
+    // MARK: Properties
     let reservationId: String
+    let customerUserId: String
+    let photographerUserId: String
     let reservationStartDate: Date
+    let reservationEndDate: Date
     let status: String
     
-    func toEntity() -> Reservation {
-        Reservation(
-            customerserId: self.customerserId,
-            photographerUserId: self.photographerUserId,
-            reservationEndDate: self.reservationEndDate,
+    // TODO: Date 되어 있는 부분 String으로 변환하는 작업 처리
+    // MARK: Methods
+    func toModel() -> Reservation {
+        return Reservation(
             reservationId: self.reservationId,
-            reservationStartDate: self.reservationStartDate
+            customerUserId: self.customerUserId,
+            photographerUserId: self.photographerUserId,
+            reservationStartDate: self.reservationStartDate,
+            reservationEndDate: self.reservationEndDate
         )
     }
-}
-
-struct Reservation: Codable {
-    let customerserId: String
-    let photographerUserId: String
-    let reservationEndDate: String
-    let reservationId: String
-    let reservationStartDate: Date
 }

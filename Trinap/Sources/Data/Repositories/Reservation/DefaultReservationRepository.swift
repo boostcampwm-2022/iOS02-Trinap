@@ -43,12 +43,12 @@ final class DefaultReservationRepository: ReservationRepository {
             condition: [token]
         )
         .map { datas in
-            datas.compactMap { $0.toObject(type: ReservationDTO.self)?.toEntity() }
+            datas.compactMap { $0.toObject(type: ReservationDTO.self)?.toModel() }
         }
         .asObservable()
     }
     
-    func fetchCustomerReservations() -> RxSwift.Observable<[Reservation]> {
+    func fetchCustomerReservations() -> Observable<[Reservation]> {
         guard let token = keychainManager.getToken() else {
             return .error(TokenManagerError.notFound)
         }
@@ -59,7 +59,7 @@ final class DefaultReservationRepository: ReservationRepository {
             condition: [token]
         )
         .map { datas in
-            datas.compactMap { $0.toObject(type: ReservationDTO.self)?.toEntity() }
+            datas.compactMap { $0.toObject(type: ReservationDTO.self)?.toModel() }
         }
         .asObservable()
     }
@@ -70,7 +70,7 @@ final class DefaultReservationRepository: ReservationRepository {
             collection: .reservations,
             document: reservationId
         )
-        .compactMap { $0.toObject(type: ReservationDTO.self)?.toEntity() }
+        .compactMap { $0.toObject(type: ReservationDTO.self)?.toModel() }
         .asObservable()
     }
     
@@ -79,7 +79,7 @@ final class DefaultReservationRepository: ReservationRepository {
         return fireStore
             .createDocument(
                 collection: .reservations,
-                document: UUID().uuidString,
+                document: reservation.reservationId,
                 values: data
             )
             .asObservable()
@@ -99,7 +99,7 @@ final class DefaultReservationRepository: ReservationRepository {
             collection: .reservations,
             document: reservationId,
             values: ["status": state.rawValue]
-            )
-            .asObservable()
+        )
+        .asObservable()
     } 
 }
