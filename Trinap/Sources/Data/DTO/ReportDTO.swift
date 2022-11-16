@@ -23,4 +23,19 @@ struct ReportDTO: Codable {
         self.status = status
     }
     
+    init(report: Report, status: String) {
+        self.blockId = report.blockId
+        self.blockedUserId = report.blockedUserId
+        self.userId = report.userId
+        self.status = status
+    }
+        
+    // MARK: Methods
+    func toReport() -> Report {
+        return Report(
+            blockId: blockId,
+            blockedUserId: blockedUserId,
+            userId: userId
+        )
+    }
 }
