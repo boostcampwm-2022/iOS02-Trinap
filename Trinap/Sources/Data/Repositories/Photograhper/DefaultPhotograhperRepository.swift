@@ -35,6 +35,19 @@ final class DefaultPhotographerRepository: PhotographerRepository {
         .asObservable()
     }
     
+    func create(photographer: Photograhper) -> Observable<Void> {
+        let dto = PhotographerDTO(
+            photograhper: photographer,
+            status: .activate
+        )
+        guard let value = dto.asDictionary else { return .error(LocalError.structToDictionaryError) }
+        return firebaseStoreService.createDocument(
+            collection: .photographers,
+            document: photographer.photograhperId,
+            values: value)
+            .asObservable()
+    }
+    
     func updatePhotograhperInformation(with information: Photograhper) -> Observable<Void> {
         
         let values = PhotographerDTO(photograhper: information, status: .activate)
