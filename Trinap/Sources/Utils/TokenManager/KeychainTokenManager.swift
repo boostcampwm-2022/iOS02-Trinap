@@ -28,7 +28,10 @@ final class KeychainTokenManager: TokenManager {
         
         let status = SecItemCopyMatching(query as CFDictionary, &item)
         
-        guard status == errSecSuccess else { return nil }
+        guard status == errSecSuccess else {
+            logStatus(status)
+            return nil
+        }
         
         guard
             let existingItem = item as? [String: Any],
@@ -57,6 +60,7 @@ final class KeychainTokenManager: TokenManager {
         } else if status == errSecDuplicateItem {
             return update(tokenData: tokenData)
         } else {
+            logStatus(status)
             return false
         }
     }
@@ -70,7 +74,12 @@ final class KeychainTokenManager: TokenManager {
         
         let status = SecItemUpdate(searchQuery as CFDictionary, updateQuery as CFDictionary)
         
-        return status == errSecSuccess
+        if status == errSecSuccess {
+            return true
+        } else {
+            logStatus(status)
+            return false
+        }
     }
     
     func deleteToken() -> Bool {
@@ -81,6 +90,16 @@ final class KeychainTokenManager: TokenManager {
         
         let status = SecItemDelete(searchQuery as CFDictionary)
         
-        return status == errSecSuccess
+        if status == errSecSuccess {
+            return true
+        } else {
+            logStatus(status)
+            return false
+        }
+    }
+    
+    private func logStatus(_ status: OSStatus) {
+        let description = SecCopyErrorMessageString(status, nil)
+        Logger.print(description ?? "Unknown error detected at Keychain.")
     }
 }
