@@ -19,8 +19,6 @@ enum FireBaseStoreError: Error, LocalizedError {
 
 final class DefaultFireBaseStoreService: FirebaseStoreService {
     
-    typealias FirebaseData = [String: Any]
-    
     //MARK: Properties
     private let database = Firestore.firestore()
     

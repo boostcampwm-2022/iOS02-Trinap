@@ -12,7 +12,7 @@ import RxSwift
 
 protocol FirebaseStoreService {
     
-    associatedtype FirebaseData
+    typealias FirebaseData = [String: Any]
     
     //MARK: Methods
     func getDocument(collection: String) -> Single<[FirebaseData]>
