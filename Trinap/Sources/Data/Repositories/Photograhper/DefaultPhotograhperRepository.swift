@@ -18,14 +18,14 @@ final class DefaultPhotographerRepository: PhotographerRepository {
         self.firebaseStoreService = firebaseStoreService
     }
     
-    func fetchPhotographers(type: TagType) -> Observable<[Photograhper]> {
+    func fetchPhotographers(type: TagType) -> Observable<[Photographer]> {
         
         return firebaseStoreService.getDocument(collection: .photographers)
             .map { $0.compactMap { $0.toObject(type: PhotographerDTO.self)?.toModel() } }
             .asObservable()
     }
     
-    func fetchDetailPhotographer(of photograhperId: String) -> Observable<Photograhper> {
+    func fetchDetailPhotographer(of photograhperId: String) -> Observable<Photographer> {
         
         return firebaseStoreService.getDocument(
             collection: .photographers,
@@ -35,9 +35,22 @@ final class DefaultPhotographerRepository: PhotographerRepository {
         .asObservable()
     }
     
-    func updatePhotograhperInformation(photograhperId: String, with information: Photograhper) -> Observable<Void> {
+    func create(photographer: Photographer) -> Observable<Void> {
+        let dto = PhotographerDTO(
+            photographer: photographer,
+            status: .activate
+        )
+        guard let value = dto.asDictionary else { return .error(LocalError.structToDictionaryError) }
+        return firebaseStoreService.createDocument(
+            collection: .photographers,
+            document: photographer.photographerId,
+            values: value)
+            .asObservable()
+    }
+    
+    func updatePhotograhperInformation(with information: Photographer) -> Observable<Void> {
         
-        let values = PhotographerDTO(photograhper: information, status: .activate)
+        let values = PhotographerDTO(photographer: information, status: .activate)
         
         guard let data = values.asDictionary else {
             return .error(FireStoreError.unknown)
@@ -45,7 +58,7 @@ final class DefaultPhotographerRepository: PhotographerRepository {
         
         return firebaseStoreService.updateDocument(
             collection: .photographers,
-            document: photograhperId,
+            document: information.photographerId,
             values: data
         )
         .asObservable()
