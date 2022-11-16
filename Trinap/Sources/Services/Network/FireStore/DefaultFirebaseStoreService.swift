@@ -176,7 +176,7 @@ final class DefaultFireStoreService: FireStoreService {
         }
     }
     
-    func deleteDocument(collection: FireStoreCollection, document: String, values: FirebaseData) -> Single<Void> {
+    func deleteDocument(collection: FireStoreCollection, document: String) -> Single<Void> {
         
         return Single.create { [weak self] single in
             
@@ -195,7 +195,6 @@ final class DefaultFireStoreService: FireStoreService {
             return Disposables.create()
         }
     }
-    
     
 }
 

@@ -22,7 +22,7 @@ protocol FireStoreService {
     func createDocument(collection: FireStoreCollection, document: String, values: FirebaseData) -> Single<Void>
     func createDocument(documents: [String], values: FirebaseData) -> Single<Void>
     func updateDocument(collection: FireStoreCollection, document: String, values: FirebaseData) -> Single<Void>
-    func deleteDocument(collection: FireStoreCollection, document: String, values: FirebaseData) -> Single<Void>
+    func deleteDocument(collection: FireStoreCollection, document: String) -> Single<Void>
     func observer(collection: FireStoreCollection, document: String) -> Observable<FirebaseData>
     func observer(documents: [String]) -> Observable<FirebaseData>
     func uploadImage(imageData: Data) -> Single<String>
