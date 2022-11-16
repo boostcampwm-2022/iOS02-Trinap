@@ -12,6 +12,13 @@ import RxSwift
 
 final class DefaultReservationRepository: ReservationRepository {
     
+    enum ReservationState: String {
+        case request
+        case confirm
+        case done
+        case cancel
+    }
+    
     // MARK: Properties
     private let fireStore: FirebaseStoreService
     private let keychainManager: KeychainTokenManager

@@ -11,6 +11,10 @@ import Foundation
 import RxSwift
 
 protocol ReservationRepository {
+    
+    associatedtype ReservationState
+    
+    // MARK: Methods
     func fetchPhotographerReservations() -> Observable<[Reservation]>
     func fetchCustomerReservations() -> Observable<[Reservation]>
     func fetchDetail(reservationId: String) -> Observable<Reservation>
