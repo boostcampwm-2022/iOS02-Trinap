@@ -19,10 +19,12 @@ enum FireBaseStoreError: Error, LocalizedError {
 
 final class DefaultFireBaseStoreService: FirebaseStoreService {
     
-    //MARK: Properties
+    typealias FirebaseData = [String: Any]
+    
+    // MARK: Properties
     private let database = Firestore.firestore()
     
-    //MARK: Methods
+    // MARK: Methods
     func getDocument(collection: String, document: String) -> Single<FirebaseData> {
         return Single<FirebaseData>.create { [weak self] single in
             guard let self else { return Disposables.create() }
