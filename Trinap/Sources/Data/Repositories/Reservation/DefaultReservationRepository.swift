@@ -101,6 +101,5 @@ final class DefaultReservationRepository: ReservationRepository {
             values: ["status": state.rawValue]
             )
             .asObservable()
-    }
-    
+    } 
 }

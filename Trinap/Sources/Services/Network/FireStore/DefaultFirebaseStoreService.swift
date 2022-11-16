@@ -216,7 +216,6 @@ final class DefaultFireStoreService: FireStoreService {
             return Disposables.create()
         }
     }
-    
 }
 
 // MARK: - Observe
