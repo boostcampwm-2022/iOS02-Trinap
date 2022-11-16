@@ -53,7 +53,27 @@ final class DefaultUserRepository: UserRepository {
             .asObservable()
     }
     
-    func update(profileImage: URL?, nickname: String?) -> Observable<Void> {
-        return .just(())
+    func update(profileImage: URL?, nickname: String?, isPhotographer: Bool?) -> Observable<Void> {
+        guard let userId = tokenManager.getToken() else {
+            return .error(TokenManagerError.notFound)
+        }
+        
+        var values: [String: Any] = [:]
+        
+        if let profileImage {
+            values.updateValue(profileImage, forKey: "profileImage")
+        }
+        
+        if let nickname {
+            values.updateValue(nickname, forKey: "nickname")
+        }
+        
+        if let isPhotographer {
+            values.updateValue(isPhotographer, forKey: "isPhotographer")
+        }
+        
+        return self.firestoreService
+            .updateDocument(collection: "users", document: userId, values: values)
+            .asObservable()
     }
 }
