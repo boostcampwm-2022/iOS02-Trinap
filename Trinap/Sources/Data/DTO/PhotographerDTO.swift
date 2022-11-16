@@ -9,12 +9,19 @@
 import Foundation
 
 struct PhotographerDTO: Codable {
-    let photograhperId, location, introduction, status: String
+    
+    enum Status: String, Codable {
+        case activate, deactivate
+    }
+    
+    // MARK: - Properties
+    let photograhperId, location, introduction: String
     let tags, pictures: [String]
     let pricePerHalfHour: Int
     let possibleDate: [Date]
+    let status: Status
     
-    init(photograhper: Photograhper, status: String) {
+    init(photograhper: Photograhper, status: Status) {
         self.photograhperId = photograhper.photograhperId
         self.location = photograhper.location
         self.introduction = photograhper.introduction
@@ -25,7 +32,8 @@ struct PhotographerDTO: Codable {
         self.status = status
     }
     
-    func toEntity() -> Photograhper {
+    // MARK: - Methods
+    func toModel() -> Photograhper {
         return Photograhper(
             photograhperId: photograhperId,
             location: location,
@@ -36,16 +44,4 @@ struct PhotographerDTO: Codable {
             possibleDate: possibleDate
         )
     }
-}
-
-struct Photograhper: Codable {
-    let photograhperId, location, introduction: String
-    let tags, pictures: [String]
-    let pricePerHalfHour: Int
-    let possibleDate: [Date]
-}
-
-enum TagType: String {
-    case all
-    case family
 }
