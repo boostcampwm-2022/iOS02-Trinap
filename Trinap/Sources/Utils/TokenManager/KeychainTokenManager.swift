@@ -28,9 +28,11 @@ final class KeychainTokenManager: TokenManager {
         
         guard status == errSecSuccess else { return nil }
         
-        guard let existingItem = item as? [String: Any],
-              let data = existingItem[kSecValueData as String] as? Data,
-              let token = String(data: data, encoding: .utf8) else {
+        guard
+            let existingItem = item as? [String: Any],
+            let data = existingItem[kSecValueData as String] as? Data,
+            let token = String(data: data, encoding: .utf8)
+        else {
             return nil
         }
         

@@ -21,10 +21,10 @@ final class DefaultFireBaseStoreService: FirebaseStoreService {
     
     typealias FirebaseData = [String: Any]
     
-    //MARK: Properties
+    // MARK: Properties
     private let database = Firestore.firestore()
     
-    //MARK: Methods
+    // MARK: Methods
     func getDocument(collection: String, document: String) -> Single<FirebaseData> {
         return Single<FirebaseData>.create { [weak self] single in
             guard let self else { return Disposables.create() }

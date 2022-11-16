@@ -14,7 +14,7 @@ protocol FirebaseStoreService {
     
     associatedtype FirebaseData
     
-    //MARK: Methods
+    // MARK: Methods
     func getDocument(collection: String) -> Single<[FirebaseData]>
     func getDocument(collection: String, document: String) -> Single<FirebaseData>
     func getDocument(collection: String, field: String, condition: [String]) -> Single<[FirebaseData]>
