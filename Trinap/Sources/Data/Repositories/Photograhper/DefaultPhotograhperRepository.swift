@@ -12,9 +12,9 @@ import RxSwift
 
 final class DefaultPhotographerRepository: PhotographerRepository {
     
-    private let firebaseStoreService: FirebaseStoreService
+    private let firebaseStoreService: FireStoreService
     
-    init(firebaseStoreService: FirebaseStoreService) {
+    init(firebaseStoreService: FireStoreService) {
         self.firebaseStoreService = firebaseStoreService
     }
     
@@ -37,10 +37,10 @@ final class DefaultPhotographerRepository: PhotographerRepository {
     
     func updatePhotograhperInformation(photograhperId: String, with information: Photograhper) -> Observable<Void> {
         
-        let values = PhotographerDTO(photograhper: information, status: "active")
+        let values = PhotographerDTO(photograhper: information, status: .activate)
         
         guard let data = values.asDictionary else {
-            return .error(FireBaseStoreError.unknown)
+            return .error(FireStoreError.unknown)
         }
         
         return firebaseStoreService.updateDocument(
