@@ -18,7 +18,7 @@ final class DefaultChatroomRepository: ChatroomRepository {
         self.firebaseStoreService = firebaseStoreService
     }
 
-    func fetch() -> Single<[Chatroom]> {
+    func fetch() -> Observable<[Chatroom]> {
         let userId = "NJwAjxZyNBDMu92wqD73"
         
         return fetchChatrooms(userId: userId, forType: "customerUserId")
@@ -29,9 +29,10 @@ final class DefaultChatroomRepository: ChatroomRepository {
                     .map { $0 + customerChatroomsDTO }
             }
             .map { $0.map { $0.toModel() } }
+            .asObservable()
     }
 
-    func create(customerUserId: String, photographerUserId: String) -> Single<Void> {
+    func create(customerUserId: String, photographerUserId: String) -> Observable<Void> {
         return .just(())
     }
 }

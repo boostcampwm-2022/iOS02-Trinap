@@ -11,6 +11,6 @@ import RxSwift
 protocol ChatroomRepository {
     
     // MARK: - Methods
-    func fetch() -> Single<[Chatroom]>
-    func create(customerUserId: String, photographerUserId: String) -> Single<Void>
+    func fetch() -> Observable<[Chatroom]>
+    func create(customerUserId: String, photographerUserId: String) -> Observable<Void>
 }
