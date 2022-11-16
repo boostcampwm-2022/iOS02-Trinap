@@ -25,6 +25,7 @@ final class DefaultFireStoreService: FireStoreService {
     // MARK: Methods
     func getDocument(collection: FireStoreCollection, document: String) -> Single<FirebaseData> {
         
+
         return Single<FirebaseData>.create { [weak self] single in
             
             guard let self else { return Disposables.create() }
