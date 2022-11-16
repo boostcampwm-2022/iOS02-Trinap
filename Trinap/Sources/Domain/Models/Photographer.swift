@@ -8,12 +8,9 @@
 
 import Foundation
 
-enum TagType: String {
-    case all
-    case family
-}
-
-struct Photograhper: Codable {
+struct Photograhper {
+    
+    // MARK: - Properties
     let photograhperId, location, introduction: String
     let tags, pictures: [String]
     let pricePerHalfHour: Int
