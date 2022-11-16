@@ -6,6 +6,8 @@
 //  Copyright © 2022 Trinap. All rights reserved.
 //
 
+import Foundation
+
 import RxSwift
 
 final class DefaultChatroomRepository: ChatroomRepository {
@@ -33,7 +35,23 @@ final class DefaultChatroomRepository: ChatroomRepository {
     }
 
     func create(customerUserId: String, photographerUserId: String) -> Observable<Void> {
-        return .just(())
+        let chatroom = ChatroomDTO(
+            chatroomId: UUID().uuidString,
+            customerUserId: customerUserId,
+            photographerUserId: photographerUserId,
+            status: .activate
+        )
+        
+        guard let values = chatroom.asDictionary else {
+            return .error(FireBaseStoreError.unknown)
+        }
+        
+        return firebaseStoreService.createDocument(
+            collection: "chatrooms",
+            document: chatroom.chatroomId,
+            values: values
+        )
+        .asObservable()
     }
 }
 
