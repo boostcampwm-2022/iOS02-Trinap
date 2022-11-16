@@ -25,7 +25,7 @@ struct PhotographerDTO: Codable {
         self.status = status
     }
     
-    func toEntity() -> Photograhper {
+    func toModel() -> Photograhper {
         return Photograhper(
             photograhperId: photograhperId,
             location: location,
@@ -36,16 +36,4 @@ struct PhotographerDTO: Codable {
             possibleDate: possibleDate
         )
     }
-}
-
-struct Photograhper: Codable {
-    let photograhperId, location, introduction: String
-    let tags, pictures: [String]
-    let pricePerHalfHour: Int
-    let possibleDate: [Date]
-}
-
-enum TagType: String {
-    case all
-    case family
 }
