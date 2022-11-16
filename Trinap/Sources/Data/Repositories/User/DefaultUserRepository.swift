@@ -40,6 +40,19 @@ final class DefaultUserRepository: UserRepository {
             .asObservable()
     }
     
+    func fetchUsers(userIds: [String]) -> Observable<[User]> {
+        guard let userId = tokenManager.getToken() else {
+            return .error(TokenManagerError.notFound)
+        }
+        
+        let userIds = userIds.filter { $0 != userId }
+        
+        return self.firestoreService
+            .getDocument(collection: "users", field: "userId", in: userIds)
+            .map { $0.compactMap { $0.toObject(UserDTO.self)?.toModel() } }
+            .asObservable()
+    }
+    
     func update(profileImage: URL?, nickname: String?) -> Observable<Void> {
         return .just(())
     }
