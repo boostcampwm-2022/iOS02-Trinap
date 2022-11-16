@@ -23,13 +23,13 @@ final class DefaultFireBaseStoreService: FirebaseStoreService {
     private let database = Firestore.firestore()
     
     // MARK: Methods
-    func getDocument(collection: String, document: String) -> Single<FirebaseData> {
+    func getDocument(collection: FireStoreCollection, document: String) -> Single<FirebaseData> {
         
         return Single<FirebaseData>.create { [weak self] single in
             
             guard let self else { return Disposables.create() }
             
-            self.database.collection(collection).document(document).getDocument { snapshot, error in
+            self.database.collection(collection.name).document(document).getDocument { snapshot, error in
                 if let error = error {
                     single(.failure(error))
                 }
@@ -43,13 +43,13 @@ final class DefaultFireBaseStoreService: FirebaseStoreService {
         }
     }
     
-    func getDocument(collection: String, field: String, condition: [String]) -> Single<[FirebaseData]> {
+    func getDocument(collection: FireStoreCollection, field: String, condition: [String]) -> Single<[FirebaseData]> {
         
         return Single.create { [weak self] single in
             
             guard let self else { return Disposables.create() }
             
-            self.database.collection(collection)
+            self.database.collection(collection.name)
                 .whereField(field, arrayContains: condition)
                 .getDocuments { snapshot, error in
                     
@@ -69,13 +69,13 @@ final class DefaultFireBaseStoreService: FirebaseStoreService {
     }
     
     /// collection의 모든 값 가져올 때
-    func getDocument(collection: String) -> Single<[FirebaseData]> {
+    func getDocument(collection: FireStoreCollection) -> Single<[FirebaseData]> {
         
         return Single.create { [weak self] single in
             
             guard let self else { return Disposables.create() }
             
-            self.database.collection(collection)
+            self.database.collection(collection.name)
                 .getDocuments { snapshot, error in
                     
                     if let error = error {
@@ -115,13 +115,13 @@ final class DefaultFireBaseStoreService: FirebaseStoreService {
         }
     }
     
-    func createDocument(collection: String, document: String, values: FirebaseData) -> Single<Void> {
+    func createDocument(collection: FireStoreCollection, document: String, values: FirebaseData) -> Single<Void> {
         
         return Single.create { [weak self] single in
             
             guard let self else { return Disposables.create() }
             
-            self.database.collection(collection)
+            self.database.collection(collection.name)
                 .document(document)
                 .setData(values) { error in
                     
@@ -155,13 +155,13 @@ final class DefaultFireBaseStoreService: FirebaseStoreService {
     }
 
     
-    func updateDocument(collection: String, document: String, values: FirebaseData) -> Single<Void> {
+    func updateDocument(collection: FireStoreCollection, document: String, values: FirebaseData) -> Single<Void> {
         
         return Single.create { [weak self] single in
             
             guard let self else { return Disposables.create() }
             
-            self.database.collection(collection)
+            self.database.collection(collection.name)
                 .document(document)
                 .updateData(values) { error in
                     
@@ -175,13 +175,13 @@ final class DefaultFireBaseStoreService: FirebaseStoreService {
         }
     }
     
-    func deleteDocument(collection: String, document: String, values: FirebaseData) -> Single<Void> {
+    func deleteDocument(collection: FireStoreCollection, document: String, values: FirebaseData) -> Single<Void> {
         
         return Single.create { [weak self] single in
             
             guard let self else { return Disposables.create() }
             
-            self.database.collection(collection)
+            self.database.collection(collection.name)
                 .document(document)
                 .delete { error in
                     
@@ -195,13 +195,13 @@ final class DefaultFireBaseStoreService: FirebaseStoreService {
         }
     }
     
-    func observer(collection: String, document: String) -> Observable<FirebaseData> {
+    func observer(collection: FireStoreCollection, document: String) -> Observable<FirebaseData> {
         
         return Observable<FirebaseData>.create { [weak self] observable in
             
             guard let self else { return Disposables.create() }
             
-            self.database.collection(collection)
+            self.database.collection(collection.name)
                 .document(document)
                 .addSnapshotListener { snapshot, error in
                     

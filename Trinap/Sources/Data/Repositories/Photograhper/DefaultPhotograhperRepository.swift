@@ -20,7 +20,7 @@ final class DefaultPhotographerRepository: PhotographerRepository {
     
     func fetchPhotographers(type: TagType) -> Observable<[Photograhper]> {
         
-        return firebaseStoreService.getDocument(collection: FireStoreCollectionName.photographers.rawValue)
+        return firebaseStoreService.getDocument(collection: .photographers)
             .map { $0.compactMap { $0.toObject(type: PhotographerDTO.self)?.toModel() } }
             .asObservable()
     }
@@ -28,7 +28,7 @@ final class DefaultPhotographerRepository: PhotographerRepository {
     func fetchDetailPhotographer(of photograhperId: String) -> Observable<Photograhper> {
         
         return firebaseStoreService.getDocument(
-            collection: FireStoreCollectionName.photographers.rawValue,
+            collection: .photographers,
             document: photograhperId
         )
         .compactMap { $0.toObject(type: PhotographerDTO.self)?.toModel() }
@@ -44,7 +44,7 @@ final class DefaultPhotographerRepository: PhotographerRepository {
         }
         
         return firebaseStoreService.updateDocument(
-            collection: FireStoreCollectionName.photographers.rawValue,
+            collection: .photographers,
             document: photograhperId,
             values: data
         )
@@ -62,7 +62,7 @@ final class DefaultPhotographerRepository: PhotographerRepository {
                 updateImages.append(url)
                 let values = ["pictures": updateImages]
                 return owner.firebaseStoreService.updateDocument(
-                    collection: FireStoreCollectionName.photographers.rawValue,
+                    collection: .photographers,
                     document: photograhperId,
                     values: values
                 )
