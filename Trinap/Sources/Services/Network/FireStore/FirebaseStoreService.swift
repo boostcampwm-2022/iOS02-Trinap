@@ -27,4 +27,8 @@ protocol FireStoreService {
     func observer(collection: FireStoreCollection, document: String) -> Observable<FirebaseData>
     func observer(documents: [String]) -> Observable<FirebaseData>
     func uploadImage(imageData: Data) -> Single<String>
+    
+    // MARK: - Added
+    func getDocuments(documents: [String]) -> Single<[FirebaseData]>
+    func observe(documents: [String]) -> Observable<[FirebaseData]>
 }

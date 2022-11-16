@@ -1,0 +1,16 @@
+//
+//  ChatRepository.swift
+//  Trinap
+//
+//  Created by 김세영 on 2022/11/16.
+//  Copyright © 2022 Trinap. All rights reserved.
+//
+
+import RxSwift
+
+protocol ChatRepository {
+    
+    // MARK: - Methods
+    func observe(chatroomId: String) -> Observable<[Chat]>
+    func send(chat: Chat, at chatroomId: String) -> Observable<Void>
+}
