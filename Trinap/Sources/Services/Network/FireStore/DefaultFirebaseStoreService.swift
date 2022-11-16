@@ -72,6 +72,7 @@ final class DefaultFireStoreService: FireStoreService {
     func getDocument(collection: String, field: String, in values: [Any]) -> Single<[FirebaseData]> {
         return Single.create { [weak self] single in
             guard let self else { return Disposables.create() }
+            
             self.database.collection(collection)
                 .whereField(field, in: values)
                 .getDocuments { snapshot, error in
@@ -79,7 +80,7 @@ final class DefaultFireStoreService: FireStoreService {
                         single(.failure(error))
                     }
                     guard let snapshot = snapshot else {
-                        single(.failure(FireBaseStoreError.unknown))
+                        single(.failure(FireStoreError.unknown))
                         return
                     }
                     let data = snapshot.documents.map { $0.data() }
@@ -197,7 +198,7 @@ final class DefaultFireStoreService: FireStoreService {
         }
     }
     
-    func deleteDocument(collection: FireStoreCollection, document: String, values: FirebaseData) -> Single<Void> {
+    func deleteDocument(collection: FireStoreCollection, document: String) -> Single<Void> {
         
         return Single.create { [weak self] single in
             
@@ -216,8 +217,6 @@ final class DefaultFireStoreService: FireStoreService {
             return Disposables.create()
         }
     }
-    
-    
 }
 
 // MARK: - Observe

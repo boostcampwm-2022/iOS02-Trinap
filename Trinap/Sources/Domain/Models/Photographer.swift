@@ -8,10 +8,10 @@
 
 import Foundation
 
-struct Photograhper {
-    
+struct Photographer {
+        
     // MARK: - Properties
-    let photograhperId, location, introduction: String
+    let photographerId, location, introduction: String
     let tags, pictures: [String]
     let pricePerHalfHour: Int
     let possibleDate: [Date]
