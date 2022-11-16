@@ -31,4 +31,26 @@ final class DefaultChatRepository: ChatRepository {
             .map { $0.compactMap { $0.toObject(ChatDTO.self)?.toModel() } }
             .asObservable()
     }
+    
+    func send(chat: Chat, at chatroomId: String) -> Observable<Void> {
+        guard let userId = tokenManager.getToken() else {
+            return .error(TokenManagerError.notFound)
+        }
+        
+        let chatDTO = ChatDTO(
+            chatId: chat.chatId,
+            senderUserId: userId,
+            chatType: chat.chatType,
+            content: chat.content,
+            isChecked: chat.isChecked
+        )
+        
+        guard let values = chatDTO.asDictionary else {
+            return .error(FireBaseStoreError.unknown)
+        }
+        
+        return self.firestoreService
+            .createDocument(documents: ["chatrooms", chatroomId, "chats", chatDTO.chatId], values: values)
+            .asObservable()
+    }
 }

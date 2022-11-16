@@ -102,26 +102,6 @@ final class DefaultFireBaseStoreService: FirebaseStoreService {
     }
     
     // TODO: 아래 getDocument(documents:) -> Single<[String: Any]> 사용하시나요?
-    func getDocuments(documents: [String]) -> Single<[FirebaseData]> {
-        return Single.create { single in
-            self.database.collection(documents.joined(separator: "/"))
-                .getDocuments { snapshot, error in
-                    if let error = error {
-                        Logger.print(error)
-                        single(.failure(error))
-                        return
-                    }
-                    guard let snapshot = snapshot else {
-                        single(.failure(FireBaseStoreError.unknown))
-                        return
-                    }
-                    let data = snapshot.documents.map { $0.data() }
-                    single(.success(data))
-                }
-            return Disposables.create()
-        }
-    }
-    
     func getDocument(documents: [String]) -> Single<[String: Any]> {
         return Single.create { single in
             self.database.document(documents.joined(separator: "/"))
@@ -221,27 +201,6 @@ final class DefaultFireBaseStoreService: FirebaseStoreService {
         }
     }
     
-    func observe(documents: [String]) -> Observable<[FirebaseData]> {
-        return Observable.create { [weak self] observable in
-            guard let self else { return Disposables.create() }
-            self.database
-                .collection(documents.joined(separator: "/"))
-                .addSnapshotListener { snapshot, error in
-                    if let error = error {
-                        observable.onError(error)
-                    }
-                    guard let snapshot = snapshot else {
-                        observable.onError(FireBaseStoreError.unknown)
-                        return
-                    }
-                    let data = snapshot.documents.map { $0.data() }
-                    
-                    observable.onNext(data)
-                }
-            return Disposables.create()
-        }
-    }
-    
     func observer(documents: [String]) -> Observable<FirebaseData> {
         return Observable<FirebaseData>.create { [weak self] observable in
             guard let self else { return Disposables.create() }
@@ -279,6 +238,48 @@ final class DefaultFireBaseStoreService: FirebaseStoreService {
                     single(.success(url.absoluteString))
                 }
             }
+            return Disposables.create()
+        }
+    }
+    
+    // MARK: - Added
+    func getDocuments(documents: [String]) -> Single<[FirebaseData]> {
+        return Single.create { single in
+            self.database.collection(documents.joined(separator: "/"))
+                .getDocuments { snapshot, error in
+                    if let error = error {
+                        Logger.print(error)
+                        single(.failure(error))
+                        return
+                    }
+                    guard let snapshot = snapshot else {
+                        single(.failure(FireBaseStoreError.unknown))
+                        return
+                    }
+                    let data = snapshot.documents.map { $0.data() }
+                    single(.success(data))
+                }
+            return Disposables.create()
+        }
+    }
+    
+    func observe(documents: [String]) -> Observable<[FirebaseData]> {
+        return Observable.create { [weak self] observable in
+            guard let self else { return Disposables.create() }
+            self.database
+                .collection(documents.joined(separator: "/"))
+                .addSnapshotListener { snapshot, error in
+                    if let error = error {
+                        observable.onError(error)
+                    }
+                    guard let snapshot = snapshot else {
+                        observable.onError(FireBaseStoreError.unknown)
+                        return
+                    }
+                    let data = snapshot.documents.map { $0.data() }
+                    
+                    observable.onNext(data)
+                }
             return Disposables.create()
         }
     }

@@ -12,4 +12,5 @@ protocol ChatRepository {
     
     // MARK: - Methods
     func observe(chatroomId: String) -> Observable<[Chat]>
+    func send(chat: Chat, at chatroomId: String) -> Observable<Void>
 }
