@@ -35,7 +35,7 @@ final class DefaultPhotographerRepository: PhotographerRepository {
         .asObservable()
     }
     
-    func updatePhotograhperInformation(photograhperId: String, with information: Photograhper) -> Observable<Void> {
+    func updatePhotograhperInformation(with information: Photograhper) -> Observable<Void> {
         
         let values = PhotographerDTO(photograhper: information, status: .activate)
         
@@ -45,7 +45,7 @@ final class DefaultPhotographerRepository: PhotographerRepository {
         
         return firebaseStoreService.updateDocument(
             collection: .photographers,
-            document: photograhperId,
+            document: information.photograhperId,
             values: data
         )
         .asObservable()

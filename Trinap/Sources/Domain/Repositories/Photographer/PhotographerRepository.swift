@@ -11,8 +11,11 @@ import Foundation
 import RxSwift
 
 protocol PhotographerRepository {
+    
+    // MARK: Methods
     func fetchPhotographers(type: TagType) -> Observable<[Photograhper]>
     func fetchDetailPhotographer(of photograhperId: String) -> Observable<Photograhper>
-    func updatePhotograhperInformation(photograhperId: String, with information: Photograhper) -> Observable<Void>
+    func create(photographer: Photograhper) -> Observable<Void>
+    func updatePhotograhperInformation(with information: Photograhper) -> Observable<Void>
     func updatePortfolioPictures(photograhperId: String, with images: [String], image: Data) -> Observable<Void>
 }
