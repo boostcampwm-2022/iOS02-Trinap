@@ -10,9 +10,11 @@ import Foundation
 
 final class KeychainTokenManager: TokenManager {
     
+    // MARK: - Properties
     private let keychainAccount = "com.tnzkm.keychain"
     private let securityClass = kSecClassGenericPassword
     
+    // MARK: - Methods
     func getToken() -> Token? {
         let query: [CFString: Any] = [
             kSecClass: securityClass,
