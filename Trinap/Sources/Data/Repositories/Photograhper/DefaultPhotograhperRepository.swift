@@ -19,23 +19,29 @@ final class DefaultPhotographerRepository: PhotographerRepository {
     }
     
     func fetchPhotographers(type: TagType) -> Observable<[Photograhper]> {
+        
         return firebaseStoreService.getDocument(collection: FireStoreCollectionName.photographers.rawValue)
-            .map { $0.compactMap { $0.toObject(type: PhotographerDTO.self)?.toEntity() } }
+            .map { $0.compactMap { $0.toObject(type: PhotographerDTO.self)?.toModel() } }
             .asObservable()
     }
     
     func fetchDetailPhotographer(of photograhperId: String) -> Observable<Photograhper> {
+        
         return firebaseStoreService.getDocument(
             collection: FireStoreCollectionName.photographers.rawValue,
             document: photograhperId
         )
-        .compactMap { $0.toObject(type: PhotographerDTO.self)?.toEntity() }
+        .compactMap { $0.toObject(type: PhotographerDTO.self)?.toModel() }
         .asObservable()
     }
     
     func updatePhotograhperInformation(photograhperId: String, with information: Photograhper) -> Observable<Void> {
+        
         let values = PhotographerDTO(photograhper: information, status: "active")
-        guard let data = values.asDictionary else { return Observable.just(()) }
+        
+        guard let data = values.asDictionary else {
+            return .error(FireBaseStoreError.unknown)
+        }
         
         return firebaseStoreService.updateDocument(
             collection: FireStoreCollectionName.photographers.rawValue,
