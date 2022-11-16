@@ -20,53 +20,87 @@ final class DefaultReservationRepository: ReservationRepository {
     }
     
     // MARK: Properties
-    private let fireStore: FirebaseStoreService
-    private let keychainManager: KeychainTokenManager
-    private let token: Token
+    private let fireStore: FireStoreService
+    private let keychainManager: TokenManager
     
-    init(firebaseStoreService: FirebaseStoreService, keychainManager: KeychainTokenManager) {
+    init(
+        firebaseStoreService: FireStoreService,
+        keychainManager: TokenManager
+    ) {
         self.fireStore = firebaseStoreService
         self.keychainManager = keychainManager
-        guard let token = keychainManager.getToken() else { return }
-        self.token = token
     }
     
     // MARK: Methods
     func fetchPhotographerReservations() -> Observable<[Reservation]> {
+        guard let token = keychainManager.getToken() else {
+            return .error(TokenManagerError.notFound)
+        }
         
-        fireStore.getDocument(collection: "reservations", field: "photograhperUserId", condition: [token])
-            .map { datas in
-                datas.compactMap { $0.toObject(type: ReservationDTO.self)?.toEntity() }
-            }
-            .asObservable()
+        return fireStore.getDocument(
+            collection: .reservations,
+            field: "photograhperUserId",
+            condition: [token]
+        )
+        .map { datas in
+            datas.compactMap { $0.toObject(type: ReservationDTO.self)?.toEntity() }
+        }
+        .asObservable()
     }
     
     func fetchCustomerReservations() -> RxSwift.Observable<[Reservation]> {
-        <#code#>
+        guard let token = keychainManager.getToken() else {
+            return .error(TokenManagerError.notFound)
+        }
+        
+        return fireStore.getDocument(
+            collection: .reservations,
+            field: "customerUserId",
+            condition: [token]
+        )
+        .map { datas in
+            datas.compactMap { $0.toObject(type: ReservationDTO.self)?.toEntity() }
+        }
+        .asObservable()
     }
-
     
     // document가 reservationId라고 가정하고 진행함
     func fetchDetail(reservationId: String) -> Observable<Reservation> {
-        fireStore.getDocument(collection: "reservations", document: reservationId)
-            .compactMap { $0.toObject(type: ReservationDTO.self)?.toEntity()}
-            .asObservable()
+        return fireStore.getDocument(
+            collection: .reservations,
+            document: reservationId
+        )
+        .compactMap { $0.toObject(type: ReservationDTO.self)?.toEntity() }
+        .asObservable()
     }
     
     func addReservation(reservation: Reservation) -> Observable<Bool> {
         guard let data = reservation.asDictionary else { return Observable.just(false) }
-        return fireStore.createDocument(collection: "reservations", document: UUID().uuidString, values: data)
+        return fireStore
+            .createDocument(
+                collection: .reservations,
+                document: UUID().uuidString,
+                values: data
+            )
             .asObservable()
             .map { true }
     }
     
     func deleteReservation(reservationId: String) -> Observable<Void> {
-        <#code#>
+        return fireStore.deleteDocument(
+            collection: .reservations,
+            document: reservationId
+        )
+        .asObservable()
     }
     
-    func updateState(reservationId: String, state: String) -> Observable<Void> {
-        <#code#>
+    func updateState(reservationId: String, state: ReservationState) -> Observable<Void> {
+        return fireStore.updateDocument(
+            collection: .reservations,
+            document: reservationId,
+            values: ["status": state.rawValue]
+            )
+            .asObservable()
     }
-    
     
 }
