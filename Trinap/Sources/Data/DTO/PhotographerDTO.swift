@@ -15,27 +15,27 @@ struct PhotographerDTO: Codable {
     }
     
     // MARK: - Properties
-    let photograhperId, location, introduction: String
+    let photographerId, location, introduction: String
     let tags, pictures: [String]
     let pricePerHalfHour: Int
     let possibleDate: [Date]
     let status: Status
     
-    init(photograhper: Photograhper, status: Status) {
-        self.photograhperId = photograhper.photograhperId
-        self.location = photograhper.location
-        self.introduction = photograhper.introduction
-        self.tags = photograhper.tags
-        self.pictures = photograhper.pictures
-        self.pricePerHalfHour = photograhper.pricePerHalfHour
-        self.possibleDate = photograhper.possibleDate
+    init(photographer: Photographer, status: Status) {
+        self.photographerId = photographer.photographerId
+        self.location = photographer.location
+        self.introduction = photographer.introduction
+        self.tags = photographer.tags
+        self.pictures = photographer.pictures
+        self.pricePerHalfHour = photographer.pricePerHalfHour
+        self.possibleDate = photographer.possibleDate
         self.status = status
     }
     
     // MARK: - Methods
-    func toModel() -> Photograhper {
-        return Photograhper(
-            photograhperId: photograhperId,
+    func toModel() -> Photographer {
+        return Photographer(
+            photographerId: photographerId,
             location: location,
             introduction: introduction,
             tags: tags,
