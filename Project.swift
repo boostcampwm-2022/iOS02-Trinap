@@ -42,6 +42,8 @@ class BaseProjectFactory: ProjectFactory {
         .external(name: "RealmSwift"),
         .external(name: "FirebaseStorage"),
         .external(name: "FirebaseMessaging"),
+        .external(name: "SnapKit"),
+        .target(name: "Queenfisher")
     ]
     
     let infoPlist: [String: InfoPlist.Value] = [
@@ -90,6 +92,15 @@ class BaseProjectFactory: ProjectFactory {
                 scripts: [.pre(path: "Scripts/SwiftLintRunScript.sh", arguments: [], name: "SwiftLint")],
                 dependencies: dependencies
             ),
+            Target(
+                name: "Queenfisher",
+                platform: .iOS,
+                product: .framework,
+                bundleId: "com.tnzkm.\(projectName).Queenfisher",
+                infoPlist: .default,
+                sources: ["Queenfisher/Sources/**"],
+                dependencies: []
+            )
         ]
     }
 }

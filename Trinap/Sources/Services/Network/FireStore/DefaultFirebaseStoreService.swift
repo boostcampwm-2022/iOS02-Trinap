@@ -13,16 +13,16 @@ import FirebaseFirestore
 import FirebaseStorage
 import RxSwift
 
-enum FireBaseStoreError: Error, LocalizedError {
-    case unknown
-}
-
 final class DefaultFireBaseStoreService: FirebaseStoreService {
     
-    //MARK: Properties
+    enum FireBaseStoreError: Error, LocalizedError {
+        case unknown
+    }
+    
+    // MARK: Properties
     private let database = Firestore.firestore()
     
-    //MARK: Methods
+    // MARK: Methods
     func getDocument(collection: String, document: String) -> Single<FirebaseData> {
         return Single<FirebaseData>.create { [weak self] single in
             guard let self else { return Disposables.create() }
