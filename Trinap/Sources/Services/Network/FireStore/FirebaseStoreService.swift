@@ -12,9 +12,9 @@ import RxSwift
 
 protocol FirebaseStoreService {
     
-    associatedtype FirebaseData
+    typealias FirebaseData = [String: Any]
     
-    //MARK: Methods
+    // MARK: Methods
     func getDocument(collection: String) -> Single<[FirebaseData]>
     func getDocument(collection: String, document: String) -> Single<FirebaseData>
     func getDocument(collection: String, field: String, condition: [String]) -> Single<[FirebaseData]>
@@ -27,4 +27,8 @@ protocol FirebaseStoreService {
     func observer(collection: String, document: String) -> Observable<FirebaseData>
     func observer(documents: [String]) -> Observable<FirebaseData>
     func uploadImage(imageData: Data) -> Single<String>
+}
+
+enum FireStoreCollectionName: String {
+    case blocks, chatrooms, photographers, reservations, reviews, users
 }
