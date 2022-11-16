@@ -10,9 +10,13 @@ import Foundation
 
 struct Chatroom {
     
+    enum Status: String, Codable {
+        case activate, deactivate
+    }
+    
     // MARK: - Properties
     let chatroomId: String
     let customerUserId: String
     let photographerUserId: String
-    let status: ChatroomDTO.Status
+    let status: Status
 }

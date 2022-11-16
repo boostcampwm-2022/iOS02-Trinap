@@ -10,11 +10,15 @@ import Foundation
 
 struct User {
     
+    enum Status: String, Codable {
+        case activate, deactivate
+    }
+    
     // MARK: - Properties
     let userId: String
     let nickname: String
     let profileImage: URL?
     let isPhotographer: Bool
     let fcmToken: String
-    let status: UserDTO.Status
+    let status: Status
 }

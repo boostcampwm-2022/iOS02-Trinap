@@ -10,15 +10,11 @@ import Foundation
 
 struct ChatroomDTO: Codable {
     
-    enum Status: String, Codable {
-        case activate, deactivate
-    }
-    
     // MARK: - Properties
     let chatroomId: String
     let customerUserId: String
     let photographerUserId: String
-    let status: Status
+    let status: Chatroom.Status
     
     // MARK: - Methods
     func toModel() -> Chatroom {

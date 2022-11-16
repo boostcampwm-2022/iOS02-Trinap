@@ -10,6 +10,13 @@ import Foundation
 
 struct Chat {
     
+    enum ChatType: String, Codable {
+        case text
+        case image
+        case reservation
+        case location
+    }
+    
     // MARK: - Properties
     let chatId: String
     let senderUserId: String

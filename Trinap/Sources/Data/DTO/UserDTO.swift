@@ -10,17 +10,13 @@ import Foundation
 
 struct UserDTO: Codable {
     
-    enum Status: String, Codable {
-        case activate, deactivate
-    }
-    
     // MARK: - Properties
     let userId: String
     let nickname: String
     let profileImage: String
     let isPhotographer: Bool
     let fcmToken: String
-    let status: Status
+    let status: User.Status
     
     // MARK: - Methods
     func toModel() -> User {

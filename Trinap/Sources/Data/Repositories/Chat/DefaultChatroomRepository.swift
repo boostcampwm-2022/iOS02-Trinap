@@ -14,14 +14,21 @@ final class DefaultChatroomRepository: ChatroomRepository {
 
     // MARK: - Properties
     private let firebaseStoreService: FirebaseStoreService
+    private let tokenManager: TokenManager
 
     // MARK: - Methods
-    init(firebaseStoreService: FirebaseStoreService) {
+    init(
+        firebaseStoreService: FirebaseStoreService,
+        tokenManager: TokenManager = KeychainTokenManager()
+    ) {
         self.firebaseStoreService = firebaseStoreService
+        self.tokenManager = tokenManager
     }
 
     func fetch() -> Observable<[Chatroom]> {
-        let userId = "NJwAjxZyNBDMu92wqD73"
+        guard let userId = tokenManager.getToken() else {
+            return .error(TokenManagerError.notFound)
+        }
         
         return fetchChatrooms(userId: userId, forType: "customerUserId")
             .flatMap { [weak self] customerChatroomsDTO -> Single<[ChatroomDTO]> in

@@ -10,17 +10,10 @@ import Foundation
 
 struct ChatDTO: Codable {
     
-    enum ChatType: String, Codable {
-        case text
-        case image
-        case reservation
-        case location
-    }
-    
     // MARK: - Properties
     let chatId: String
     let senderUserId: String
-    let chatType: ChatType
+    let chatType: Chat.ChatType
     let content: String
     let isChecked: Bool
 //    let createdAt: Date
