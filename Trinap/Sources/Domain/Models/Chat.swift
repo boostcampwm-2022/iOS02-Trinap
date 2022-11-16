@@ -20,7 +20,7 @@ struct Chat {
     // MARK: - Properties
     let chatId: String
     let senderUserId: String
-    let chatType: ChatDTO.ChatType
+    let chatType: ChatType
     let content: String
     let isChecked: Bool
 //    let createdAt: Date

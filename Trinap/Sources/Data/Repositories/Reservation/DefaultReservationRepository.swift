@@ -43,7 +43,7 @@ final class DefaultReservationRepository: ReservationRepository {
             condition: [token]
         )
         .map { datas in
-            datas.compactMap { $0.toObject(type: ReservationDTO.self)?.toModel() }
+            datas.compactMap { $0.toObject(ReservationDTO.self)?.toModel() }
         }
         .asObservable()
     }
@@ -59,7 +59,7 @@ final class DefaultReservationRepository: ReservationRepository {
             condition: [token]
         )
         .map { datas in
-            datas.compactMap { $0.toObject(type: ReservationDTO.self)?.toModel() }
+            datas.compactMap { $0.toObject(ReservationDTO.self)?.toModel() }
         }
         .asObservable()
     }
@@ -70,7 +70,7 @@ final class DefaultReservationRepository: ReservationRepository {
             collection: .reservations,
             document: reservationId
         )
-        .compactMap { $0.toObject(type: ReservationDTO.self)?.toModel() }
+        .compactMap { $0.toObject(ReservationDTO.self)?.toModel() }
         .asObservable()
     }
     

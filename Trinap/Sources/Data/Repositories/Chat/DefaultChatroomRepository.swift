@@ -13,12 +13,12 @@ import RxSwift
 final class DefaultChatroomRepository: ChatroomRepository {
 
     // MARK: - Properties
-    private let firebaseStoreService: FirebaseStoreService
+    private let firebaseStoreService: FireStoreService
     private let tokenManager: TokenManager
 
     // MARK: - Methods
     init(
-        firebaseStoreService: FirebaseStoreService,
+        firebaseStoreService: FireStoreService,
         tokenManager: TokenManager = KeychainTokenManager()
     ) {
         self.firebaseStoreService = firebaseStoreService
@@ -32,7 +32,7 @@ final class DefaultChatroomRepository: ChatroomRepository {
         
         return fetchChatrooms(userId: userId, forType: "customerUserId")
             .flatMap { [weak self] customerChatroomsDTO -> Single<[ChatroomDTO]> in
-                guard let self else { return .error(FireBaseStoreError.unknown) }
+                guard let self else { return .error(FireStoreError.unknown) }
                 
                 return self.fetchChatrooms(userId: userId, forType: "photographerUserId")
                     .map { $0 + customerChatroomsDTO }
@@ -50,11 +50,11 @@ final class DefaultChatroomRepository: ChatroomRepository {
         )
         
         guard let values = chatroom.asDictionary else {
-            return .error(FireBaseStoreError.unknown)
+            return .error(FireStoreError.unknown)
         }
         
         return firebaseStoreService.createDocument(
-            collection: "chatrooms",
+            collection: .chatrooms,
             document: chatroom.chatroomId,
             values: values
         )

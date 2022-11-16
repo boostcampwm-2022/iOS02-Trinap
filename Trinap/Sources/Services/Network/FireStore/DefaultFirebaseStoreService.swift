@@ -1,5 +1,5 @@
 //
-//  DefaultFirebaseStoreService.swift
+//  DefaultFireStoreService.swift
 //  Trinap
 //
 //  Created by Doyun Park on 2022/11/15.
@@ -315,7 +315,7 @@ extension DefaultFireStoreService {
                         return
                     }
                     guard let snapshot = snapshot else {
-                        single(.failure(FireBaseStoreError.unknown))
+                        single(.failure(FireStoreError.unknown))
                         return
                     }
                     let data = snapshot.documents.map { $0.data() }
@@ -335,7 +335,7 @@ extension DefaultFireStoreService {
                         observable.onError(error)
                     }
                     guard let snapshot = snapshot else {
-                        observable.onError(FireBaseStoreError.unknown)
+                        observable.onError(FireStoreError.unknown)
                         return
                     }
                     let data = snapshot.documents.map { $0.data() }

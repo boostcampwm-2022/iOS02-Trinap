@@ -13,12 +13,12 @@ import RxSwift
 final class DefaultUserRepository: UserRepository {
     
     // MARK: - Properties
-    private let firestoreService: FirebaseStoreService
+    private let firestoreService: FireStoreService
     private let tokenManager: TokenManager
     
     // MARK: - Methods
     init(
-        firestoreService: FirebaseStoreService,
+        firestoreService: FireStoreService,
         tokenManager: TokenManager = KeychainTokenManager()
     ) {
         self.firestoreService = firestoreService
@@ -35,7 +35,7 @@ final class DefaultUserRepository: UserRepository {
     
     func fetch(userId: String) -> Observable<User> {
         return self.firestoreService
-            .getDocument(collection: "users", document: userId)
+            .getDocument(collection: .users, document: userId)
             .compactMap { $0.toObject(UserDTO.self)?.toModel() }
             .asObservable()
     }
@@ -73,7 +73,7 @@ final class DefaultUserRepository: UserRepository {
         }
         
         return self.firestoreService
-            .updateDocument(collection: "users", document: userId, values: values)
+            .updateDocument(collection: .users, document: userId, values: values)
             .asObservable()
     }
 }
