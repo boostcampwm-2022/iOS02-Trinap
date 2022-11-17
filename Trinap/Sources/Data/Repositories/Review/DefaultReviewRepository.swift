@@ -18,6 +18,7 @@ enum ReviewTarget: String {
 
 final class DefaultReviewRepository: ReviewRepository {
     
+    // MARK: - Properties
     private let fireStoreService: FireStoreService
     private let keychainManager: TokenManager
     
@@ -26,15 +27,14 @@ final class DefaultReviewRepository: ReviewRepository {
         self.keychainManager = KeychainTokenManager()
     }
     
+    // MARK: - Methods
     func fetchReviews(id: String, target: ReviewTarget) -> Observable<[Review]> {
-        
         return fireStoreService.getDocument(collection: .reviews, field: target.rawValue, in: [id])
             .map { $0.compactMap { $0.toObject(ReviewDTO.self)?.toModel() } }
             .asObservable()
     }
     
     func createReview(to photograhper: String, review: Review) -> Observable<Bool> {
-        
         guard let token = keychainManager.getToken() else {
             return .error(TokenManagerError.notFound)
         }
