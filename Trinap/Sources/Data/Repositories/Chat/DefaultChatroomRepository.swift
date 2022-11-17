@@ -67,7 +67,7 @@ private extension DefaultChatroomRepository {
     
     func fetchChatrooms(userId: String, forType userType: String) -> Single<[ChatroomDTO]> {
         return self.firebaseStoreService
-            .getDocument(collection: "chatrooms", field: userType, in: [userId])
+            .getDocument(collection: .chatrooms, field: userType, in: [userId])
             .map { $0.compactMap { $0.toObject() } }
     }
 }
