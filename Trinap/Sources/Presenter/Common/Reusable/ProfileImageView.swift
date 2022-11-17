@@ -38,6 +38,6 @@ final class ProfileImageView: UIImageView {
     }
     
     func setImage(at profileImageURL: URL?) {
-        self.qf.setImage(at: profileImageURL)
+        self.qf.setImage(at: profileImageURL, scale: 2)
     }
 }

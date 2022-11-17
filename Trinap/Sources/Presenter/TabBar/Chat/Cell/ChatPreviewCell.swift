@@ -8,6 +8,8 @@
 
 import UIKit
 
+import RxSwift
+import RxCocoa
 import SnapKit
 
 final class ChatPreviewCell: BaseTableViewCell {
@@ -53,14 +55,13 @@ final class ChatPreviewCell: BaseTableViewCell {
     // MARK: - Initializer
     
     // MARK: - Methods
-    func bind(
-    
-    func configureCell(_ chatPreview: ChatPreview) {
-        self.profileImageView.setImage(at: chatPreview.profileImage)
-        self.nicknameLabel.text = chatPreview.nickname
-        self.chatPreviewLabel.text = chatPreview.content
-        self.dateLabel.text = ["어제", "15시 38분", "10월 23일"].randomElement() ?? "?"
-        self.unreadAccessoryView.isHidden = !chatPreview.isChecked
+    func bind(lastChatPreview: Driver<ChatPreview>) {
+        lastChatPreview.drive { [weak self] chatPreview in
+            guard let self else { return }
+            
+            self.configureCell(chatPreview)
+        }
+        .disposed(by: disposeBag)
     }
     
     override func prepareForReuse() {
@@ -112,5 +113,17 @@ final class ChatPreviewCell: BaseTableViewCell {
             make.trailing.equalToSuperview().offset(-padding)
             make.centerY.equalTo(self.chatPreviewLabel.snp.centerY)
         }
+    }
+}
+
+// MARK: - Privates
+extension ChatPreviewCell {
+    
+    private func configureCell(_ chatPreview: ChatPreview) {
+        self.profileImageView.setImage(at: chatPreview.profileImage)
+        self.nicknameLabel.text = chatPreview.nickname
+        self.chatPreviewLabel.text = chatPreview.content
+        self.dateLabel.text = ["어제", "15시 38분", "10월 23일"].randomElement() ?? "?"
+        self.unreadAccessoryView.isHidden = !chatPreview.isChecked
     }
 }
