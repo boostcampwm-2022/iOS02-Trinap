@@ -101,7 +101,7 @@ final class DefaultAuthRepository: AuthRepository {
         }
     }
 
-    func dropOut() -> Observable<Void> {
+    func dropOut() -> Single<Void> {
         guard let user = Auth.auth().currentUser else {
             return .error(FireStoreError.unknown)
         }
@@ -117,6 +117,5 @@ final class DefaultAuthRepository: AuthRepository {
             
             return Disposables.create()
         }
-        .asObservable()
     }
 }
