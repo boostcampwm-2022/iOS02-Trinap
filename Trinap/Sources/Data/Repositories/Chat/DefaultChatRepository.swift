@@ -11,6 +11,7 @@ import Foundation
 import FirestoreService
 import RxSwift
 
+// TODO: - 각 메서드에 Date 기준으로 Chat sort하는 코드 넣기
 final class DefaultChatRepository: ChatRepository {
     
     // MARK: - Properties
@@ -30,6 +31,14 @@ final class DefaultChatRepository: ChatRepository {
         return self.firestoreService
             .observe(documents: ["chatrooms", chatroomId, "chats"])
             .map { $0.compactMap { $0.toObject(ChatDTO.self)?.toModel() } }
+            .asObservable()
+    }
+    
+    func fetchLastChat(chatroomId: String) -> Observable<Chat> {
+        return self.firestoreService
+            .getDocuments(documents: ["chatrooms", chatroomId, "chats"])
+            .map { $0.compactMap { $0.toObject(ChatDTO.self)?.toModel() } }
+            .compactMap { $0.last }
             .asObservable()
     }
     

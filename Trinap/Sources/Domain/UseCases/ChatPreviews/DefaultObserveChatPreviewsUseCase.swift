@@ -1,5 +1,5 @@
 //
-//  DefaultFetchChatPreviewsUseCase.swift
+//  DefaultObserveChatPreviewsUseCase.swift
 //  Trinap
 //
 //  Created by 김세영 on 2022/11/16.
@@ -10,7 +10,7 @@ import Foundation
 
 import RxSwift
 
-final class DefaultFetchChatPreviewsUseCase: FetchChatPreviewsUseCase {
+final class DefaultObserveChatPreviewsUseCase: ObserveChatPreviewsUseCase {
     
     // MARK: - Properties
     private let chatroomRepository: ChatroomRepository
@@ -28,7 +28,7 @@ final class DefaultFetchChatPreviewsUseCase: FetchChatPreviewsUseCase {
     func execute() -> Observable<[ChatPreview]> {
         return chatroomRepository.fetch()
             .withUnretained(self)
-            .flatMap { (owner, chatrooms) -> Observable<[ChatPreview]> in
+            .flatMap { owner, chatrooms -> Observable<[ChatPreview]> in
                 let customerUserIds = chatrooms.map { $0.customerUserId }
                 let photographerUserIds = chatrooms.map { $0.photographerUserId }
                 
@@ -42,7 +42,7 @@ final class DefaultFetchChatPreviewsUseCase: FetchChatPreviewsUseCase {
     }
 }
 
-private extension DefaultFetchChatPreviewsUseCase {
+private extension DefaultObserveChatPreviewsUseCase {
     
     func mapChatPreview(chatrooms: [Chatroom], users: [User]) -> [ChatPreview] {
         var chatPreviews: [ChatPreview] = []
@@ -57,7 +57,7 @@ private extension DefaultFetchChatPreviewsUseCase {
                         profileImage: user.profileImage,
                         nickname: user.nickname,
                         content: "네?",
-                        date: Date(),
+//                        date: Date(),
                         isChecked: .random()
                     )
                     
