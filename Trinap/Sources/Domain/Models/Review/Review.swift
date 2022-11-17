@@ -14,6 +14,6 @@ enum ReviewTarget: String {
 }
 
 struct Review {
-    let reviewId, photographerId, creatorId, contents, status: String
+    let reviewId, photographerUserId, creatorUserId, contents, status: String
     let rating: Int
 }

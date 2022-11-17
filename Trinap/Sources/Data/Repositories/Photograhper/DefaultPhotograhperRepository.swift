@@ -17,11 +17,8 @@ final class DefaultPhotographerRepository: PhotographerRepository {
     private let fireStoreService: FireStoreService
     private let tokenManager: TokenManager
     
-    init(
-        firebaseStoreService: FireStoreService,
-        tokenManager: TokenManager
-    ) {
-        self.fireStoreService = firebaseStoreService
+    init(tokenManager: TokenManager) {
+        self.fireStoreService = DefaultFireStoreService()
         self.tokenManager = tokenManager
     }
     
@@ -33,7 +30,7 @@ final class DefaultPhotographerRepository: PhotographerRepository {
     }
     
     func fetchPhotographers(ids: [String]) -> Observable<[Photographer]> {
-        return fireStoreService.getDocument(collection: .photographers, field: "photographerUserId", in: ids)
+        return fireStoreService.getDocument(collection: .photographers, field: "photographerId", in: ids)
             .map { $0.compactMap { $0.toObject(PhotographerDTO.self)?.toModel() } }
             .asObservable()
     }

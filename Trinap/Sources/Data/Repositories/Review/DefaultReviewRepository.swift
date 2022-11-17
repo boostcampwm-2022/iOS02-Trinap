@@ -29,14 +29,14 @@ final class DefaultReviewRepository: ReviewRepository {
             .asObservable()
     }
     
-    func createReview(to photograhper: String, review: Review) -> Observable<Bool> {
+    func createReview(to photographer: String, review: Review) -> Observable<Bool> {
         guard let token = keychainManager.getToken() else {
             return .error(TokenManagerError.notFound)
         }
         
         let dto = ReviewDTO(
             creatorUserId: token,
-            photographerUserId: photograhper,
+            photographerUserId: photographer,
             reviewId: review.reviewId,
             contents: review.contents,
             status: review.status,
