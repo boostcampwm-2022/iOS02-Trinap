@@ -33,6 +33,8 @@ final class DefaultPhotographerRepository: PhotographerRepository {
             .asObservable()
     }
     
+    //TODO: 지역으로 검색하는 메소드 MapService 구현 후 적용
+    
     func fetchDetailPhotographer(of photograhperId: String) -> Observable<Photographer> {
         
         return firebaseStoreService.getDocument(
