@@ -22,6 +22,8 @@ public final class DefaultFireStoreService: FireStoreService {
     // MARK: Properties
     private let database = Firestore.firestore()
     
+    public init() { }
+    
     // MARK: Methods
     public func getDocument(collection: FireStoreCollection, document: String) -> Single<FirebaseData> {
         
@@ -69,11 +71,11 @@ public final class DefaultFireStoreService: FireStoreService {
         }
     }
     
-    public func getDocument(collection: String, field: String, in values: [Any]) -> Single<[FirebaseData]> {
+    public func getDocument(collection: FireStoreCollection, field: String, in values: [Any]) -> Single<[FirebaseData]> {
         return Single.create { [weak self] single in
             guard let self else { return Disposables.create() }
             
-            self.database.collection(collection)
+            self.database.collection(collection.name)
                 .whereField(field, in: values)
                 .getDocuments { snapshot, error in
                     if let error = error {
