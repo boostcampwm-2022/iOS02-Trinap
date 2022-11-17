@@ -15,9 +15,9 @@ import RxSwift
 protocol AuthRepository {
     
     // MARK: - Methods
-    func checkUser() -> Observable<Void>
-    func signOut() -> Observable<Void>
-    func dropOut() -> Observable<Void>
+    func checkUser() -> Single<Bool>
     func createUser(nickname: String, fcmToken: String) -> Observable<Void>
     func signIn(with cretencial: OAuthCredential) -> Single<String>
+    func signOut() -> Single<Void>
+    func dropOut() -> Observable<Void>
 }

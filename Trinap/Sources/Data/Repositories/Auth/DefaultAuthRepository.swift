@@ -18,7 +18,7 @@ final class DefaultAuthRepository: AuthRepository {
     private let firebaseStoreService: FireStoreService
     private let tokenManager: TokenManager
     
-    // MARK: - Methods
+    // MARK: Initializer
     init(
         firebaseStoreService: FireStoreService = DefaultFireStoreService(),
         tokenManager: TokenManager = KeychainTokenManager()
@@ -27,6 +27,7 @@ final class DefaultAuthRepository: AuthRepository {
         self.tokenManager = tokenManager
     }
     
+    // MARK: - Methods
     func checkUser() -> Single<Bool> {
         guard let userId = tokenManager.getToken() else {
             return .error(TokenManagerError.notFound)
@@ -37,7 +38,6 @@ final class DefaultAuthRepository: AuthRepository {
             document: userId
         )
         .map { !$0.isEmpty }
-//        .asObservable()
     }
 
     func createUser(nickname: String, fcmToken: String) -> Observable<Void> {
@@ -87,24 +87,36 @@ final class DefaultAuthRepository: AuthRepository {
         }
     }
     
-//    func signOut() -> Single<Void> {
-//        return Single.create { single in
-//                    
-//            do {
-//                try Auth.auth().signOut()
-//                // TODO: 로그아웃 성공시 이렇게 처리하는게 맞을까요..?
-//                single(.success(()))
-//            } catch let error {
-//                single(.failure(error))
-//                return
-//            }
-//            return Disposables.create()
-//        }
-//    }
-//
-//    func dropOut() -> RxSwift.Observable<Void> {
-//        <#code#>
-//    }
-    
-    
+    func signOut() -> Single<Void> {
+        return Single.create { single in
+
+            do {
+                try Auth.auth().signOut()
+                single(.success(()))
+            } catch let error {
+                single(.failure(error))
+                return Disposables.create()
+            }
+            return Disposables.create()
+        }
+    }
+
+    func dropOut() -> Observable<Void> {
+        guard let user = Auth.auth().currentUser else {
+            return .error(FireStoreError.unknown)
+        }
+        
+        return Single.create { single in
+            user.delete { error in
+                if let error = error {
+                    single(.failure(error))
+                    return
+                }
+                single(.success(()))
+            }
+            
+            return Disposables.create()
+        }
+        .asObservable()
+    }
 }
