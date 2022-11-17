@@ -24,7 +24,7 @@ struct ChatroomDTO: Codable {
             customerUserId: customerUserId,
             photographerUserId: photographerUserId,
             status: status,
-            updatedAt: <#T##Date#>
+            updatedAt: Date.fromStringOrNow(updatedAt)
         )
     }
 }

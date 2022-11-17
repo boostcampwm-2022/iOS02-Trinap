@@ -14,6 +14,9 @@ extension Date {
         case yearToDay = "yyyy.MM.dd"
         case yearToSecond = "yyyy-MM-dd HH:mm:ss"
         case timeStamp = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        case hourAndMinute = "HH:mm"
+        case monthAndDate = "M월 d일"
+        case yearAndMonthAndDate = "YYYY년 M월 d일"
     }
     
     // MARK: Methods
@@ -51,6 +54,11 @@ extension Date {
         
         formatter.dateFormat = format.rawValue
         formatter.locale = Locale(identifier: "ko_KR")
+        
+        if formatter.date(from: string) == nil {
+            Logger.print("string -> date failed.")
+        }
+        
         return formatter.date(from: string) ?? Date()
     }
 }
