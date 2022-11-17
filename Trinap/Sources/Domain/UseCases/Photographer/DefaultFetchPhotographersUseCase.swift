@@ -1,5 +1,5 @@
 //
-//  FetchPhotographersUseCase.swift
+//  DefaultFetchPhotographersUseCase.swift
 //  Trinap
 //
 //  Created by kimchansoo on 2022/11/17.
