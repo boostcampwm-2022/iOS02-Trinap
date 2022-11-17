@@ -1,8 +1,8 @@
 //
 //  RxTest+.swift
-//  ReciptopiaTests
+//  TrinapTests
 //
-//  Created by 김세영 on 2022/05/09.
+//  Created by 김세영 on 2022/11/17.
 //
 
 import XCTest
@@ -12,11 +12,12 @@ import RxTest
 
 extension XCTestCase {
     
-    /// Recorded Events를 생성합니다.
-    /// 랜덤한 Unit Time 간격으로 
+    /// 랜덤한 Unit Time 간격으로 Recorded Events를 생성합니다.
     ///
     /// ```
     /// let events = makeRecordedEvnets([1, 2, 3])
+    ///
+    /// // ----1---2------3----|-->
     /// ```
     func makeRecordedEvents<Element>(
         by elements: [Element],
