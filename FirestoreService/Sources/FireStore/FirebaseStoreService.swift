@@ -31,4 +31,5 @@ public protocol FireStoreService {
     // MARK: - Added
     func getDocuments(documents: [String]) -> Single<[FirebaseData]>
     func observe(documents: [String]) -> Observable<[FirebaseData]>
+    func observe(collection: FireStoreCollection, field: String, in values: [Any]) -> Observable<[FirebaseData]>
 }

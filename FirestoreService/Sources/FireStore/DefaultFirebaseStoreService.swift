@@ -25,6 +25,8 @@ public final class DefaultFireStoreService: FireStoreService {
     public init() {}
     
     // MARK: Methods
+    public init() {}
+    
     public func getDocument(collection: FireStoreCollection, document: String) -> Single<FirebaseData> {
         
 
@@ -331,6 +333,28 @@ public extension DefaultFireStoreService {
             guard let self else { return Disposables.create() }
             self.database
                 .collection(documents.joined(separator: "/"))
+                .addSnapshotListener { snapshot, error in
+                    if let error = error {
+                        observable.onError(error)
+                    }
+                    guard let snapshot = snapshot else {
+                        observable.onError(FireStoreError.unknown)
+                        return
+                    }
+                    let data = snapshot.documents.map { $0.data() }
+                    
+                    observable.onNext(data)
+                }
+            return Disposables.create()
+        }
+    }
+    
+    func observe(collection: FireStoreCollection, field: String, in values: [Any]) -> Observable<[FirebaseData]> {
+        return Observable.create { [weak self] observable in
+            guard let self else { return Disposables.create() }
+            self.database
+                .collection(collection.name)
+                .whereField(field, in: values)
                 .addSnapshotListener { snapshot, error in
                     if let error = error {
                         observable.onError(error)

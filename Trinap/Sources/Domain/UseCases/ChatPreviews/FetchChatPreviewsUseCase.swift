@@ -1,5 +1,5 @@
 //
-//  FetchChatPreviewsUseCase.swift
+//  ObserveChatPreviewsUseCase.swift
 //  Trinap
 //
 //  Created by 김세영 on 2022/11/16.
@@ -8,7 +8,7 @@
 
 import RxSwift
 
-protocol FetchChatPreviewsUseCase {
+protocol ObserveChatPreviewsUseCase {
     
     // MARK: - Methods
     func execute() -> Observable<[ChatPreview]>

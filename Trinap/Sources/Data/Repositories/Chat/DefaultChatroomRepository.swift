@@ -31,15 +31,14 @@ final class DefaultChatroomRepository: ChatroomRepository {
             return .error(TokenManagerError.notFound)
         }
         
-        return fetchChatrooms(userId: userId, forType: "customerUserId")
-            .flatMap { [weak self] customerChatroomsDTO -> Single<[ChatroomDTO]> in
+        return observeChatrooms(userId: userId, forType: "customerUserId")
+            .flatMap { [weak self] customerChatroomsDTO -> Observable<[ChatroomDTO]> in
                 guard let self else { return .error(FireStoreError.unknown) }
                 
-                return self.fetchChatrooms(userId: userId, forType: "photographerUserId")
+                return self.observeChatrooms(userId: userId, forType: "photographerUserId")
                     .map { $0 + customerChatroomsDTO }
             }
             .map { $0.map { $0.toModel() } }
-            .asObservable()
     }
 
     func create(customerUserId: String, photographerUserId: String) -> Observable<Void> {
@@ -65,9 +64,9 @@ final class DefaultChatroomRepository: ChatroomRepository {
 
 private extension DefaultChatroomRepository {
     
-    func fetchChatrooms(userId: String, forType userType: String) -> Single<[ChatroomDTO]> {
+    func observeChatrooms(userId: String, forType userType: String) -> Observable<[ChatroomDTO]> {
         return self.firebaseStoreService
-            .getDocument(collection: .chatrooms, field: userType, in: [userId])
+            .observe(collection: .chatrooms, field: userType, in: [userId])
             .map { $0.compactMap { $0.toObject() } }
     }
 }

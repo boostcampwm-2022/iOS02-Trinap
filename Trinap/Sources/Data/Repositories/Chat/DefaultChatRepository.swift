@@ -11,6 +11,7 @@ import Foundation
 import FirestoreService
 import RxSwift
 
+// TODO: - 각 메서드에 Date 기준으로 Chat sort하는 코드 넣기
 final class DefaultChatRepository: ChatRepository {
     
     // MARK: - Properties
