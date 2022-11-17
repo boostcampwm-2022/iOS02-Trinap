@@ -1,5 +1,5 @@
 //
-//  DefaultFirebaseStoreService.swift
+//  DefaultFireStoreService.swift
 //  Trinap
 //
 //  Created by Doyun Park on 2022/11/15.

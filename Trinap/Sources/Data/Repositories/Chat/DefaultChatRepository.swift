@@ -13,12 +13,12 @@ import RxSwift
 final class DefaultChatRepository: ChatRepository {
     
     // MARK: - Properties
-    private let firestoreService: FirebaseStoreService
+    private let firestoreService: FireStoreService
     private let tokenManager: TokenManager
     
     // MARK: - Methods
     init(
-        firestoreService: FirebaseStoreService,
+        firestoreService: FireStoreService,
         tokenManager: TokenManager = KeychainTokenManager()
     ) {
         self.firestoreService = firestoreService
@@ -46,7 +46,7 @@ final class DefaultChatRepository: ChatRepository {
         )
         
         guard let values = chatDTO.asDictionary else {
-            return .error(FireBaseStoreError.unknown)
+            return .error(FireStoreError.unknown)
         }
         
         return self.firestoreService
