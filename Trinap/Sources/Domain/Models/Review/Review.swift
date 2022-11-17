@@ -8,7 +8,12 @@
 
 import Foundation
 
+enum ReviewTarget: String {
+    case customer = "creatorUserId"
+    case photographer = "photographerUserId"
+}
+
 struct Review {
-    let reviewId, contents, status: String
+    let reviewId, photographerId, creatorId, contents, status: String
     let rating: Int
 }

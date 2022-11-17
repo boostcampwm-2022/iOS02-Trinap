@@ -11,11 +11,6 @@ import Foundation
 import FirestoreService
 import RxSwift
 
-enum ReviewTarget: String {
-    case customer = "creatorUserId"
-    case photographer = "photographerUserId"
-}
-
 final class DefaultReviewRepository: ReviewRepository {
     
     // MARK: - Properties
