@@ -47,8 +47,6 @@ private extension DefaultObserveChatPreviewsUseCase {
     func mapChatPreview(chatrooms: [Chatroom], users: [User]) -> [ChatPreview] {
         var chatPreviews: [ChatPreview] = []
         
-        // TODO: 로직 깔끔하게 처리해보기
-        // TODO: content, date, isChecked 업데이트하기
         for user in users {
             for chatroom in chatrooms {
                 if user.userId == chatroom.customerUserId || user.userId == chatroom.photographerUserId {
@@ -56,9 +54,9 @@ private extension DefaultObserveChatPreviewsUseCase {
                         chatroomId: chatroom.chatroomId,
                         profileImage: user.profileImage,
                         nickname: user.nickname,
-                        content: "네?",
-//                        date: Date(),
-                        isChecked: .random()
+                        content: "",
+                        date: chatroom.updatedAt,
+                        isChecked: false
                     )
                     
                     chatPreviews.append(chatPreview)

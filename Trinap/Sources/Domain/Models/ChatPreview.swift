@@ -23,7 +23,7 @@ extension ChatPreview: Hashable {
     
     static var onError: Self {
         return ChatPreview(
-            chatroomId: "",
+            chatroomId: UUID().uuidString,
             profileImage: nil,
             nickname: "",
             content: "오류가 발생했습니다.",
