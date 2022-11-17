@@ -31,16 +31,36 @@ final class DefaultAuthRepository: AuthRepository {
 //
 //    }
 //
-//    func createUser(with fcmToken: String) -> RxSwift.Observable<Void> {
-//        <#code#>
-//    }
+    func createUser(nickname: String, fcmToken: String) -> Observable<Void> {
+        guard let userId = tokenManager.getToken() else {
+            return .error(TokenManagerError.notFound)
+        }
+        let user = UserDTO(
+            userId: userId,
+            nickname: nickname,
+            // TODO: nil or 빈 문자열?
+            profileImage: "",
+            isPhotographer: false,
+            fcmToken: fcmToken,
+            status: .activate
+        )
+        
+        guard let values = user.asDictionary else {
+            return .error(FireStoreError.unknown)
+        }
+        
+        return firebaseStoreService.createDocument(
+            collection: .users,
+            document: user.userId,
+            values: values
+        )
+        .asObservable()
+    }
     
-    func signIn(with cretencial: OAuthCredential) -> RxSwift.Single<String> {
-        return Single.create { [weak self] single in
-            
-            guard let self else { return Disposables.create() }
-            
-            Auth.auth().signIn(with: cretencial){ authResult, error in //
+    func signIn(with cretencial: OAuthCredential) -> Single<String> {
+        return Single.create { single in
+                        
+            Auth.auth().signIn(with: cretencial) { authResult, error in
                 if let error = error {
                     single(.failure(error))
                     return
@@ -58,8 +78,19 @@ final class DefaultAuthRepository: AuthRepository {
         }
     }
     
-//    func signOut() -> RxSwift.Observable<Void> {
-//        <#code#>
+//    func signOut() -> Single<Void> {
+//        return Single.create { single in
+//                    
+//            do {
+//                try Auth.auth().signOut()
+//                // TODO: 로그아웃 성공시 이렇게 처리하는게 맞을까요..?
+//                single(.success(()))
+//            } catch let error {
+//                single(.failure(error))
+//                return
+//            }
+//            return Disposables.create()
+//        }
 //    }
 //
 //    func dropOut() -> RxSwift.Observable<Void> {
