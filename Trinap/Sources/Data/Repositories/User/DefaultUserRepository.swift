@@ -49,7 +49,7 @@ final class DefaultUserRepository: UserRepository {
         let userIds = userIds.filter { $0 != userId }
         
         return self.firestoreService
-            .getDocument(collection: "users", field: "userId", in: userIds)
+            .getDocument(collection: .users, field: "userId", in: userIds)
             .map { $0.compactMap { $0.toObject(UserDTO.self)?.toModel() } }
             .asObservable()
     }
