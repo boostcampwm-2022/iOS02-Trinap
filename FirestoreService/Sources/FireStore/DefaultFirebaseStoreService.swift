@@ -23,6 +23,8 @@ public final class DefaultFireStoreService: FireStoreService {
     private let database = Firestore.firestore()
     
     // MARK: Methods
+    public init() {}
+    
     public func getDocument(collection: FireStoreCollection, document: String) -> Single<FirebaseData> {
         
 
