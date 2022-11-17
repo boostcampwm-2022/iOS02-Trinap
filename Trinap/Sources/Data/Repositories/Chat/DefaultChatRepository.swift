@@ -34,14 +34,6 @@ final class DefaultChatRepository: ChatRepository {
             .asObservable()
     }
     
-    func fetchLastChat(chatroomId: String) -> Observable<Chat> {
-        return self.firestoreService
-            .getDocuments(documents: ["chatrooms", chatroomId, "chats"])
-            .map { $0.compactMap { $0.toObject(ChatDTO.self)?.toModel() } }
-            .compactMap { $0.last }
-            .asObservable()
-    }
-    
     func send(chat: Chat, at chatroomId: String) -> Observable<Void> {
         guard let userId = tokenManager.getToken() else {
             return .error(TokenManagerError.notFound)
