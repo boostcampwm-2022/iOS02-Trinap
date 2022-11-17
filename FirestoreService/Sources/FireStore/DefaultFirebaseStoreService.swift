@@ -22,7 +22,7 @@ public final class DefaultFireStoreService: FireStoreService {
     // MARK: Properties
     private let database = Firestore.firestore()
     
-    public init() { }
+    public init() {}
     
     // MARK: Methods
     public func getDocument(collection: FireStoreCollection, document: String) -> Single<FirebaseData> {
