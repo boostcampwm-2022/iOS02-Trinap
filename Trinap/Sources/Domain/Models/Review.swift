@@ -9,6 +9,6 @@
 import Foundation
 
 struct Review {
-    let creatorUserId, photographerUserId, reviewId, contents, status: String
+    let reviewId, contents, status: String
     let rating: Int
 }

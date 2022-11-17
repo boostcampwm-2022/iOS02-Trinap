@@ -14,10 +14,9 @@ struct ReviewDTO: Codable {
     let creatorUserId, photographerUserId, reviewId, contents, status: String
     let rating: Int
     
+    // MARK: - Methods
     func toModel() -> Review {
         return Review(
-            creatorUserId: creatorUserId,
-            photographerUserId: photographerUserId,
             reviewId: reviewId,
             contents: contents,
             status: status,
