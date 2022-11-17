@@ -11,8 +11,9 @@ import Foundation
 struct Photographer {
         
     // MARK: - Properties
-    let photographerId, location, introduction: String
-    let tags, pictures: [String]
+    let photographerId, photographerUserId, location, introduction: String
+    let tags: [TagType]
+    let pictures: [String]
     let pricePerHalfHour: Int
     let possibleDate: [Date]
 }

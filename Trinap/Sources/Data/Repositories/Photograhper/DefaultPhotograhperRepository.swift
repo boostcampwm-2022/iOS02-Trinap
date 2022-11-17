@@ -13,12 +13,19 @@ import RxSwift
 
 final class DefaultPhotographerRepository: PhotographerRepository {
     
+    // MARK: Properties
     private let firebaseStoreService: FireStoreService
+    private let tokenManager: TokenManager
     
-    init(firebaseStoreService: FireStoreService) {
+    init(
+        firebaseStoreService: FireStoreService,
+        tokenManager: TokenManager
+    ) {
         self.firebaseStoreService = firebaseStoreService
+        self.tokenManager = tokenManager
     }
     
+    // MARK: Methods
     func fetchPhotographers(type: TagType) -> Observable<[Photographer]> {
         
         return firebaseStoreService.getDocument(collection: .photographers)
@@ -37,10 +44,17 @@ final class DefaultPhotographerRepository: PhotographerRepository {
     }
     
     func create(photographer: Photographer) -> Observable<Void> {
-        let dto = PhotographerDTO(
+        guard let token = tokenManager.getToken() else {
+            return .error(TokenManagerError.notFound)
+        }
+
+        var dto = PhotographerDTO(
             photographer: photographer,
             status: .activate
         )
+        
+        dto.photographerUserId = token
+        
         guard let value = dto.asDictionary else { return .error(LocalError.structToDictionaryError) }
         return firebaseStoreService.createDocument(
             collection: .photographers,
