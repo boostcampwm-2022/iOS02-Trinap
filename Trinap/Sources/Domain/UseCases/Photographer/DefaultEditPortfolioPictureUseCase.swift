@@ -43,4 +43,16 @@ final class DefaultEditPortfolioPictureUseCase: EditPortfolioPictureUseCase {
         return photographerRepository
             .updatePhotograhperInformation(with: updated)
     }
+    
+    func addPortfolioPictures(
+        photographerId: String,
+        currentPictures: [String],
+        pictureData: Data) -> Observable<Void> {
+        return photographerRepository
+            .updatePortfolioPictures(
+                photograhperId: photographerId,
+                with: currentPictures,
+                image: pictureData
+            )
+    }
 }
