@@ -50,7 +50,7 @@ extension ChatPreviewsViewModel {
     
     private func observeChatPreviews() -> Driver<[ChatPreview]> {
         return observeChatPreviewsUseCase.execute()
-            .asDriver(onErrorJustReturn: [])
+            .asDriver(onErrorJustReturn: [.onError])
     }
     
     private func mapChatToChatPreview(chat: Chat, baseChatPreview: ChatPreview) -> ChatPreview {

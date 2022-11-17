@@ -123,7 +123,7 @@ extension ChatPreviewCell {
         self.profileImageView.setImage(at: chatPreview.profileImage)
         self.nicknameLabel.text = chatPreview.nickname
         self.chatPreviewLabel.text = chatPreview.content
-        self.dateLabel.text = ["어제", "15시 38분", "10월 23일"].randomElement() ?? "?"
+        self.dateLabel.text = chatPreview.date.properText
         self.unreadAccessoryView.isHidden = !chatPreview.isChecked
     }
 }
