@@ -27,10 +27,19 @@ final class DefaultAuthRepository: AuthRepository {
         self.tokenManager = tokenManager
     }
     
-//    func checkUser() -> RxSwift.Observable<Void> {
-//
-//    }
-//
+    func checkUser() -> Single<Bool> {
+        guard let userId = tokenManager.getToken() else {
+            return .error(TokenManagerError.notFound)
+        }
+        
+        return self.firebaseStoreService.getDocument(
+            collection: .users,
+            document: userId
+        )
+        .map { !$0.isEmpty }
+//        .asObservable()
+    }
+
     func createUser(nickname: String, fcmToken: String) -> Observable<Void> {
         guard let userId = tokenManager.getToken() else {
             return .error(TokenManagerError.notFound)
@@ -49,7 +58,7 @@ final class DefaultAuthRepository: AuthRepository {
             return .error(FireStoreError.unknown)
         }
         
-        return firebaseStoreService.createDocument(
+        return self.firebaseStoreService.createDocument(
             collection: .users,
             document: user.userId,
             values: values
