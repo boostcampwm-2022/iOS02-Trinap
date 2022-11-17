@@ -43,3 +43,14 @@ extension Date {
         return formatter.date(from: dateString)
     }
 }
+
+extension Date {
+    
+    static func fromStringOrNow(_ string: String, ofFormat format: Format = .timeStamp) -> Date {
+        let formatter = DateFormatter()
+        
+        formatter.dateFormat = format.rawValue
+        formatter.locale = Locale(identifier: "ko_KR")
+        return formatter.date(from: string) ?? Date()
+    }
+}
