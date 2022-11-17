@@ -12,14 +12,7 @@ import FirestoreService
 import RxSwift
 
 final class DefaultReservationRepository: ReservationRepository {
-    
-    enum ReservationState: String {
-        case request
-        case confirm
-        case done
-        case cancel
-    }
-    
+        
     // MARK: Properties
     private let fireStore: FireStoreService
     private let keychainManager: TokenManager
@@ -95,7 +88,7 @@ final class DefaultReservationRepository: ReservationRepository {
         .asObservable()
     }
     
-    func updateState(reservationId: String, state: ReservationState) -> Observable<Void> {
+    func updateState(reservationId: String, state: Reservation.State) -> Observable<Void> {
         return fireStore.updateDocument(
             collection: .reservations,
             document: reservationId,

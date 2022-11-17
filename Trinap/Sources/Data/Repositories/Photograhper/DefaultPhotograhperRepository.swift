@@ -13,18 +13,27 @@ import RxSwift
 
 final class DefaultPhotographerRepository: PhotographerRepository {
     
+    // MARK: Properties
     private let firebaseStoreService: FireStoreService
+    private let tokenManager: TokenManager
     
-    init(firebaseStoreService: FireStoreService) {
+    init(
+        firebaseStoreService: FireStoreService,
+        tokenManager: TokenManager
+    ) {
         self.firebaseStoreService = firebaseStoreService
+        self.tokenManager = tokenManager
     }
     
+    // MARK: Methods
     func fetchPhotographers(type: TagType) -> Observable<[Photographer]> {
         
         return firebaseStoreService.getDocument(collection: .photographers)
             .map { $0.compactMap { $0.toObject(PhotographerDTO.self)?.toModel() } }
             .asObservable()
     }
+    
+    //TODO: 지역으로 검색하는 메소드 MapService 구현 후 적용
     
     func fetchDetailPhotographer(of photograhperId: String) -> Observable<Photographer> {
         
@@ -37,10 +46,17 @@ final class DefaultPhotographerRepository: PhotographerRepository {
     }
     
     func create(photographer: Photographer) -> Observable<Void> {
-        let dto = PhotographerDTO(
+        guard let token = tokenManager.getToken() else {
+            return .error(TokenManagerError.notFound)
+        }
+
+        var dto = PhotographerDTO(
             photographer: photographer,
             status: .activate
         )
+        
+        dto.photographerUserId = token
+        
         guard let value = dto.asDictionary else { return .error(LocalError.structToDictionaryError) }
         return firebaseStoreService.createDocument(
             collection: .photographers,
