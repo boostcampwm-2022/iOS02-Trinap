@@ -1,5 +1,5 @@
 //
-//  DefaultFirebaseStoreService.swift
+//  DefaultFireStoreService.swift
 //  Trinap
 //
 //  Created by Doyun Park on 2022/11/15.
@@ -13,17 +13,17 @@ import FirebaseFirestore
 import FirebaseStorage
 import RxSwift
 
-enum FireStoreError: Error, LocalizedError {
+public enum FireStoreError: Error, LocalizedError {
     case unknown
 }
 
-final class DefaultFireStoreService: FireStoreService {
+public final class DefaultFireStoreService: FireStoreService {
     
     // MARK: Properties
     private let database = Firestore.firestore()
     
     // MARK: Methods
-    func getDocument(collection: FireStoreCollection, document: String) -> Single<FirebaseData> {
+    public func getDocument(collection: FireStoreCollection, document: String) -> Single<FirebaseData> {
         
 
         return Single<FirebaseData>.create { [weak self] single in
@@ -44,24 +44,45 @@ final class DefaultFireStoreService: FireStoreService {
         }
     }
     
-    func getDocument(collection: FireStoreCollection, field: String, condition: [String]) -> Single<[FirebaseData]> {
-        
+    public func getDocument(collection: FireStoreCollection, field: String, condition: [String]) -> Single<[FirebaseData]> {
+    
         return Single.create { [weak self] single in
-            
+    
             guard let self else { return Disposables.create() }
-            
+    
             self.database.collection(collection.name)
                 .whereField(field, arrayContains: condition)
                 .getDocuments { snapshot, error in
-                    
+    
                     if let error = error {
                         single(.failure(error))
                     }
-                    
+    
                     guard let snapshot = snapshot else { single(.failure(FireStoreError.unknown))
                         return
                     }
-                    
+    
+                    let data = snapshot.documents.map { $0.data() }
+                    single(.success(data))
+                }
+            return Disposables.create()
+        }
+    }
+    
+    public func getDocument(collection: String, field: String, in values: [Any]) -> Single<[FirebaseData]> {
+        return Single.create { [weak self] single in
+            guard let self else { return Disposables.create() }
+            
+            self.database.collection(collection)
+                .whereField(field, in: values)
+                .getDocuments { snapshot, error in
+                    if let error = error {
+                        single(.failure(error))
+                    }
+                    guard let snapshot = snapshot else {
+                        single(.failure(FireStoreError.unknown))
+                        return
+                    }
                     let data = snapshot.documents.map { $0.data() }
                     single(.success(data))
                 }
@@ -70,7 +91,7 @@ final class DefaultFireStoreService: FireStoreService {
     }
     
     /// collection의 모든 값 가져올 때
-    func getDocument(collection: FireStoreCollection) -> Single<[FirebaseData]> {
+    public func getDocument(collection: FireStoreCollection) -> Single<[FirebaseData]> {
         
         return Single.create { [weak self] single in
             
@@ -94,7 +115,8 @@ final class DefaultFireStoreService: FireStoreService {
         }
     }
     
-    func getDocument(documents: [String]) -> Single<[String: Any]> {
+    // TODO: 아래 getDocument(documents:) -> Single<[String: Any]> 사용하시나요?
+    public func getDocument(documents: [String]) -> Single<[String: Any]> {
         
         return Single.create { single in
             
@@ -116,7 +138,7 @@ final class DefaultFireStoreService: FireStoreService {
         }
     }
     
-    func createDocument(collection: FireStoreCollection, document: String, values: FirebaseData) -> Single<Void> {
+    public func createDocument(collection: FireStoreCollection, document: String, values: FirebaseData) -> Single<Void> {
         
         return Single.create { [weak self] single in
             
@@ -136,7 +158,7 @@ final class DefaultFireStoreService: FireStoreService {
         }
     }
     
-    func createDocument(documents: [String], values: FirebaseData) -> Single<Void> {
+    public func createDocument(documents: [String], values: FirebaseData) -> Single<Void> {
         
         return Single.create { [weak self] single in
             
@@ -156,7 +178,7 @@ final class DefaultFireStoreService: FireStoreService {
     }
 
     
-    func updateDocument(collection: FireStoreCollection, document: String, values: FirebaseData) -> Single<Void> {
+    public func updateDocument(collection: FireStoreCollection, document: String, values: FirebaseData) -> Single<Void> {
         
         return Single.create { [weak self] single in
             
@@ -176,7 +198,7 @@ final class DefaultFireStoreService: FireStoreService {
         }
     }
     
-    func deleteDocument(collection: FireStoreCollection, document: String, values: FirebaseData) -> Single<Void> {
+    public func deleteDocument(collection: FireStoreCollection, document: String) -> Single<Void> {
         
         return Single.create { [weak self] single in
             
@@ -195,12 +217,10 @@ final class DefaultFireStoreService: FireStoreService {
             return Disposables.create()
         }
     }
-    
-    
 }
 
 // MARK: - Observe
-extension DefaultFireStoreService {
+public extension DefaultFireStoreService {
     
     func observer(collection: FireStoreCollection, document: String) -> Observable<FirebaseData> {
         
@@ -253,7 +273,7 @@ extension DefaultFireStoreService {
     }
 }
 // MARK: - ImageUpload
-extension DefaultFireStoreService {
+public extension DefaultFireStoreService {
     
     func uploadImage(imageData: Data) -> Single<String> {
         
@@ -280,6 +300,47 @@ extension DefaultFireStoreService {
                     single(.success(url.absoluteString))
                 }
             }
+            return Disposables.create()
+        }
+    }
+    
+    // MARK: - Added
+    func getDocuments(documents: [String]) -> Single<[FirebaseData]> {
+        return Single.create { single in
+            self.database.collection(documents.joined(separator: "/"))
+                .getDocuments { snapshot, error in
+                    if let error = error {
+                        single(.failure(error))
+                        return
+                    }
+                    guard let snapshot = snapshot else {
+                        single(.failure(FireStoreError.unknown))
+                        return
+                    }
+                    let data = snapshot.documents.map { $0.data() }
+                    single(.success(data))
+                }
+            return Disposables.create()
+        }
+    }
+    
+    func observe(documents: [String]) -> Observable<[FirebaseData]> {
+        return Observable.create { [weak self] observable in
+            guard let self else { return Disposables.create() }
+            self.database
+                .collection(documents.joined(separator: "/"))
+                .addSnapshotListener { snapshot, error in
+                    if let error = error {
+                        observable.onError(error)
+                    }
+                    guard let snapshot = snapshot else {
+                        observable.onError(FireStoreError.unknown)
+                        return
+                    }
+                    let data = snapshot.documents.map { $0.data() }
+                    
+                    observable.onNext(data)
+                }
             return Disposables.create()
         }
     }

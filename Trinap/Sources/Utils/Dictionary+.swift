@@ -21,7 +21,7 @@ extension Dictionary<String, Any> {
         return object
     }
     
-    func toObject<T>(type: T.Type) -> T? where T: Decodable {
+    func toObject<T>(_ type: T.Type) -> T? where T: Decodable {
         return self.toObject()
     }
 }
