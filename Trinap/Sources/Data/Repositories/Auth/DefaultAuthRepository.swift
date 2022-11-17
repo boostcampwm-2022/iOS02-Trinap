@@ -34,8 +34,9 @@ final class DefaultAuthRepository: AuthRepository {
         }
         
         return self.firebaseStoreService.getDocument(
-            collection: .users,
-            document: userId
+            collection: "users",
+            field: "userId",
+            in: [userId]
         )
         .map { !$0.isEmpty }
     }
@@ -69,7 +70,7 @@ final class DefaultAuthRepository: AuthRepository {
     func signIn(with cretencial: OAuthCredential) -> Single<String> {
         return Single.create { single in
                         
-            Auth.auth().signIn(with: cretencial) { authResult, error in
+            Auth.auth().signIn(with: cretencial) { [weak self] authResult, error in
                 if let error = error {
                     single(.failure(error))
                     return
@@ -77,10 +78,10 @@ final class DefaultAuthRepository: AuthRepository {
                 
                 guard let userId = authResult?.user.uid else {
                     // TODO: 인증 관련 에러를 구현하여 교체
-                    single(.failure(FireStoreError.unknown))
+                    single(.failure(LocalError.signInError))
                     return
                 }
-                
+                self?.tokenManager.save(token: userId)
                 single(.success(userId))
             }
             return Disposables.create()
