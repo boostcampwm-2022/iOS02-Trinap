@@ -9,31 +9,37 @@
 import Foundation
 
 extension Date {
-        
-    func dateTimeString() -> String {
+    
+    enum Format: String {
+        case yearToDay = "yyyy.MM.dd"
+        case yearToSecond = "yyyy-MM-dd HH:mm:ss"
+        case timeStamp = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+    }
+    
+    // MARK: Methods
+    func toString(type: Format) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy.MM.dd"
+        formatter.dateFormat = type.rawValue
         formatter.locale = Locale(identifier: "ko_KR")
-        
         return formatter.string(from: self)
     }
     
-    func convertTodateTime(dateString: String) -> Date? {
+    func toString(format: String) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy.MM.dd"
-        return formatter.date(from: dateString)
-    }
-
-    var wholeFormatString: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        formatter.dateFormat = format
+        formatter.locale = Locale(identifier: "ko_KR")
         return formatter.string(from: self)
     }
-    
-    func convertToWholeFormatDate(dateString: String) -> Date? {
+
+    func stringToDate(dateString: String, type: Format) -> Date? {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        formatter.dateFormat = type.rawValue
         return formatter.date(from: dateString)
     }
-
+    
+    func stringToDate(dateString: String, format: String) -> Date? {
+        let formatter = DateFormatter()
+        formatter.dateFormat = format
+        return formatter.date(from: dateString)
+    }
 }
