@@ -9,7 +9,14 @@
 import Foundation
 
 struct Reservation: Codable {
-    
+
+    enum State: String {
+        case request
+        case confirm
+        case done
+        case cancel
+    }
+
     // MARK: Properties
     let reservationId: String
     let customerUserId: String
