@@ -14,28 +14,32 @@ import RxSwift
 final class DefaultPhotographerRepository: PhotographerRepository {
     
     // MARK: Properties
-    private let firebaseStoreService: FireStoreService
+    private let fireStoreService: FireStoreService
     private let tokenManager: TokenManager
     
     init(
         firebaseStoreService: FireStoreService,
         tokenManager: TokenManager
     ) {
-        self.firebaseStoreService = firebaseStoreService
+        self.fireStoreService = firebaseStoreService
         self.tokenManager = tokenManager
     }
     
     // MARK: Methods
     func fetchPhotographers(type: TagType) -> Observable<[Photographer]> {
-        
-        return firebaseStoreService.getDocument(collection: .photographers)
+        return fireStoreService.getDocument(collection: .photographers)
+            .map { $0.compactMap { $0.toObject(PhotographerDTO.self)?.toModel() } }
+            .asObservable()
+    }
+    
+    func fetchPhotographers(ids: [String]) -> Observable<[Photographer]> {
+        return fireStoreService.getDocument(collection: .photographers, field: "photographerUserId", in: ids)
             .map { $0.compactMap { $0.toObject(PhotographerDTO.self)?.toModel() } }
             .asObservable()
     }
     
     func fetchDetailPhotographer(of photograhperId: String) -> Observable<Photographer> {
-        
-        return firebaseStoreService.getDocument(
+        return fireStoreService.getDocument(
             collection: .photographers,
             document: photograhperId
         )
@@ -56,7 +60,7 @@ final class DefaultPhotographerRepository: PhotographerRepository {
         dto.photographerUserId = token
         
         guard let value = dto.asDictionary else { return .error(LocalError.structToDictionaryError) }
-        return firebaseStoreService.createDocument(
+        return fireStoreService.createDocument(
             collection: .photographers,
             document: photographer.photographerId,
             values: value)
@@ -64,14 +68,13 @@ final class DefaultPhotographerRepository: PhotographerRepository {
     }
     
     func updatePhotograhperInformation(with information: Photographer) -> Observable<Void> {
-        
         let values = PhotographerDTO(photographer: information, status: .activate)
         
         guard let data = values.asDictionary else {
             return .error(FireStoreError.unknown)
         }
         
-        return firebaseStoreService.updateDocument(
+        return fireStoreService.updateDocument(
             collection: .photographers,
             document: information.photographerId,
             values: data
@@ -83,13 +86,13 @@ final class DefaultPhotographerRepository: PhotographerRepository {
         
         var updateImages = images
         
-        return firebaseStoreService.uploadImage(imageData: image)
+        return fireStoreService.uploadImage(imageData: image)
             .asObservable()
             .withUnretained(self)
             .flatMap { owner, url in
                 updateImages.append(url)
                 let values = ["pictures": updateImages]
-                return owner.firebaseStoreService.updateDocument(
+                return owner.fireStoreService.updateDocument(
                     collection: .photographers,
                     document: photograhperId,
                     values: values
