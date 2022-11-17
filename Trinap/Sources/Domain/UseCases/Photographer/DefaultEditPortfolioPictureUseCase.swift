@@ -20,7 +20,7 @@ final class DefaultEditPortfolioPictureUseCase: EditPortfolioPictureUseCase {
     }
     
     // MARK: Methods
-    func deletePortfolioPictures(photographer: Photographer, indices: [Int]) -> Observable<Void> {
+    func delete(photographer: Photographer, indices: [Int]) -> Observable<Void> {
         let photos = photographer.pictures
             .enumerated()
             .filter { index, _ in
@@ -44,10 +44,11 @@ final class DefaultEditPortfolioPictureUseCase: EditPortfolioPictureUseCase {
             .updatePhotograhperInformation(with: updated)
     }
     
-    func addPortfolioPictures(
+    func add(
         photographerId: String,
         currentPictures: [String],
-        pictureData: Data) -> Observable<Void> {
+        pictureData: Data
+    ) -> Observable<Void> {
         return photographerRepository
             .updatePortfolioPictures(
                 photograhperId: photographerId,

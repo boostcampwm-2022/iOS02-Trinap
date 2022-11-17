@@ -13,9 +13,10 @@ import RxSwift
 protocol EditPortfolioPictureUseCase {
     
     // MARK: Methods
-    func deletePortfolioPictures(photographer: Photographer, indices: [Int]) -> Observable<Void>
-    func addPortfolioPictures(
+    func delete(photographer: Photographer, indices: [Int]) -> Observable<Void>
+    func add(
         photographerId: String,
         currentPictures: [String],
-        pictureData: Data) -> Observable<Void>
+        pictureData: Data
+    ) -> Observable<Void>
 }
