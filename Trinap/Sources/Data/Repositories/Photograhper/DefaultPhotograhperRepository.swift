@@ -21,7 +21,7 @@ final class DefaultPhotographerRepository: PhotographerRepository {
     func fetchPhotographers(type: TagType) -> Observable<[Photographer]> {
         
         return firebaseStoreService.getDocument(collection: .photographers)
-            .map { $0.compactMap { $0.toObject(type: PhotographerDTO.self)?.toModel() } }
+            .map { $0.compactMap { $0.toObject(PhotographerDTO.self)?.toModel() } }
             .asObservable()
     }
     
@@ -31,7 +31,7 @@ final class DefaultPhotographerRepository: PhotographerRepository {
             collection: .photographers,
             document: photograhperId
         )
-        .compactMap { $0.toObject(type: PhotographerDTO.self)?.toModel() }
+        .compactMap { $0.toObject(PhotographerDTO.self)?.toModel() }
         .asObservable()
     }
     
