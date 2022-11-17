@@ -19,4 +19,5 @@ struct Chatroom {
     let customerUserId: String
     let photographerUserId: String
     let status: Status
+    let updatedAt: Date
 }

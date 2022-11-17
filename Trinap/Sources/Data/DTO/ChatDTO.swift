@@ -16,7 +16,7 @@ struct ChatDTO: Codable {
     let chatType: Chat.ChatType
     let content: String
     let isChecked: Bool
-//    let createdAt: Date
+    let createdAt: Date
     
     // MARK: - Methods
     func toModel() -> Chat {
@@ -25,8 +25,8 @@ struct ChatDTO: Codable {
             senderUserId: senderUserId,
             chatType: chatType,
             content: content,
-            isChecked: isChecked//,
-//            createdAt: createdAt
+            isChecked: isChecked,
+            createdAt: createdAt
         )
     }
 }

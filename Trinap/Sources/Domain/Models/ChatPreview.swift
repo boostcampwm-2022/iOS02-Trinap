@@ -15,7 +15,7 @@ struct ChatPreview {
     let profileImage: URL?
     let nickname: String
     var content: String
-//    var date: Date
+    var date: Date
     var isChecked: Bool
 }
 
@@ -27,7 +27,7 @@ extension ChatPreview: Hashable {
             profileImage: nil,
             nickname: "",
             content: "오류가 발생했습니다.",
-//            date: Date(),
+            date: Date(),
             isChecked: true
         )
     }
