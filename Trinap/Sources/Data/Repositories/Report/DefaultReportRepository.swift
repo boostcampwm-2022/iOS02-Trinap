@@ -8,6 +8,7 @@
 
 import Foundation
 
+import FirestoreService
 import RxSwift
 
 final class DefaultReportRepository: ReportRepository {

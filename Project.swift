@@ -35,19 +35,23 @@ class BaseProjectFactory: ProjectFactory {
         .external(name: "RxRelay"),
         .external(name: "RxGesture"),
         .external(name: "Lottie"),
-        .external(name: "FirebaseAuth"),
-        .external(name: "FirebaseDatabase"),
-        .external(name: "FirebaseFirestore"),
-        .external(name: "RealmSwift"),
-        .external(name: "FirebaseStorage"),
-        .external(name: "FirebaseMessaging"),
         .external(name: "SnapKit"),
-        .target(name: "Queenfisher")
+        .target(name: "Queenfisher"),
+        .target(name: "FirestoreService")
     ]
     
     let testDependencies: [TargetDependency] = [
         .external(name: "RxTest"),
         .external(name: "RxBlocking")
+    ]
+    
+    let firestoreServiceDependencies: [TargetDependency] = [
+        .external(name: "FirebaseAuth"),
+        .external(name: "FirebaseDatabase"),
+        .external(name: "FirebaseFirestore"),
+        .external(name: "FirebaseMessaging"),
+        .external(name: "FirebaseStorage"),
+        .external(name: "RxSwift")
     ]
     
     let infoPlist: [String: InfoPlist.Value] = [
@@ -113,6 +117,15 @@ class BaseProjectFactory: ProjectFactory {
                 infoPlist: .default,
                 sources: ["\(projectName)Tests/Sources/**"],
                 dependencies: testDependencies + [.target(name: projectName)]
+            ),
+            Target(
+                name: "FirestoreService",
+                platform: .iOS,
+                product: .framework,
+                bundleId: "com.tnzkm.\(projectName).FirestoreService",
+                infoPlist: .default,
+                sources: ["FirestoreService/Sources/**"],
+                dependencies: firestoreServiceDependencies
             )
         ]
     }
