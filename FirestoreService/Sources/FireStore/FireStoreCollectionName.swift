@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum FireStoreCollection: String {
+public enum FireStoreCollection: String {
     case blocks, chatrooms, photographers, reservations, reviews, users, chats, locations
     
     var name: String {
