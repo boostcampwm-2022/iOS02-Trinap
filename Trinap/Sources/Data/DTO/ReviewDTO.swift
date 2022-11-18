@@ -18,6 +18,8 @@ struct ReviewDTO: Codable {
     func toModel() -> Review {
         return Review(
             reviewId: reviewId,
+            photographerUserId: photographerUserId,
+            creatorUserId: creatorUserId,
             contents: contents,
             status: status,
             rating: rating
