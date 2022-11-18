@@ -27,12 +27,24 @@ final class AuthCoordinator: Coordinator {
 }
 
 // MARK: - Private Methods
-private extension AuthCoordinator {
+extension AuthCoordinator {
     func showSignInViewController() {
-        let viewController = SignInViewController()
-        self.navigationController.setNavigationBarHidden(true, animated: true)
+        let viewController = SignInViewController(
+            viewModel: SignInViewModel(
+                signInUseCase: DefaultSignInUseCase(
+                    authRepository: DefaultAuthRepository()
+                ),
+                coordinator: self
+            )
+        )
+        self.navigationController.setNavigationBarHidden(true, animated: false)
         self.navigationController.pushViewController(viewController, animated: false)
     }
     
     // TODO: CreateUserViewController로 이동하는 Method 구현
+    func showCreateUserViewController() {
+        let viewController = CreateUserViewController()
+        self.navigationController.setNavigationBarHidden(true, animated: false)
+        self.navigationController.pushViewController(viewController, animated: false)
+    }
 }

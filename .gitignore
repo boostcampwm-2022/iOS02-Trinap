@@ -5,7 +5,6 @@
 .LSOverride
 Signing/
 GoogleService-Info.plist
-*.entitlements
 
 # Icon must end with two
 Icon

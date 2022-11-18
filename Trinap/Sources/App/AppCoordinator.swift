@@ -44,6 +44,7 @@ extension AppCoordinator: CoordinatorDelegate {
     
     func didFinish(childCoordinator: Coordinator) {
         // TODO: AuthFlow <-> TabBarFlow로 전환 구현
+        start()
         Logger.print("끝")
     }
 }
