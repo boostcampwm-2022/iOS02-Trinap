@@ -63,8 +63,8 @@ extension DefaultFetchReviewUseCase {
         
         /// 중복된 id제거
         let photographerIds = reviews.map { $0.photographerUserId }.removingDuplicates()
-        
-        return photographerRepository.fetchPhotographers(ids: photographerIds)
+
+        return photographerIds.isEmpty ? .just([]) : photographerRepository.fetchPhotographers(ids: photographerIds)
             .map { photographers in
                 var userReviews: [UserReview] = []
                 
@@ -90,7 +90,7 @@ extension DefaultFetchReviewUseCase {
         /// 중복된 id제거
         let userIds = reviews.map { $0.creatorUserId }.removingDuplicates()
 
-        return userRepository.fetchUsers(userIds: userIds)
+        return userIds.isEmpty ? .just([]) : userRepository.fetchUsers(userIds: userIds)
             .map { users in
                 
                 var photographerReviews: [PhotographerReview] = []
