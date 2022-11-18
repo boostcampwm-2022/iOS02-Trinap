@@ -15,6 +15,7 @@ struct ChatroomDTO: Codable {
     let customerUserId: String
     let photographerUserId: String
     let status: Chatroom.Status
+    let updatedAt: String
     
     // MARK: - Methods
     func toModel() -> Chatroom {
@@ -22,7 +23,8 @@ struct ChatroomDTO: Codable {
             chatroomId: chatroomId,
             customerUserId: customerUserId,
             photographerUserId: photographerUserId,
-            status: status
+            status: status,
+            updatedAt: Date.fromStringOrNow(updatedAt)
         )
     }
 }

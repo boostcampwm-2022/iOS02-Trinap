@@ -44,7 +44,8 @@ final class DefaultChatRepository: ChatRepository {
             senderUserId: userId,
             chatType: chat.chatType,
             content: chat.content,
-            isChecked: chat.isChecked
+            isChecked: chat.isChecked,
+            createdAt: chat.createdAt.toString(type: .timeStamp)
         )
         
         guard let values = chatDTO.asDictionary else {

@@ -46,7 +46,8 @@ final class DefaultChatroomRepository: ChatroomRepository {
             chatroomId: UUID().uuidString,
             customerUserId: customerUserId,
             photographerUserId: photographerUserId,
-            status: .activate
+            status: .activate,
+            updatedAt: Date().toString(type: .timeStamp)
         )
         
         guard let values = chatroom.asDictionary else {

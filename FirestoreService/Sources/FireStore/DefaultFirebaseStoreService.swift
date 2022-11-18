@@ -22,8 +22,6 @@ public final class DefaultFireStoreService: FireStoreService {
     // MARK: Properties
     private let database = Firestore.firestore()
     
-    public init() {}
-    
     // MARK: Methods
     public init() {}
     

@@ -23,5 +23,5 @@ struct Chat {
     let chatType: ChatType
     let content: String
     let isChecked: Bool
-//    let createdAt: Date
+    let createdAt: Date
 }
