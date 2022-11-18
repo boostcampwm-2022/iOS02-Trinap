@@ -29,25 +29,27 @@ final class DefaultReviewRepository: ReviewRepository {
             .asObservable()
     }
     
-    func createReview(to photographer: String, review: Review) -> Observable<Bool> {
+    func createReview(to photograhperId: String, contents: String, rating: Int) -> Observable<Bool> {
         guard let token = keychainManager.getToken() else {
             return .error(TokenManagerError.notFound)
         }
         
+        let reviewId = UUID().uuidString
+        
         let dto = ReviewDTO(
             creatorUserId: token,
-            photographerUserId: photographer,
-            reviewId: review.reviewId,
-            contents: review.contents,
-            status: review.status,
-            rating: review.rating
+            photographerUserId: photograhperId,
+            reviewId: reviewId,
+            contents: contents,
+            status: "activate",
+            rating: rating
         )
         
         guard let values = dto.asDictionary else {
             return .just(false)
         }
         
-        return fireStoreService.createDocument(collection: .reviews, document: review.reviewId, values: values)
+        return fireStoreService.createDocument(collection: .reviews, document: reviewId, values: values)
             .map { true }
             .catchAndReturn(false)
             .asObservable()
