@@ -47,7 +47,7 @@ final class DefaultPhotographerRepository: PhotographerRepository {
     }
     
     func create(photographer: Photographer) -> Observable<Void> {
-        guard let token = tokenManager.getToken() else {
+        guard let token = tokenManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
         }
 

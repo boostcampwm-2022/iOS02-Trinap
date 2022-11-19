@@ -30,7 +30,7 @@ final class DefaultReviewRepository: ReviewRepository {
     }
     
     func createReview(to photograhperId: String, contents: String, rating: Int) -> Observable<Bool> {
-        guard let token = keychainManager.getToken() else {
+        guard let token = keychainManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
         }
         

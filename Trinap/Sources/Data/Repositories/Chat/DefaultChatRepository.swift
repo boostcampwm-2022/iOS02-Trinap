@@ -35,7 +35,7 @@ final class DefaultChatRepository: ChatRepository {
     }
     
     func send(chat: Chat, at chatroomId: String) -> Observable<Void> {
-        guard let userId = tokenManager.getToken() else {
+        guard let userId = tokenManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
         }
         

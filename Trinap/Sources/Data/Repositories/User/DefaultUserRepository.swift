@@ -24,7 +24,7 @@ final class DefaultUserRepository: UserRepository {
     }
     
     func fetch() -> Observable<User> {
-        guard let userId = tokenManager.getToken() else {
+        guard let userId = tokenManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
         }
         
@@ -39,7 +39,7 @@ final class DefaultUserRepository: UserRepository {
     }
     
     func fetchUsers(userIds: [String]) -> Observable<[User]> {
-        guard let userId = tokenManager.getToken() else {
+        guard let userId = tokenManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
         }
         
@@ -52,7 +52,7 @@ final class DefaultUserRepository: UserRepository {
     }
     
     func update(profileImage: URL?, nickname: String?, isPhotographer: Bool?) -> Observable<Void> {
-        guard let userId = tokenManager.getToken() else {
+        guard let userId = tokenManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
         }
         
