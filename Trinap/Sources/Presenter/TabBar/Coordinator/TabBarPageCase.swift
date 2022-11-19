@@ -9,11 +9,8 @@
 import Foundation
 import UIKit
 
-enum TabBarPageCase: CaseIterable {
-    case main
-    case chat
-    case reservation
-    case myPage
+enum TabBarPageCase: Int, CaseIterable {
+    case main = 0, chat, reservation, myPage
     
     init?(index: Int) {
         switch index {
@@ -31,16 +28,7 @@ enum TabBarPageCase: CaseIterable {
     }
     
     var pageOrderNumber: Int {
-        switch self {
-        case .main:
-            return 0
-        case .chat:
-            return 1
-        case .reservation:
-            return 2
-        case .myPage:
-            return 3
-        }
+        return self.rawValue
     }
     
     var pageTitle: String {
