@@ -50,10 +50,10 @@ private extension TabBarCoordinator {
     private func configureTabBarController(with tabViewControllers: [UIViewController]) {
         self.tabBarController.setViewControllers(tabViewControllers, animated: true)
         self.tabBarController.selectedIndex = TabBarPageCase.main.pageOrderNumber
-        self.tabBarController.view.backgroundColor = .systemBackground
-        self.tabBarController.tabBar.backgroundColor = .systemBackground
+        self.tabBarController.view.backgroundColor = TrinapAsset.background.color
+        self.tabBarController.tabBar.backgroundColor = TrinapAsset.background.color
         self.tabBarController.tabBar.tintColor = TrinapAsset.primary.color
-        self.tabBarController.tabBar.unselectedItemTintColor = .black
+        self.tabBarController.tabBar.unselectedItemTintColor = TrinapAsset.gray40.color
         self.navigationController.setNavigationBarHidden(true, animated: false)
         self.navigationController.pushViewController(tabBarController, animated: true)
     }
@@ -70,6 +70,7 @@ private extension TabBarCoordinator {
         let tabNavigationController = UINavigationController()
         tabNavigationController.setNavigationBarHidden(false, animated: false)
         tabNavigationController.tabBarItem = self.configureTabBarItem(of: page)
+        tabNavigationController.tabBarItem.selectedImage = page.selectedTabIcon()
         connectTabCoordinator(of: page, to: tabNavigationController)
         return tabNavigationController
     }

@@ -68,4 +68,17 @@ enum TabBarPageCase: CaseIterable {
             return TrinapAsset.user.image
         }
     }
+    
+    func selectedTabIcon() -> UIImage {
+        switch self {
+        case .main:
+            return TrinapAsset.selectHome.image
+        case .chat:
+            return TrinapAsset.selectedChat.image
+        case .reservation:
+            return TrinapAsset.selectedReservation.image
+        case .myPage:
+            return TrinapAsset.selectUser.image
+        }
+    }
 }
