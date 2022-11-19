@@ -34,18 +34,18 @@ final class DefaultChatRepository: ChatRepository {
             .asObservable()
     }
     
-    func send(chat: Chat, at chatroomId: String) -> Observable<Void> {
+    func send(chatType: Chat.ChatType, content: String, at chatroomId: String) -> Observable<Void> {
         guard let userId = tokenManager.getToken() else {
             return .error(TokenManagerError.notFound)
         }
         
         let chatDTO = ChatDTO(
-            chatId: chat.chatId,
+            chatId: UUID().uuidString,
             senderUserId: userId,
-            chatType: chat.chatType,
-            content: chat.content,
-            isChecked: chat.isChecked,
-            createdAt: chat.createdAt.toString(type: .timeStamp)
+            chatType: chatType,
+            content: content,
+            isChecked: false,
+            createdAt: Date().toString(type: .timeStamp)
         )
         
         guard let values = chatDTO.asDictionary else {

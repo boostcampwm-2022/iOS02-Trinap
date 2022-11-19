@@ -34,7 +34,7 @@ final class DefaultAuthRepository: AuthRepository {
         }
         
         return self.firebaseStoreService.getDocument(
-            collection: "users",
+            collection: .users,
             field: "userId",
             in: [userId]
         )
