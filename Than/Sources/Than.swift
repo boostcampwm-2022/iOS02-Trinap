@@ -34,7 +34,7 @@ extension Than where Self: AnyObject {
     }
 }
 
-extension NSObject: Than {}
+extension NSObject:     Than {}
 
 extension CGPoint:      Than {}
 extension CGRect:       Than {}
