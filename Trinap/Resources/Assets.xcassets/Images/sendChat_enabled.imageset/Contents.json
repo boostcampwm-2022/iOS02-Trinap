@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "arrow-up-alt.png",
+      "filename" : "Chat=Send_enabled.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "arrow-up-alt@2x.png",
+      "filename" : "Chat=Send_enabled@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "arrow-up-alt@3x.png",
+      "filename" : "Chat=Send_enabled@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
