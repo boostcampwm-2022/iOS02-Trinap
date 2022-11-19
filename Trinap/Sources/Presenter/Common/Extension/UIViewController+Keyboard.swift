@@ -1,5 +1,5 @@
 //
-//  UIViewController+Keyboard.swift
+//  UIView+Keyboard.swift
 //  Trinap
 //
 //  Created by 김세영 on 2022/11/19.
@@ -10,7 +10,7 @@ import UIKit
 
 import RxCocoa
 
-extension UIViewController {
+extension UIView {
     
     /// 키보드가 나타날 때 `CGRect`를 방출합니다.
     /// `CGRect`는 키보드의 크기를 나타냅니다.
