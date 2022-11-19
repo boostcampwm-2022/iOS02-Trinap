@@ -41,6 +41,7 @@ class BaseProjectFactory: ProjectFactory {
     ]
     
     let testDependencies: [TargetDependency] = [
+        .external(name: "RxSwift"),
         .external(name: "RxTest"),
         .external(name: "RxBlocking")
     ]

@@ -10,7 +10,7 @@ import Foundation
 
 import RxSwift
 
-final class DefaultFetchReviewUseCase {
+final class DefaultFetchReviewUseCase: FetchReviewUseCase {
     
     // MARK: - Properties
     private let reviewRepository: ReviewRepository
@@ -58,19 +58,16 @@ final class DefaultFetchReviewUseCase {
 }
 
 extension DefaultFetchReviewUseCase {
-    
-    ///
+
     private func mappingReviewWithUser(reviews: [Review]) -> Observable<[UserReview]> {
         
         /// 중복된 id제거
         let photographerIds = reviews.map { $0.photographerUserId }.removingDuplicates()
-        
-        return photographerRepository.fetchPhotographers(ids: photographerIds)
+
+        return photographerIds.isEmpty ? .just([]) : photographerRepository.fetchPhotographers(ids: photographerIds)
             .map { photographers in
                 var userReviews: [UserReview] = []
                 
-                print(userReviews)
-                print("DBEUGL \(photographers)")
                 for photographer in photographers {
                     print(photographer)
                     for review in reviews where review.photographerUserId == photographer.photographerUserId {
@@ -93,7 +90,7 @@ extension DefaultFetchReviewUseCase {
         /// 중복된 id제거
         let userIds = reviews.map { $0.creatorUserId }.removingDuplicates()
 
-        return userRepository.fetchUsers(userIds: userIds)
+        return userIds.isEmpty ? .just([]) : userRepository.fetchUsers(userIds: userIds)
             .map { users in
                 
                 var photographerReviews: [PhotographerReview] = []
