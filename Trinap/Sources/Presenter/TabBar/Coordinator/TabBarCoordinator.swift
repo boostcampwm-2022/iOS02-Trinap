@@ -33,7 +33,7 @@ final class TabBarCoordinator: Coordinator {
     }
     
     func currentPage() -> TabBarPageCase? {
-        TabBarPageCase(index: self.tabBarController.selectedIndex)
+        return TabBarPageCase(rawValue: self.tabBarController.selectedIndex)
     }
 
     func selectPage(_ page: TabBarPageCase) {
@@ -41,7 +41,7 @@ final class TabBarCoordinator: Coordinator {
     }
 
     func setSelectedIndex(_ index: Int) {
-        guard let page = TabBarPageCase(index: index) else { return }
+        guard let page = TabBarPageCase(rawValue: index) else { return }
         self.tabBarController.selectedIndex = page.pageOrderNumber
     }
 }

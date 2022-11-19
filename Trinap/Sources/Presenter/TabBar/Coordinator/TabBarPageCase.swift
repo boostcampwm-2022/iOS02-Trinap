@@ -6,43 +6,16 @@
 //  Copyright © 2022 Trinap. All rights reserved.
 //
 
-import Foundation
 import UIKit
 
-enum TabBarPageCase: CaseIterable {
-    case main
-    case chat
-    case reservation
-    case myPage
-    
-    init?(index: Int) {
-        switch index {
-        case 0:
-            self = .main
-        case 1:
-            self = .chat
-        case 2:
-            self = .reservation
-        case 3:
-            self = .myPage
-        default:
-            return nil
-        }
-    }
-    
+enum TabBarPageCase: Int, CaseIterable {
+    case main = 0, chat, reservation, myPage
+
+    // MARK: - Properties
     var pageOrderNumber: Int {
-        switch self {
-        case .main:
-            return 0
-        case .chat:
-            return 1
-        case .reservation:
-            return 2
-        case .myPage:
-            return 3
-        }
+        return self.rawValue
     }
-    
+
     var pageTitle: String {
         switch self {
         case .main:
@@ -55,7 +28,8 @@ enum TabBarPageCase: CaseIterable {
             return "마이페이지"
         }
     }
-    
+
+    // MARK: - Methods
     func tabIcon() -> UIImage {
         switch self {
         case .main:
@@ -68,7 +42,7 @@ enum TabBarPageCase: CaseIterable {
             return TrinapAsset.user.image
         }
     }
-    
+
     func selectedTabIcon() -> UIImage {
         switch self {
         case .main:
