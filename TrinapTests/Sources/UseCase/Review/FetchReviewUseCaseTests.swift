@@ -18,7 +18,7 @@ final class FetchReviewUseCaseTests: XCTestCase {
     private var fetchReviewUseCase: FetchReviewUseCase!
     
     private var scheduler: TestScheduler!
-    private var disposBag: DisposeBag!
+    private var disposeBag: DisposeBag!
     
     override func setUpWithError() throws {
         self.fetchReviewUseCase = DefaultFetchReviewUseCase(
@@ -28,13 +28,15 @@ final class FetchReviewUseCaseTests: XCTestCase {
         )
         
         self.scheduler = TestScheduler(initialClock: 0)
-        self.disposBag = DisposeBag()
+        self.disposeBag = DisposeBag()
+        
+        try super.setUpWithError()
     }
     
     override func tearDownWithError() throws {
         self.fetchReviewUseCase = nil
         self.scheduler = nil
-        self.disposBag = nil
+        self.disposeBag = nil
         
         try super.tearDownWithError()
     }
@@ -42,7 +44,7 @@ final class FetchReviewUseCaseTests: XCTestCase {
     func test_fetch_reviews() {
         let reviews = scheduler.createObserver(Bool.self)
         
-        let resultObseravble = self.scheduler
+        self.scheduler
             .createColdObservable([
                 .next(10, ""),
                 .next(20, "363B9925-06AC-495E-9DE4-41D34F72BBEE")
@@ -51,6 +53,7 @@ final class FetchReviewUseCaseTests: XCTestCase {
                 return self.fetchReviewUseCase.fetchReviews(photographerId: $0).map { _ in true }.catchAndReturn(false)
             }
             .bind(to: reviews)
+            .disposed(by: disposeBag)
         
         self.scheduler.start()
         
