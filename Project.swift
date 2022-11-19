@@ -37,7 +37,8 @@ class BaseProjectFactory: ProjectFactory {
         .external(name: "Lottie"),
         .external(name: "SnapKit"),
         .target(name: "Queenfisher"),
-        .target(name: "FirestoreService")
+        .target(name: "FirestoreService"),
+        .target(name: "Than")
     ]
     
     let testDependencies: [TargetDependency] = [
@@ -126,6 +127,15 @@ class BaseProjectFactory: ProjectFactory {
                 infoPlist: .default,
                 sources: ["FirestoreService/Sources/**"],
                 dependencies: firestoreServiceDependencies
+            ),
+            Target(
+                name: "Than",
+                platform: .iOS,
+                product: .framework,
+                bundleId: "com.tnzkm.\(projectName).Than",
+                infoPlist: .default,
+                sources: ["Than/Sources/**"],
+                dependencies: []
             )
         ]
     }
