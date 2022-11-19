@@ -9,6 +9,7 @@
 import UIKit
 
 import RxCocoa
+import RxSwift
 
 extension UIView {
     
@@ -28,5 +29,31 @@ extension UIView {
             .notification(UIResponder.keyboardWillHideNotification)
             .map { _ in return }
             .asSignal(onErrorJustReturn: ())
+    }
+    
+    func moveUp(by height: CGFloat) {
+        self.transform = CGAffineTransform(translationX: 0, y: -height)
+    }
+    
+    func transformToIdentity() {
+        self.transform = .identity
+    }
+    
+    func followKeyboardObserver() -> Disposable {
+        let moveUpDisposable = self.keyboardWillShowObserver
+            .map(\.height)
+            .withUnretained(self)
+            .emit { owner, height in
+                let distance = height - (self.superview?.safeAreaInsets.bottom ?? 40)
+                owner.moveUp(by: distance)
+            }
+        
+        let transformToIdentityDisposable = self.keyboardWillHideObserver
+            .withUnretained(self)
+            .emit { owner, _ in
+                owner.transformToIdentity()
+            }
+        
+        return Disposables.create(moveUpDisposable, transformToIdentityDisposable)
     }
 }
