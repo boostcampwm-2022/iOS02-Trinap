@@ -12,21 +12,7 @@ import UIKit
 enum TabBarPageCase: Int, CaseIterable {
     case main = 0, chat, reservation, myPage
     
-    init?(index: Int) {
-        switch index {
-        case 0:
-            self = .main
-        case 1:
-            self = .chat
-        case 2:
-            self = .reservation
-        case 3:
-            self = .myPage
-        default:
-            return nil
-        }
-    }
-    
+    // MARK: - Properties
     var pageOrderNumber: Int {
         return self.rawValue
     }
@@ -44,6 +30,7 @@ enum TabBarPageCase: Int, CaseIterable {
         }
     }
     
+    // MARK: - Methods
     func tabIcon() -> UIImage {
         switch self {
         case .main:
