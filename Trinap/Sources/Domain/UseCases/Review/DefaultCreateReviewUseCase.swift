@@ -23,4 +23,8 @@ final class DefaultCreateReviewUseCase: CreateReviewUseCase {
         return reviewRepository.createReview(to: photographerId, contents: contents, rating: rating)
             .asObservable()
     }
+    
+    func checkButtonEnabled(text: String, rating: Int) -> Bool {
+        return text != "작가님을 위한 한마디를 남겨주세요!" && !text.isEmpty && rating != 0
+    }
 }

@@ -12,4 +12,5 @@ import RxSwift
 
 protocol CreateReviewUseCase {
     func createReview(photographerId: String, contents: String, rating: Int) -> Observable<Bool>
+    func checkButtonEnabled(text: String, rating: Int) -> Bool
 }

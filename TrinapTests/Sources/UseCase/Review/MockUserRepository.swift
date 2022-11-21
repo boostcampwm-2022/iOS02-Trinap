@@ -31,6 +31,4 @@ final class MockUserRepository: UserRepository {
     func update(profileImage: URL?, nickname: String?, isPhotographer: Bool?) -> Observable<Void> {
         return .just(())
     }
-    
-    
 }

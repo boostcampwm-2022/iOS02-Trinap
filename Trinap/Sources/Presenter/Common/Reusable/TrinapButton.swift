@@ -20,7 +20,10 @@ final class TrinapButton: UIButton {
         set { self.layer.cornerRadius = newValue }
     }
     
-    private var style: ColorType
+    var style: ColorType {
+        didSet { configureColorSet() }
+    }
+    
     private var fillType: FillType
     private var isCircle: Bool
     
@@ -90,6 +93,7 @@ extension TrinapButton {
         case secondary
         case error
         case black
+        case disabled
         
         var color: UIColor {
             switch self {
@@ -101,6 +105,8 @@ extension TrinapButton {
                 return TrinapAsset.error.color
             case .black:
                 return TrinapAsset.black.color
+            case .disabled:
+                return TrinapAsset.disabled.color
             }
         }
     }
@@ -112,5 +118,16 @@ extension TrinapButton {
     enum FillType {
         case fill
         case border
+    }
+}
+
+// MARK: - RxEnabled
+/// isEnabled에 따라 동작과 style 설정.
+extension Reactive where Base: TrinapButton {
+    var enabled: Binder<Bool> {
+        return Binder(self.base) { trinapButton, enabled in
+            trinapButton.isEnabled = enabled
+            trinapButton.style = enabled ? .primary : .disabled
+        }
     }
 }

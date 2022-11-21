@@ -17,7 +17,7 @@ final class DefaultReviewRepository: ReviewRepository {
     private let fireStoreService: FireStoreService
     private let keychainManager: TokenManager
     
-    init(keychainManager: TokenManager) {
+    init(keychainManager: TokenManager = KeychainTokenManager()) {
         self.fireStoreService = DefaultFireStoreService()
         self.keychainManager = KeychainTokenManager()
     }
