@@ -39,6 +39,15 @@ final class DefaultMapService: NSObject, MapService {
         searchCompleter.queryFragment = searchText
     }
     
+    func fetchCurrentLocation() -> Observable<Coordinate> {
+        guard let lat = locationManager.location?.coordinate.latitude,
+              let lng = locationManager.location?.coordinate.longitude
+        // 오류 처리 어떻게 하면 좋을까요?
+        else { return Observable.just(Coordinate(lat: 0.0, lng: 0.0)) }
+        
+        return Observable.just(Coordinate(lat: lat, lng: lng))
+    }
+    
     private func fetchSelectedLocationInfo(with selectedResult: MKLocalSearchCompletion) -> Single<Space?> {
         
         return Single.create { single in
@@ -69,6 +78,18 @@ final class DefaultMapService: NSObject, MapService {
 
 }
 
+extension DefaultMapService: CLLocationManagerDelegate {
+//    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+//        if let location = locations.first {
+//            self.curCoordinate.accept(Coordinate(lat: location.coordinate.latitude, lng: location.coordinate.longitude))
+//        }
+//    }
+//
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        self.curCoordinate.accept(Coordinate(lat: 0.0, lng: 0.0))
+        Logger.print(error)
+    }
+}
 
 extension DefaultMapService: MKLocalSearchCompleterDelegate {
     
@@ -84,3 +105,7 @@ extension DefaultMapService: MKLocalSearchCompleterDelegate {
         .disposed(by: disposebag)
     }
     
+    func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
+        print(error)
+    }
+}
