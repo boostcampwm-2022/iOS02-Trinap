@@ -13,13 +13,15 @@ import RxSwift
 
 final class DefaultSignInUseCase: SignInUseCase {
     
+    // MARK: - Properties
     private let authRepository: AuthRepository
     
+    // MARK: - Initializers
     init(authRepository: AuthRepository) {
         self.authRepository = authRepository
     }
     
-    // enum으로 반환타입 수정
+    // MARK: - Methods
     func signIn(with credential: OAuthCredential) -> Observable<SignInResult> {
         return self.authRepository.signIn(with: credential)
             .asObservable()

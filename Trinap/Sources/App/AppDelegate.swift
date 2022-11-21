@@ -7,6 +7,7 @@ import FirebaseMessaging
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    private let tokenManager: TokenManager = KeychainTokenManager()
 
     func application(
         _ application: UIApplication,
@@ -37,6 +38,7 @@ extension AppDelegate : MessagingDelegate {
             Logger.print("fcm token not exists.")
             return
         }
+        tokenManager.save(token: fcmToken, with: .fcmToken)
         Logger.print(fcmToken)
     }
 }

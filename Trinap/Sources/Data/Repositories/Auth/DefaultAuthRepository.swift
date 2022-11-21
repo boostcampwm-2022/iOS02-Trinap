@@ -40,15 +40,17 @@ final class DefaultAuthRepository: AuthRepository {
         )
         .map { !$0.isEmpty }
     }
-
-    func createUser(nickname: String, fcmToken: String) -> Observable<Void> {
-        guard let userId = tokenManager.getToken(with: .userId) else {
+    
+    func createUser(nickname: String) -> Observable<Void> {
+        guard
+            let userId = tokenManager.getToken(with: .userId),
+            let fcmToken = tokenManager.getToken(with: .fcmToken)
+        else {
             return .error(TokenManagerError.notFound)
         }
         let user = UserDTO(
             userId: userId,
             nickname: nickname,
-            // TODO: nil or 빈 문자열?
             profileImage: "",
             isPhotographer: false,
             fcmToken: fcmToken,
