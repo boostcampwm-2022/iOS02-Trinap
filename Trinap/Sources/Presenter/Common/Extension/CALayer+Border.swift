@@ -22,13 +22,13 @@ extension CALayer {
             
             switch edge {
             case .top:
-                border.frame = CGRect.init(x: 0, y: 0, width: frame.width, height: width)
+                border.frame = CGRect(x: 0, y: 0, width: frame.width, height: width)
             case .bottom:
-                border.frame = CGRect.init(x: 0, y: frame.height - width, width: frame.width, height: width)
+                border.frame = CGRect(x: 0, y: frame.height - width, width: frame.width, height: width)
             case .left:
-                border.frame = CGRect.init(x: 0, y: 0, width: width, height: frame.height)
+                border.frame = CGRect(x: 0, y: 0, width: width, height: frame.height)
             case .right:
-                border.frame = CGRect.init(x: frame.width - width, y: 0, width: width, height: frame.height)
+                border.frame = CGRect(x: frame.width - width, y: 0, width: width, height: frame.height)
             default:
                 break
             }

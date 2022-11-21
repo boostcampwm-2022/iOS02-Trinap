@@ -18,7 +18,7 @@ class BaseViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.view.backgroundColor = TrinapAsset.background.color
+        self.view.backgroundColor = TrinapAsset.white.color
         
         configureAttributes()
         configureHierarchy()
