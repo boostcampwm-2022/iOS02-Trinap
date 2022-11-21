@@ -58,6 +58,13 @@ final class ChatDetailViewModel: ViewModelType {
 
         return Output(chats: chats)
     }
+    
+    func hasMyChat(before index: Int) -> Bool {
+        guard let prevChat = self.chats.value[safe: index - 1] else { return false }
+        let currentChat = self.chats.value[index]
+        
+        return prevChat.senderUserId == currentChat.senderUserId
+    }
 }
 
 // MARK: - Privates
@@ -65,6 +72,5 @@ private extension ChatDetailViewModel {
     
     func sendChat(_ chat: String) -> Observable<Void> {
         return sendChatUseCase.execute(chatType: .text, content: chat, chatroomId: chatroomId)
-            .debug()
     }
 }
