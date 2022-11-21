@@ -18,8 +18,11 @@ final class DefaultUserRepository: UserRepository {
     private let tokenManager: TokenManager
     
     // MARK: - Methods
-    init(tokenManager: TokenManager = KeychainTokenManager()) {
-        self.firestoreService = DefaultFireStoreService()
+    init(
+        firestoreService: FireStoreService,
+        tokenManager: TokenManager = KeychainTokenManager()
+    ) {
+        self.firestoreService = firestoreService
         self.tokenManager = tokenManager
     }
     

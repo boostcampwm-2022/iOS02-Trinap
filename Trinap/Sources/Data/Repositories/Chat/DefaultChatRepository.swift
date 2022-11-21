@@ -27,7 +27,7 @@ final class DefaultChatRepository: ChatRepository {
     }
     
     func observe(chatroomId: String) -> Observable<[Chat]> {
-        guard let userId = tokenManager.getToken() else {
+        guard let userId = tokenManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
         }
         
