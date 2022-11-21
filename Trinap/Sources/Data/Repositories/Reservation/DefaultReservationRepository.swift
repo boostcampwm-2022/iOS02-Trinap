@@ -27,7 +27,7 @@ final class DefaultReservationRepository: ReservationRepository {
     
     // MARK: Methods
     func fetchPhotographerReservations() -> Observable<[Reservation]> {
-        guard let token = keychainManager.getToken() else {
+        guard let token = keychainManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
         }
         
@@ -43,7 +43,7 @@ final class DefaultReservationRepository: ReservationRepository {
     }
     
     func fetchCustomerReservations() -> Observable<[Reservation]> {
-        guard let token = keychainManager.getToken() else {
+        guard let token = keychainManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
         }
         

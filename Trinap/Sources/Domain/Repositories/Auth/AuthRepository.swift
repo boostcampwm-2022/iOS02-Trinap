@@ -16,7 +16,7 @@ protocol AuthRepository {
     
     // MARK: - Methods
     func checkUser() -> Single<Bool>
-    func createUser(nickname: String, fcmToken: String) -> Observable<Void>
+    func createUser(nickname: String) -> Observable<Void>
     func signIn(with cretencial: OAuthCredential) -> Single<String>
     func signOut() -> Single<Void>
     func dropOut() -> Single<Void>
