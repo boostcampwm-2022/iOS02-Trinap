@@ -18,6 +18,7 @@ final class ChatTableView: UITableView {
         
         self.separatorStyle = .none
         self.allowsSelection = false
+        self.register()
     }
     
     required init?(coder: NSCoder) {
@@ -25,4 +26,9 @@ final class ChatTableView: UITableView {
     }
     
     // MARK: - Methods
+    private func register() {
+        self.register(ChatCell.self)
+        self.register(TextChatCell.self)
+        self.register(ImageChatCell.self)
+    }
 }

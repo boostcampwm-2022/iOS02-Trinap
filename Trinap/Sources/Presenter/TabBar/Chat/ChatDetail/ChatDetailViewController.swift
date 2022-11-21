@@ -15,10 +15,6 @@ import SnapKit
 
 final class ChatDetailViewController: BaseViewController {
     
-    enum Section {
-        case main
-    }
-    
     // MARK: - UI
     private lazy var chatInputView: ChatInputView = {
         let inputView = ChatInputView()
@@ -29,15 +25,14 @@ final class ChatDetailViewController: BaseViewController {
     private lazy var chatTableView: ChatTableView = {
         let chatTableView = ChatTableView()
         
-        chatTableView.dataSource = self
+        chatTableView.dataSource = dataSource
         chatTableView.keyboardDismissMode = .onDrag
-        chatTableView.register(ChatCell.self)
-        chatTableView.register(TextChatCell.self)
         return chatTableView
     }()
     
     // MARK: - Properties
     private let viewModel: ChatDetailViewModel
+    private var dataSource: UITableViewDiffableDataSource<Section, Chat>?
     
     // MARK: - Initializers
     init(viewModel: ChatDetailViewModel) {
@@ -81,6 +76,8 @@ final class ChatDetailViewController: BaseViewController {
         
         chatTableView.followKeyboardObserver()
             .disposed(by: disposeBag)
+        
+        self.dataSource = self.configureDataSource()
     }
     
     override func bind() {
@@ -91,10 +88,11 @@ final class ChatDetailViewController: BaseViewController {
         let output = viewModel.transform(input: input)
         
         output.chats
-            .subscribe { [weak self] chats in
-                Logger.printArray(chats)
-                self?.chatTableView.reloadData()
-                self?.scrollToBottom()
+            .compactMap { [weak self] chats in self?.generateSnapshot(chats) }
+            .subscribe { [weak self] snapshot in
+                self?.dataSource?.apply(snapshot, animatingDifferences: false) {
+                    self?.scrollToBottom()
+                }
             }
             .disposed(by: disposeBag)
     }
@@ -107,51 +105,54 @@ final class ChatDetailViewController: BaseViewController {
     }
 }
 
-extension ChatDetailViewController: UITableViewDataSource {
+// MARK: - Diffable DataSource
+extension ChatDetailViewController {
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.chats.value.count
+    enum Section: CaseIterable {
+        case main
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let chat = viewModel.chats.value[indexPath.item]
-        guard let cell = tableView.dequeueCell(chat.chatType.cellClass, for: indexPath) else {
-            return UITableViewCell()
+    func generateSnapshot(_ sources: [Chat]) -> NSDiffableDataSourceSnapshot<Section, Chat> {
+        var snapshot = NSDiffableDataSourceSnapshot<Section, Chat>()
+        
+        snapshot.appendSections([.main])
+        snapshot.appendItems(sources)
+        return snapshot
+    }
+    
+    func configureDataSource() -> UITableViewDiffableDataSource<Section, Chat> {
+        return UITableViewDiffableDataSource(
+            tableView: self.chatTableView
+        ) { [weak self] tableView, indexPath, item in
+            guard
+                let self = self,
+                let cell = tableView.dequeueCell(item.chatType.cellClass, for: indexPath)
+            else {
+                return UITableViewCell()
+            }
+            
+            let hasMyChatBefore = self.viewModel.hasMyChat(before: indexPath.row)
+            cell.configureCell(by: item, hasMyChatBefore: hasMyChatBefore)
+            
+            return cell
         }
-        
-        cell.configureCell(by: chat)
-        
-        return cell
     }
 }
 
 private extension Chat.ChatType {
     
     var cellClass: ChatCell.Type {
-        return TextChatCell.self
-// TODO: - Cell 만들면 채울 것
-//        switch self {
-//        case .text:
-//            return TextChatCell.self
-//        case .image:
-//            <#code#>
+        switch self {
+        case .text:
+            return TextChatCell.self
+        case .image:
+            return ImageChatCell.self
+        default:
+            return TextChatCell.self
 //        case .reservation:
 //            <#code#>
 //        case .location:
 //            <#code#>
-//        }
-    }
-}
-
-extension String {
-    
-    func width(by font: UIFont) -> CGFloat {
-        var textWidth: CGFloat = 0
-        for element in self {
-            let characterString = String(element)
-            let letterSize = characterString.size(withAttributes: [.font: font])
-            textWidth += letterSize.width
         }
-        return textWidth + 1
     }
 }
