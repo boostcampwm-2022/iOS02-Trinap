@@ -29,7 +29,7 @@ final class DefaultAuthRepository: AuthRepository {
     
     // MARK: - Methods
     func checkUser() -> Single<Bool> {
-        guard let userId = tokenManager.getToken() else {
+        guard let userId = tokenManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
         }
         
@@ -42,7 +42,7 @@ final class DefaultAuthRepository: AuthRepository {
     }
 
     func createUser(nickname: String, fcmToken: String) -> Observable<Void> {
-        guard let userId = tokenManager.getToken() else {
+        guard let userId = tokenManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
         }
         let user = UserDTO(
@@ -81,7 +81,7 @@ final class DefaultAuthRepository: AuthRepository {
                     single(.failure(LocalError.signInError))
                     return
                 }
-                self?.tokenManager.save(token: userId)
+                self?.tokenManager.save(token: userId, with: .userId)
                 single(.success(userId))
             }
             return Disposables.create()

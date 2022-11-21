@@ -27,7 +27,7 @@ final class DefaultChatroomRepository: ChatroomRepository {
     }
 
     func fetch() -> Observable<[Chatroom]> {
-        guard let userId = tokenManager.getToken() else {
+        guard let userId = tokenManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
         }
         

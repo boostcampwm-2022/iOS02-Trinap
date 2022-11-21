@@ -11,14 +11,13 @@ import Foundation
 final class KeychainTokenManager: TokenManager {
     
     // MARK: - Properties
-    private let keychainAccount = "com.tnzkm.keychain"
     private let securityClass = kSecClassGenericPassword
     
     // MARK: - Methods
-    func getToken() -> Token? {
+    func getToken(with key: KeychainAccount) -> Token? {
         let query: [CFString: Any] = [
             kSecClass: securityClass,
-            kSecAttrAccount: keychainAccount,
+            kSecAttrAccount: key.rawValue,
             kSecMatchLimit: kSecMatchLimitOne,
             kSecReturnAttributes: true,
             kSecReturnData: true
@@ -44,12 +43,12 @@ final class KeychainTokenManager: TokenManager {
         return token
     }
     
-    func save(token: Token) -> Bool {
+    func save(token: Token, with key: KeychainAccount) -> Bool {
         guard let tokenData = token.data(using: .utf8) else { return false }
         
         let saveQuery: [CFString: Any] = [
             kSecClass: securityClass,
-            kSecAttrAccount: keychainAccount,
+            kSecAttrAccount: key.rawValue,
             kSecValueData: tokenData
         ]
         
@@ -58,18 +57,18 @@ final class KeychainTokenManager: TokenManager {
         if status == errSecSuccess {
             return true
         } else if status == errSecDuplicateItem {
-            return update(tokenData: tokenData)
+            return update(tokenData: tokenData, with: key)
         } else {
             logStatus(status)
             return false
         }
     }
     
-    private func update(tokenData: Data) -> Bool {
+    private func update(tokenData: Data, with key: KeychainAccount) -> Bool {
         let updateQuery: [CFString: Any] = [kSecValueData: tokenData]
         let searchQuery: [CFString: Any] = [
             kSecClass: securityClass,
-            kSecAttrAccount: keychainAccount
+            kSecAttrAccount: key.rawValue
         ]
         
         let status = SecItemUpdate(searchQuery as CFDictionary, updateQuery as CFDictionary)
@@ -82,10 +81,10 @@ final class KeychainTokenManager: TokenManager {
         }
     }
     
-    func deleteToken() -> Bool {
+    func deleteToken(with key: KeychainAccount) -> Bool {
         let searchQuery: [CFString: Any] = [
             kSecClass: securityClass,
-            kSecAttrAccount: keychainAccount
+            kSecAttrAccount: key.rawValue
         ]
         
         let status = SecItemDelete(searchQuery as CFDictionary)
