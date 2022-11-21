@@ -38,6 +38,34 @@ final class DefaultMapService: NSObject, MapService {
     func setSearchText(with searchText: String) {
         searchCompleter.queryFragment = searchText
     }
+    
+    private func fetchSelectedLocationInfo(with selectedResult: MKLocalSearchCompletion) -> Single<Space?> {
+        
+        return Single.create { single in
+            let searchRequest = MKLocalSearch.Request(completion: selectedResult)
+            let search = MKLocalSearch(request: searchRequest)
+            search.start { response, error in
+                if let error = error {
+                    return single(.success(nil))
+                }
+                
+                guard let placeMark = response?.mapItems[0].placemark else {
+                    return single(.success(nil))
+                }
+                
+                let coordinate = placeMark.coordinate
+                return single(
+                    .success(
+                        Space(
+                            name: selectedResult.title,
+                            address: selectedResult.subtitle,
+                            lat: coordinate.latitude,
+                            lng: coordinate.longitude
+                        )))
+            }
+            return Disposables.create()
+        }
+    }
 
 }
 
