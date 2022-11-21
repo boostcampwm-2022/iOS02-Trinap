@@ -34,3 +34,5 @@ struct Chat {
     // TODO: Optional 제거한 다른 타입 생성하기
     var user: User?
 }
+
+extension Chat: Hashable {}
