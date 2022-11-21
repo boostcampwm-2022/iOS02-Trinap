@@ -44,7 +44,7 @@ class ChatCell: BaseTableViewCell {
     override func configureConstraints() {
         profileImageView.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(16)
-            make.centerY.equalToSuperview()
+            make.top.equalToSuperview().offset(10)
             make.width.height.equalTo(28)
         }
         

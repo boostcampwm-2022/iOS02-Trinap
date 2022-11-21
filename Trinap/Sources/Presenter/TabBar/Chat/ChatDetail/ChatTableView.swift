@@ -17,6 +17,7 @@ final class ChatTableView: UITableView {
         super.init(frame: .zero, style: .plain)
         
         self.separatorStyle = .none
+        self.allowsSelection = false
     }
     
     required init?(coder: NSCoder) {
