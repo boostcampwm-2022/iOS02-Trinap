@@ -40,8 +40,8 @@ final class TextChatCell: ChatCell {
         }
     }
     
-    override func configureCell(by chat: Chat) {
-        super.configureCell(by: chat)
+    override func configureCell(by chat: Chat, hasMyChatBefore: Bool, completion: (() -> Void)? = nil) {
+        super.configureCell(by: chat, hasMyChatBefore: hasMyChatBefore, completion: completion)
         
         self.chatLabel.text = chat.content
     }

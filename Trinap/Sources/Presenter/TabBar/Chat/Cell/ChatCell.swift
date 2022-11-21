@@ -44,46 +44,65 @@ class ChatCell: BaseTableViewCell {
     override func configureConstraints() {
         profileImageView.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(16)
-            make.top.equalToSuperview().offset(10)
+            make.top.equalToSuperview().offset(8)
             make.width.height.equalTo(28)
         }
         
-        configureLayoutAsOther()
+        configureLayoutAsOther(hasMyChatBefore: false)
     }
     
-    func configureCell(by chat: Chat) {
+    func configureCell(by chat: Chat, hasMyChatBefore: Bool, completion: (() -> Void)? = nil) {
         self.profileImageView.setImage(at: chat.user?.profileImage)
         self.chatContentView.sender = chat.senderType
-        self.reconfigureLayout(by: chat.senderType)
+        self.reconfigureLayout(
+            by: chat.senderType,
+            hasMyChatBefore: hasMyChatBefore
+        )
+        completion?()
     }
 }
 
 // MARK: - Privates
 private extension ChatCell {
     
-    private func reconfigureLayout(by senderType: Chat.SenderType) {
+    private func reconfigureLayout(
+        by senderType: Chat.SenderType,
+        hasMyChatBefore: Bool
+    ) {
         if senderType == .mine {
-            self.configureLayoutAsMine()
+            self.configureLayoutAsMine(hasMyChatBefore: hasMyChatBefore)
         } else {
-            self.configureLayoutAsOther()
+            self.configureLayoutAsOther(hasMyChatBefore: hasMyChatBefore)
         }
     }
     
-    private func configureLayoutAsMine() {
+    private func configureLayoutAsMine(hasMyChatBefore: Bool) {
         profileImageView.isHidden = true
+        let topInset = topInset(when: hasMyChatBefore)
         chatContentView.snp.remakeConstraints { make in
             make.trailing.equalToSuperview().offset(-12)
             make.leading.greaterThanOrEqualToSuperview().offset(100)
-            make.top.bottom.equalToSuperview().inset(8)
+            make.bottom.equalToSuperview().inset(8)
+            make.top.equalToSuperview().inset(topInset)
         }
     }
     
-    private func configureLayoutAsOther() {
-        profileImageView.isHidden = false
+    private func configureLayoutAsOther(hasMyChatBefore: Bool) {
+        profileImageView.isHidden = hasMyChatBefore
+        let topInset = topInset(when: hasMyChatBefore)
         chatContentView.snp.remakeConstraints { make in
             make.leading.equalTo(profileImageView.snp.trailing).offset(8)
             make.trailing.lessThanOrEqualToSuperview().offset(-100)
-            make.top.bottom.equalToSuperview().inset(8)
+            make.bottom.equalToSuperview().inset(8)
+            make.top.equalToSuperview().inset(topInset)
+        }
+    }
+    
+    private func topInset(when hasMyChatBefore: Bool) -> CGFloat {
+        if hasMyChatBefore {
+            return 0
+        } else {
+            return 8
         }
     }
 }
