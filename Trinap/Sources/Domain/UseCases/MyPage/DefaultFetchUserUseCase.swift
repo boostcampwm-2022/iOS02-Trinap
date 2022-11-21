@@ -24,8 +24,6 @@ final class DefaultFetchUserUseCase: FetchUserUseCase {
     }
     
     func fetchUserInfo() -> Observable<User> {
-        tokenManager.save(token: "RbsMGyMhufNr4wqF2blOzvL9y092", with: .userId)
-        
         guard let token = tokenManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
         }
