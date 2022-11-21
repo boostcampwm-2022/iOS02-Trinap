@@ -15,15 +15,15 @@ final class AppCoordinator: Coordinator {
     var navigationController: UINavigationController
     var childCoordinators: [Coordinator]
     
-    // MARK: - Methods
+    // MARK: - Initializers
     init(_ navigationController: UINavigationController) {
         self.navigationController = navigationController
         self.childCoordinators = []
     }
     
+    // MARK: - Methods
     func start() {
         let splashViewController = SplashViewController()
-        
         navigationController.pushViewController(splashViewController, animated: false)
     }
 }
@@ -38,7 +38,7 @@ private extension AppCoordinator {
         self.childCoordinators.append(authCoordinator)
     }
     
-    func connectTaBarFlow() {
+    func connectTabBarFlow() {
         let tabBarCoordinator = TabBarCoordinator(self.navigationController)
         tabBarCoordinator.delegate = self
         tabBarCoordinator.start()
@@ -51,9 +51,9 @@ extension AppCoordinator: CoordinatorDelegate {
     
     func didFinish(childCoordinator: Coordinator) {
         // TODO: AuthFlow <-> TabBarFlow로 전환 구현
-        navigationController.viewControllers.removeAll()
+        self.navigationController.viewControllers.removeAll()
         if childCoordinator is AuthCoordinator {
-            self.connectTaBarFlow()
+            self.connectTabBarFlow()
         } else {
             self.connectAuthFlow()
         }
