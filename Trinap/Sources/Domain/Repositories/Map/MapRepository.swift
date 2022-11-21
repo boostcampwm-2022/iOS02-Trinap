@@ -1,5 +1,5 @@
 //
-//  MapService.swift
+//  MapRepository.swift
 //  Trinap
 //
 //  Created by kimchansoo on 2022/11/21.
@@ -10,8 +10,9 @@ import MapKit
 import Foundation
 
 import RxSwift
+import RxRelay
 
-protocol MapService {
+protocol MapRepository {
     // MARK: Properties
     var results: BehaviorRelay<[Space]> { get }
     

@@ -1,5 +1,5 @@
 //
-//  DefaultMapService.swift
+//  DefaultMapRepository.swift
 //  Trinap
 //
 //  Created by kimchansoo on 2022/11/21.
@@ -12,7 +12,7 @@ import Foundation
 import RxSwift
 import RxRelay
 
-final class DefaultMapService: NSObject, MapService {
+final class DefaultMapRepository: NSObject, MapRepository {
 
     // MARK: Properties
     private let disposebag = DisposeBag()
@@ -78,7 +78,7 @@ final class DefaultMapService: NSObject, MapService {
 
 }
 
-extension DefaultMapService: CLLocationManagerDelegate {
+extension DefaultMapRepository: CLLocationManagerDelegate {
 //    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
 //        if let location = locations.first {
 //            self.curCoordinate.accept(Coordinate(lat: location.coordinate.latitude, lng: location.coordinate.longitude))
@@ -91,7 +91,7 @@ extension DefaultMapService: CLLocationManagerDelegate {
     }
 }
 
-extension DefaultMapService: MKLocalSearchCompleterDelegate {
+extension DefaultMapRepository: MKLocalSearchCompleterDelegate {
     
     func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
         Observable.zip(completer.results.compactMap {
