@@ -19,14 +19,23 @@ struct ChatDTO: Codable {
     let createdAt: String
     
     // MARK: - Methods
-    func toModel() -> Chat {
+    func toModel(clientId: String) -> Chat {
         return Chat(
             chatId: chatId,
             senderUserId: senderUserId,
+            senderType: getSenderType(clientId: clientId),
             chatType: chatType,
             content: content,
             isChecked: isChecked,
             createdAt: Date.fromStringOrNow(createdAt)
         )
+    }
+    
+    private func getSenderType(clientId: String) -> Chat.SenderType {
+        if clientId == self.senderUserId {
+            return .mine
+        } else {
+            return .other
+        }
     }
 }
