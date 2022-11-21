@@ -37,6 +37,6 @@ final class MockReviewRepository: ReviewRepository {
     }
     
     func createReview(to photograhperId: String, contents: String, rating: Int) -> Observable<Bool> {
-        return .just(!(contents.isEmpty || rating > 0 || rating > 6))
+        return .just(!(contents.isEmpty || rating <= 0 || rating > 5))
     }
 }
