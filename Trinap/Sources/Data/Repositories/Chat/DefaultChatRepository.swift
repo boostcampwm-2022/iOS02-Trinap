@@ -11,7 +11,6 @@ import Foundation
 import FirestoreService
 import RxSwift
 
-// TODO: - 각 메서드에 Date 기준으로 Chat sort하는 코드 넣기
 final class DefaultChatRepository: ChatRepository {
     
     // MARK: - Properties
@@ -28,24 +27,29 @@ final class DefaultChatRepository: ChatRepository {
     }
     
     func observe(chatroomId: String) -> Observable<[Chat]> {
+        guard let userId = tokenManager.getToken(with: .userId) else {
+            return .error(TokenManagerError.notFound)
+        }
+        
         return self.firestoreService
             .observe(documents: ["chatrooms", chatroomId, "chats"])
-            .map { $0.compactMap { $0.toObject(ChatDTO.self)?.toModel() } }
+            .map { $0.compactMap { $0.toObject(ChatDTO.self)?.toModel(clientId: userId) } }
+            .map { $0.sorted { $0.createdAt < $1.createdAt } }
             .asObservable()
     }
     
-    func send(chat: Chat, at chatroomId: String) -> Observable<Void> {
+    func send(chatType: Chat.ChatType, content: String, at chatroomId: String) -> Observable<Void> {
         guard let userId = tokenManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
         }
         
         let chatDTO = ChatDTO(
-            chatId: chat.chatId,
+            chatId: UUID().uuidString,
             senderUserId: userId,
-            chatType: chat.chatType,
-            content: chat.content,
-            isChecked: chat.isChecked,
-            createdAt: chat.createdAt.toString(type: .timeStamp)
+            chatType: chatType,
+            content: content,
+            isChecked: false,
+            createdAt: Date().toString(type: .timeStamp)
         )
         
         guard let values = chatDTO.asDictionary else {

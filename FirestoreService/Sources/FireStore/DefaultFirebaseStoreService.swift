@@ -20,10 +20,22 @@ public enum FireStoreError: Error, LocalizedError {
 public final class DefaultFireStoreService: FireStoreService {
     
     // MARK: Properties
-    private let database = Firestore.firestore()
+    private let database: Firestore
     
     // MARK: Methods
-    public init() {}
+    public init(
+        firestore: Firestore = Firestore.firestore(),
+        allowsCaching: Bool = true
+    ) {
+        if !allowsCaching {
+            let setting = Firestore.firestore().settings
+            setting.isPersistenceEnabled = false
+            
+            firestore.settings = setting
+        }
+        
+        self.database = firestore
+    }
     
     public func getDocument(collection: FireStoreCollection, document: String) -> Single<FirebaseData> {
         

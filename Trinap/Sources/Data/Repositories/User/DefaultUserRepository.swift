@@ -18,8 +18,11 @@ final class DefaultUserRepository: UserRepository {
     private let tokenManager: TokenManager
     
     // MARK: - Methods
-    init(tokenManager: TokenManager = KeychainTokenManager()) {
-        self.firestoreService = DefaultFireStoreService()
+    init(
+        firestoreService: FireStoreService,
+        tokenManager: TokenManager = KeychainTokenManager()
+    ) {
+        self.firestoreService = firestoreService
         self.tokenManager = tokenManager
     }
     
@@ -45,6 +48,13 @@ final class DefaultUserRepository: UserRepository {
         
         let userIds = userIds.filter { $0 != userId }
         
+        return self.firestoreService
+            .getDocument(collection: .users, field: "userId", in: userIds)
+            .map { $0.compactMap { $0.toObject(UserDTO.self)?.toModel() } }
+            .asObservable()
+    }
+    
+    func fetchUsersWithMine(userIds: [String]) -> Observable<[User]> {
         return self.firestoreService
             .getDocument(collection: .users, field: "userId", in: userIds)
             .map { $0.compactMap { $0.toObject(UserDTO.self)?.toModel() } }

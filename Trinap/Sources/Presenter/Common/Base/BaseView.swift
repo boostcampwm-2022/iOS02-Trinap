@@ -18,6 +18,7 @@ class BaseView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        self.backgroundColor = TrinapAsset.white.color
         configureAttributes()
         configureHierarchy()
         configureConstraints()
