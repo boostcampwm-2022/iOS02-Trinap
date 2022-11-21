@@ -129,7 +129,6 @@ final class CreateReviewViewController: BaseViewController {
         reviewTextView.rx.didEndEditing
             .bind { [weak self] _ in
                 guard let self else { return }
-                print("end")
                 if self.reviewTextView.text == nil || self.reviewTextView.text.isEmpty {
                     self.reviewTextView.text = "작가님을 위한 한마디를 남겨주세요!"
                     self.reviewTextView.textColor = .lightGray

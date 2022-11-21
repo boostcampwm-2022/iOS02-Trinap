@@ -22,7 +22,7 @@ final class ProfileImageView: UIImageView {
         
         self.clipsToBounds = true
         self.contentMode = .scaleAspectFill
-        self.backgroundColor = TrinapAsset.background.color
+        self.backgroundColor = TrinapAsset.gray40.color
     }
     
     required init?(coder: NSCoder) {
