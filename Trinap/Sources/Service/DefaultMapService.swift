@@ -41,3 +41,18 @@ final class DefaultMapService: NSObject, MapService {
 
 }
 
+
+extension DefaultMapService: MKLocalSearchCompleterDelegate {
+    
+    func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
+        Observable.zip(completer.results.compactMap {
+            self.fetchSelectedLocationInfo(with: $0).asObservable()
+        })
+        .map { locations -> [Space] in
+            let filtered = locations.filter { $0 != nil }
+            return filtered.compactMap{ $0 }
+        }
+        .bind(to: results)
+        .disposed(by: disposebag)
+    }
+    
