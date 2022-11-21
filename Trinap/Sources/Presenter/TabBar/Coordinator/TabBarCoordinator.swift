@@ -25,31 +25,31 @@ final class TabBarCoordinator: Coordinator {
     
     // MARK: - Methods
     func start() {
-        let pages: [TabBarPageCase] = TabBarPageCase.allCases
+        let pages: [TabBarPageType] = TabBarPageType.allCases
         let controllers: [UINavigationController] = pages.map {
             self.createTabNavigationController(of: $0)
         }
         self.configureTabBarController(with: controllers)
     }
     
-    func currentPage() -> TabBarPageCase? {
-        return TabBarPageCase(rawValue: self.tabBarController.selectedIndex)
+    func currentPage() -> TabBarPageType? {
+        return TabBarPageType(rawValue: self.tabBarController.selectedIndex)
     }
 
-    func selectPage(_ page: TabBarPageCase) {
-        self.tabBarController.selectedIndex = page.pageOrderNumber
+    func selectPage(_ page: TabBarPageType) {
+        self.tabBarController.selectedIndex = page.rawValue
     }
 
     func setSelectedIndex(_ index: Int) {
-        guard let page = TabBarPageCase(rawValue: index) else { return }
-        self.tabBarController.selectedIndex = page.pageOrderNumber
+        guard let page = TabBarPageType(rawValue: index) else { return }
+        self.tabBarController.selectedIndex = page.rawValue
     }
 }
 
 private extension TabBarCoordinator {
     private func configureTabBarController(with tabViewControllers: [UIViewController]) {
         self.tabBarController.setViewControllers(tabViewControllers, animated: true)
-        self.tabBarController.selectedIndex = TabBarPageCase.main.pageOrderNumber
+        self.tabBarController.selectedIndex = TabBarPageType.main.rawValue
         self.tabBarController.view.backgroundColor = TrinapAsset.background.color
         self.tabBarController.tabBar.backgroundColor = TrinapAsset.background.color
         self.tabBarController.tabBar.tintColor = TrinapAsset.primary.color
@@ -58,24 +58,15 @@ private extension TabBarCoordinator {
         self.navigationController.pushViewController(tabBarController, animated: true)
     }
     
-    func configureTabBarItem(of page: TabBarPageCase) -> UITabBarItem {
-        return UITabBarItem(
-            title: page.pageTitle,
-            image: page.tabIcon(),
-            tag: page.pageOrderNumber
-        )
-    }
-    
-    func createTabNavigationController(of page: TabBarPageCase) -> UINavigationController {
+    func createTabNavigationController(of page: TabBarPageType) -> UINavigationController {
         let tabNavigationController = UINavigationController()
         tabNavigationController.setNavigationBarHidden(false, animated: false)
-        tabNavigationController.tabBarItem = self.configureTabBarItem(of: page)
-        tabNavigationController.tabBarItem.selectedImage = page.selectedTabIcon()
+        tabNavigationController.tabBarItem = page.tabBarItem
         connectTabCoordinator(of: page, to: tabNavigationController)
         return tabNavigationController
     }
     
-    func connectTabCoordinator(of page: TabBarPageCase, to tabNavigationController: UINavigationController) {
+    func connectTabCoordinator(of page: TabBarPageType, to tabNavigationController: UINavigationController) {
         switch page {
         case .main:
             self.connectMainFlow(to: tabNavigationController)
