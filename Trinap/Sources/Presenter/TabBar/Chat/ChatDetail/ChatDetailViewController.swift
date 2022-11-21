@@ -25,7 +25,7 @@ final class ChatDetailViewController: BaseViewController {
     private lazy var chatTableView: ChatTableView = {
         let chatTableView = ChatTableView()
         
-        chatTableView.dataSource = dataSource
+//        chatTableView.dataSource = dataSource
         chatTableView.keyboardDismissMode = .onDrag
         return chatTableView
     }()
