@@ -40,7 +40,7 @@ final class DefaultAuthRepository: AuthRepository {
         )
         .map { !$0.isEmpty }
     }
-
+    
     func createUser(nickname: String) -> Observable<Void> {
         guard
             let userId = tokenManager.getToken(with: .userId),

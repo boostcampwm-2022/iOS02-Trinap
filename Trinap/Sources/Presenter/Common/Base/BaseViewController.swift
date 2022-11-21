@@ -12,13 +12,13 @@ import RxSwift
 class BaseViewController: UIViewController {
     
     // MARK: - Properties
-    let disposeBag = DisposeBag()
+    var disposeBag = DisposeBag()
     
     // MARK: - Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.view.backgroundColor = TrinapAsset.background.color
+        self.view.backgroundColor = TrinapAsset.white.color
         
         configureAttributes()
         configureHierarchy()
