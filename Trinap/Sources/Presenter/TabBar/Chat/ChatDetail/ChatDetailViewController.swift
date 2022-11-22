@@ -24,7 +24,6 @@ final class ChatDetailViewController: BaseViewController {
     private lazy var chatTableView: ChatTableView = {
         let chatTableView = ChatTableView()
         
-//        chatTableView.dataSource = dataSource
         chatTableView.keyboardDismissMode = .onDrag
         return chatTableView
     }()
@@ -32,12 +31,15 @@ final class ChatDetailViewController: BaseViewController {
     // MARK: - Properties
     private let viewModel: ChatDetailViewModel
     private var dataSource: UITableViewDiffableDataSource<Section, Chat>?
+    private var imagePicker = ImagePickerController()
     
     // MARK: - Initializers
     init(viewModel: ChatDetailViewModel) {
         self.viewModel = viewModel
         
         super.init()
+        
+        self.imagePicker.delegate = self
     }
     
     required init?(coder: NSCoder) {
@@ -77,6 +79,20 @@ final class ChatDetailViewController: BaseViewController {
             .disposed(by: disposeBag)
         
         self.dataSource = self.configureDataSource()
+        
+        let selectImage = self.imagePicker
+            .pickImage()
+            .observe(on: MainScheduler.instance)
+        
+        chatInputView.didTapAction
+            .asObservable()
+            .flatMap { _ in
+                return selectImage
+            }
+            .subscribe(onNext: { image in
+                print(image)
+            })
+            .disposed(by: disposeBag)
     }
     
     override func bind() {
