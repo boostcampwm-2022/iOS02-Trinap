@@ -6,15 +6,26 @@
 //  Copyright © 2022 Trinap. All rights reserved.
 //
 
+import MapKit
 import UIKit
 
 import RxCocoa
 import RxSwift
 import SnapKit
+import Than
 
 final class LocationShareViewController: BaseViewController {
     
     // MARK: - UI
+    private lazy var mapView = MKMapView().than {
+        $0.delegate = self
+    }
+    
+    private lazy var locationManager = CLLocationManager().than {
+        $0.delegate = self
+        $0.requestWhenInUseAuthorization()
+        $0.startUpdatingLocation()
+    }
     
     // MARK: - Properties
     private let viewModel: LocationShareViewModel
@@ -32,21 +43,36 @@ final class LocationShareViewController: BaseViewController {
     }
     
     override func configureHierarchy() {
-        self.view.addSubviews([
-        ])
+        self.view.addSubviews([mapView])
     }
     
     override func configureConstraints() {
-        <#view#>.snp.makeConstraints { make in
-            make.<#code#>
+        mapView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
         }
     }
     
     override func configureAttributes() {
-        <#code#>
+        
     }
     
     override func bind() {
-        <#code#>
+        
+    }
+}
+
+// MARK: - MKMapView Delegate
+extension LocationShareViewController: MKMapViewDelegate {
+    
+    func mapView(_ mapView: MKMapView, didUpdate userLocation: MKUserLocation) {
+        
+    }
+}
+
+// MARK: - LocationShare Delegate
+extension LocationShareViewController: CLLocationManagerDelegate {
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        
     }
 }

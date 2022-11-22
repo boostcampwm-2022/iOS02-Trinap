@@ -13,26 +13,26 @@ import RxSwift
 final class LocationShareViewModel: ViewModelType {
     
     struct Input {
-        <#code#>
+        
     }
     
     struct Output {
-        <#code#>
+        
     }
     
     // MARK: - Properties
     let disposeBag = DisposeBag()
     
-    private let <#useCase#>: <#UseCaseType#>
+//    private let <#useCase#>: <#UseCaseType#>
     
     // MARK: - Initializer
-    init(<#parameters#>) {
-        <#statements#>
-    }
+//    init(<#parameters#>) {
+//        <#statements#>
+//    }
     
     // MARK: - Methods
     func transform(input: Input) -> Output {
         
-        return Output(<#code#>)
+        return Output()
     }
 }

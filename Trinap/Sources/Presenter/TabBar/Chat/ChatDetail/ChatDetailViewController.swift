@@ -187,7 +187,30 @@ extension ChatDetailViewController {
             let hasMyChatBefore = self.viewModel.hasMyChat(before: indexPath.row)
             cell.configureCell(by: item, hasMyChatBefore: hasMyChatBefore)
             
+            self.observeTapActionIfPossible(cell, disposedBy: item.chatId)
+            
             return cell
+        }
+    }
+    
+    private func observeTapActionIfPossible(_ cell: ChatCell, disposedBy id: String) {
+        guard let actionCell = cell as? ActionChatCell else { return }
+        
+        actionCell.didTapAction
+            .subscribe(onNext: { [weak self] _ in
+                self?.handleChatActionButtonTapped(actionCell)
+            })
+            .disposed(by: actionCell.actionDisposeBag)
+    }
+    
+    private func handleChatActionButtonTapped(_ cell: ActionChatCell) {
+        switch cell {
+        case is LocationShareChatCell:
+            viewModel.presentLocationShare()
+        case is ReservationChatCell:
+            Logger.print("Reservation")
+        default:
+            break
         }
     }
 }

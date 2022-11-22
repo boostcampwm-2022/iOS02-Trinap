@@ -89,6 +89,10 @@ final class ChatDetailViewModel: ViewModelType {
             return chats.value.count - 1
         }
     }
+    
+    func presentLocationShare() {
+        coordinator?.showLocationShareViewController()
+    }
 }
 
 // MARK: - Privates
