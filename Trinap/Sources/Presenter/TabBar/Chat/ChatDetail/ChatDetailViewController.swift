@@ -93,6 +93,13 @@ final class ChatDetailViewController: BaseViewController {
         output.chats
             .compactMap { [weak self] chats in self?.generateSnapshot(chats) }
             .subscribe { [weak self] snapshot in
+                guard
+                    let chats = self?.viewModel.chats.value,
+                    !chats.isEmpty
+                else {
+                    return
+                }
+                
                 self?.dataSource?.apply(snapshot, animatingDifferences: false) {
                     self?.scrollToBottom()
                 }
@@ -101,8 +108,8 @@ final class ChatDetailViewController: BaseViewController {
     }
     
     private func scrollToBottom() {
-        let lastChatIndex = viewModel.chats.value.count - 1
-        let lastIndexPath = IndexPath(item: lastChatIndex, section: 0)
+        let lastChatIndex = viewModel.lastChatIndex()
+        let lastIndexPath = IndexPath(row: lastChatIndex, section: 0)
         
         self.chatTableView.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
     }

@@ -26,6 +26,7 @@ final class ChatDetailViewModel: ViewModelType {
     let disposeBag = DisposeBag()
     let chats = BehaviorRelay<[Chat]>(value: [])
     
+    private weak var coordinator: ChatCoordinator?
     private let chatroomId: String
     private let observeChatUseCase: ObserveChatUseCase
     private let sendChatUseCase: SendChatUseCase
@@ -33,11 +34,13 @@ final class ChatDetailViewModel: ViewModelType {
     
     // MARK: - Initializer
     init(
+        coordinator: ChatCoordinator,
         chatroomId: String,
         observeChatUseCase: ObserveChatUseCase,
         sendChatUseCase: SendChatUseCase,
         uploadImageUseCase: UploadImageUseCase
     ) {
+        self.coordinator = coordinator
         self.chatroomId = chatroomId
         self.observeChatUseCase = observeChatUseCase
         self.sendChatUseCase = sendChatUseCase
@@ -77,6 +80,14 @@ final class ChatDetailViewModel: ViewModelType {
             .flatMap { owner, imageURL in
                 return owner.sendImageChat(imageURL)
             }
+    }
+    
+    func lastChatIndex() -> Int {
+        if chats.value.isEmpty {
+            return 0
+        } else {
+            return chats.value.count - 1
+        }
     }
 }
 
