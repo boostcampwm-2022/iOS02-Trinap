@@ -14,4 +14,5 @@ protocol CreateUserUseCase {
     
     // MARK: - Methods
     func createUser(with nickName: String) -> Observable<Void>
+    func createRandomNickname() -> Observable<String>
 }
