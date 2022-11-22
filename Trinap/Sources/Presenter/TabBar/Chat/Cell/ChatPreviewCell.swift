@@ -55,6 +55,10 @@ final class ChatPreviewCell: BaseTableViewCell {
     // MARK: - Initializer
     
     // MARK: - Methods
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(false, animated: false)
+    }
+    
     func bind(lastChatPreview: Driver<ChatPreview>) {
         lastChatPreview.drive { [weak self] chatPreview in
             guard let self else { return }

@@ -20,10 +20,9 @@ final class ChatPreviewsViewController: BaseViewController {
         let rowHeight = 80.0
         
         tableView.register(ChatPreviewCell.self)
-        tableView.dataSource = dataSource
+        tableView.delegate = self
         tableView.separatorStyle = .none
         tableView.rowHeight = rowHeight
-        tableView.allowsSelection = false
         return tableView
     }()
     
@@ -40,10 +39,6 @@ final class ChatPreviewsViewController: BaseViewController {
     }
     
     // MARK: - Methods
-    override func viewDidLoad() {
-        super.viewDidLoad()
-    }
-    
     override func configureHierarchy() {
         self.view.addSubview(chatPreviewsTableView)
     }
@@ -103,5 +98,16 @@ private extension ChatPreviewsViewController {
             
             return cell
         }
+    }
+}
+
+extension ChatPreviewsViewController: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let chatPreview = self.dataSource?.itemIdentifier(for: indexPath) else {
+            return
+        }
+        
+        self.viewModel.showChatDetail(of: chatPreview)
     }
 }

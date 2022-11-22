@@ -87,8 +87,13 @@ public final class DefaultFireStoreService: FireStoreService {
         return Single.create { [weak self] single in
             guard let self else { return Disposables.create() }
             
+            var queries = values
+            if queries.isEmpty {
+                queries.append("")
+            }
+            
             self.database.collection(collection.name)
-                .whereField(field, in: values)
+                .whereField(field, in: queries)
                 .getDocuments { snapshot, error in
                     if let error = error {
                         single(.failure(error))
@@ -362,9 +367,15 @@ public extension DefaultFireStoreService {
     func observe(collection: FireStoreCollection, field: String, in values: [Any]) -> Observable<[FirebaseData]> {
         return Observable.create { [weak self] observable in
             guard let self else { return Disposables.create() }
+            
+            var queries = values
+            if queries.isEmpty {
+                queries.append("")
+            }
+            
             self.database
                 .collection(collection.name)
-                .whereField(field, in: values)
+                .whereField(field, in: queries)
                 .addSnapshotListener { snapshot, error in
                     if let error = error {
                         observable.onError(error)
