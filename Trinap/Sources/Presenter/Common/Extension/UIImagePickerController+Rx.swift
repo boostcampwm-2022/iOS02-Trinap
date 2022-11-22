@@ -31,12 +31,12 @@ protocol ImagePickerDelegate: AnyObject {
  ```
  class SomeViewController: UIViewController {
     
-    private let imagePicker: ImagePickerController
+    private let imagePicker = ImagePickerController()
     
     init(...) {
         super.init(...)
  
-        self.imagePicker = ImagePickerController(delegate: self)
+        self.imagePicker.delegate = self
     }
  
     ...
@@ -57,9 +57,6 @@ final class ImagePickerController: NSObject {
     private var allowsEditing = false
     
     // MARK: - Initializer
-    init(delegate: ImagePickerDelegate) {
-        self.delegate = delegate
-    }
     
     // MARK: - Methods
     func pickImage(
