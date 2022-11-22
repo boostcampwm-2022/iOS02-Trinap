@@ -49,6 +49,30 @@ final class DefaultMapRepository: NSObject, MapRepository {
         return .success(Coordinate(lat: lat, lng: lng))
     }
     
+    func fetchLocationName(using coordinate: Coordinate) -> Observable<String> {
+        return Observable.create { observable in
+            let location = CLLocation(
+                latitude: coordinate.lat,
+                longitude: coordinate.lng
+            )
+            
+            let geocoder = CLGeocoder()
+            let locale = Locale(identifier: "Ko-kr")
+            
+            geocoder.reverseGeocodeLocation(location) { placemarks, error in
+                guard let address: [CLPlacemark] = placemarks,
+                      let name = address.last?.name
+                else {
+                    observable.onError(LocalError.addressError)
+                    return
+                }
+                
+                observable.onNext(name)
+            }
+            return Disposables.create()
+        }
+    }
+    
     private func fetchSelectedLocationInfo(with selectedResult: MKLocalSearchCompletion) -> Single<Space?> {
         
         return Single.create { single in
