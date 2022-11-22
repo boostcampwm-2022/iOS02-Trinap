@@ -57,32 +57,32 @@ class BaseProjectFactory: ProjectFactory {
     ]
     
     let infoPlist: [String: InfoPlist.Value] = [
-               "CFBundleShortVersionString": "1.0",
-               "CFBundleVersion": "1",
-               "UILaunchStoryboardName": "LaunchScreen",
-               "UIApplicationSceneManifest": [
-                   "UIApplicationSupportsMultipleScenes": false,
-                   "UISceneConfigurations": [
-                       "UIWindowSceneSessionRoleApplication": [
-                           [
-                               "UISceneConfigurationName": "Default Configuration",
-                               "UISceneDelegateClassName": "$(PRODUCT_MODULE_NAME).SceneDelegate"
-                           ],
-                       ]
-                   ]
-               ],
-               "UIAppFonts": [
-                   "Item 0": "Pretendard-Medium.otf",
-                   "Item 1": "Pretendard-Regular.otf",
-                   "Item 2": "Pretendard-SemiBold.otf",
-                   "Item 3": "Pretendard-Bold.otf"
-               ],
-               "NSPhotoLibraryUsageDescription": "Trinap이 앨범에서 사진을 가져올 수 있도록 허용해주세요.",
-               "Privacy - Location Always Usage Description": "위치 권한 요청",
-               "Privacy - Location Always and When In Use Usage Description": "위치 권한 요청",
-               "NSLocationWhenInUseUsageDescription": "위치 권한 요청",
-           ]
-
+        "CFBundleShortVersionString": "1.0",
+        "CFBundleVersion": "1",
+        "UILaunchStoryboardName": "LaunchScreen",
+        "UIApplicationSceneManifest": [
+            "UIApplicationSupportsMultipleScenes": false,
+            "UISceneConfigurations": [
+                "UIWindowSceneSessionRoleApplication": [
+                    [
+                        "UISceneConfigurationName": "Default Configuration",
+                        "UISceneDelegateClassName": "$(PRODUCT_MODULE_NAME).SceneDelegate"
+                    ],
+                ]
+            ]
+        ],
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "위치 확인을 위한 권한이 필요합니다.",
+        "NSLocationWhenInUseUsageDescription": "위치 확인을 위한 권한이 필요합니다",
+        "NSCameraUsageDescription": "카메라 권한이 필요합니다",
+        "NSPhotoLibraryUsageDescription": "앨범 권한이 필요합니다.",
+        "CFBundleURLTypes" : ["App-prefs"],
+        "UIAppFonts": [
+            "Item 0": "Pretendard-Medium.otf",
+            "Item 1": "Pretendard-Regular.otf",
+            "Item 2": "Pretendard-SemiBold.otf",
+            "Item 3": "Pretendard-Bold.otf"
+        ]
+    ]
     
     func generateConfigurations() -> Settings {
         return Settings.settings(configurations: [
