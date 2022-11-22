@@ -76,7 +76,8 @@ class BaseProjectFactory: ProjectFactory {
                    "Item 1": "Pretendard-Regular.otf",
                    "Item 2": "Pretendard-SemiBold.otf",
                    "Item 3": "Pretendard-Bold.otf"
-               ]
+               ],
+               "NSPhotoLibraryUsageDescription": "Trinap이 앨범에서 사진을 가져올 수 있도록 허용해주세요.",
            ]
 
     
