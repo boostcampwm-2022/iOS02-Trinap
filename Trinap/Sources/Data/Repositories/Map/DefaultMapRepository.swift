@@ -55,7 +55,7 @@ final class DefaultMapRepository: NSObject, MapRepository {
             let searchRequest = MKLocalSearch.Request(completion: selectedResult)
             let search = MKLocalSearch(request: searchRequest)
             search.start { response, error in
-                if let error = error {
+                guard error == nil else {
                     return single(.success(nil))
                 }
                 
