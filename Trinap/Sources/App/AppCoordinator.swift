@@ -23,14 +23,14 @@ final class AppCoordinator: Coordinator {
     
     // MARK: - Methods
     func start() {
-        showSplachViewController()
+        showSplashViewController()
     }
 }
 
 // MARK: - connectFlow Methods
 extension AppCoordinator {
     
-    func showSplachViewController() {
+    func showSplashViewController() {
         let splashViewController = SplashViewController(
             viewModel: SplashViewModel(
                 signInUseCase: DefaultSignInUseCase(
