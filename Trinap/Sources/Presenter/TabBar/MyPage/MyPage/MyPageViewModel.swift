@@ -19,7 +19,9 @@ final class MyPageViewModel: ViewModelType {
     
     private let fetchUserUseCase: FetchUserUseCase
     
-    struct Input { }
+    struct Input {
+        let viewWillAppear: Observable<Bool>
+    }
     
     struct Output {
         let dataSource: Driver<[MyPageDataSource]>
@@ -31,6 +33,20 @@ final class MyPageViewModel: ViewModelType {
     
     func transform(input: Input) -> Output {
         
+        let dataSource = input.viewWillAppear
+            .withUnretained(self)
+            .flatMap { owner, _ in
+                owner.generateDataSource()
+            }
+            .asDriver(onErrorJustReturn: [])
+        
+        return Output(dataSource: dataSource)
+    }
+}
+
+extension MyPageViewModel {
+    
+    private func generateDataSource() -> Observable<[MyPageDataSource]> {
         let profile = generateProfile().map { [$0] }
         
         let rowData = Observable.of([
@@ -39,15 +55,10 @@ final class MyPageViewModel: ViewModelType {
             generateEtc()
         ])
         
-        let dataSource = Observable.zip(profile, rowData)
+        return Observable.zip(profile, rowData)
             .map { $0.0 + $0.1 }
-            .asDriver(onErrorJustReturn: [])
-        
-        return Output(dataSource: dataSource)
     }
-}
-
-extension MyPageViewModel {
+    
     private func generateProfile() -> Observable<MyPageDataSource> {
         
         return fetchUserUseCase.fetchUserInfo()
