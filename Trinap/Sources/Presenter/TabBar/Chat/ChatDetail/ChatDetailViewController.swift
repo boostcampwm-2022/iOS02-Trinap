@@ -127,7 +127,7 @@ extension ChatDetailViewController {
     private func presentActionAlert() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             .appendingAction(title: "포토 라이브러리") { [weak self] in self?.presentPhotoLibrary() }
-            .appendingAction(title: "사진 촬영")
+            .appendingAction(title: "위치 공유")
             .appendingCancel()
         
         self.present(alert, animated: true)
@@ -200,12 +200,10 @@ private extension Chat.ChatType {
             return TextChatCell.self
         case .image:
             return ImageChatCell.self
-        default:
-            return TextChatCell.self
-//        case .reservation:
-//            <#code#>
-//        case .location:
-//            <#code#>
+        case .reservation:
+            return ReservationChatCell.self
+        case .location:
+            return LocationShareChatCell.self
         }
     }
 }
