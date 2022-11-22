@@ -27,7 +27,6 @@ final class CreateUserViewModel: ViewModelType {
     // MARK: - Properties
     weak var coordinator: AuthCoordinator?
     private let createUserUseCase: CreateUserUseCase
-    private let signUpSuccess = PublishRelay<Void>()
     private let signUpFailure = PublishRelay<Void>()
     private let randomNickName = PublishRelay<String>()
     let disposeBag = DisposeBag()
