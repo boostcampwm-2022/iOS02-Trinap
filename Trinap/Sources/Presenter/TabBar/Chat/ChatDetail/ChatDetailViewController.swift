@@ -80,19 +80,7 @@ final class ChatDetailViewController: BaseViewController {
         
         self.dataSource = self.configureDataSource()
         
-        let selectImage = self.imagePicker
-            .pickImage()
-            .observe(on: MainScheduler.instance)
-        
-        chatInputView.didTapAction
-            .asObservable()
-            .flatMap { _ in
-                return selectImage
-            }
-            .subscribe(onNext: { image in
-                print(image)
-            })
-            .disposed(by: disposeBag)
+        bindChatInputAction()
     }
     
     override func bind() {
@@ -117,6 +105,47 @@ final class ChatDetailViewController: BaseViewController {
         let lastIndexPath = IndexPath(item: lastChatIndex, section: 0)
         
         self.chatTableView.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
+    }
+}
+
+// MARK: - Privates
+extension ChatDetailViewController {
+    
+    private func bindChatInputAction() {
+        chatInputView.didTapAction
+            .emit(onNext: { [weak self] _ in self?.presentActionAlert() })
+            .disposed(by: disposeBag)
+    }
+    
+    private func presentActionAlert() {
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+            .appendingAction(title: "포토 라이브러리") { [weak self] in self?.presentPhotoLibrary() }
+            .appendingAction(title: "사진 촬영")
+            .appendingCancel()
+        
+        self.present(alert, animated: true)
+    }
+    
+    private func presentPhotoLibrary() {
+        self.imagePicker
+            .pickImage()
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] image in self?.presentUploadImageAlert(image) })
+            .disposed(by: disposeBag)
+    }
+    
+    private func presentUploadImageAlert(_ image: UIImage) {
+        let alert = UIAlertController(title: nil, message: "선택한 사진을 전송합니다.", preferredStyle: .alert)
+            .appendingAction(title: "전송") { [weak self] in self?.requestUploadImage(image) }
+            .appendingCancel()
+        
+        self.present(alert, animated: true)
+    }
+    
+    private func requestUploadImage(_ image: UIImage) {
+        guard let imageData = image.jpegData(compressionQuality: 1) else { return }
+        
+        self.viewModel.uploadImageAndSendChat(imageData)
     }
 }
 

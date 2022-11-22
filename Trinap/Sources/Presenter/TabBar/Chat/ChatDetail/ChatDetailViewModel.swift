@@ -6,6 +6,8 @@
 //  Copyright © 2022 Trinap. All rights reserved.
 //
 
+import Foundation
+
 import RxCocoa
 import RxRelay
 import RxSwift
@@ -64,6 +66,10 @@ final class ChatDetailViewModel: ViewModelType {
         let currentChat = self.chats.value[index]
         
         return prevChat.senderUserId == currentChat.senderUserId
+    }
+    
+    func uploadImageAndSendChat(_ imageData: Data) {
+        
     }
 }
 
