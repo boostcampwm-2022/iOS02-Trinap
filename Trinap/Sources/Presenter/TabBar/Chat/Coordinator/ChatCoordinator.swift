@@ -16,10 +16,30 @@ final class ChatCoordinator: Coordinator {
     var navigationController: UINavigationController
     var childCoordinators: [Coordinator]
     
+    private let chatRepository: ChatRepository
+    private let observeChatPreviewsUseCase: ObserveChatPreviewsUseCase
+    private let observeChatUseCase: ObserveChatUseCase
+    
     // MARK: - Initializers
     init(_ navigationController: UINavigationController) {
         self.navigationController = navigationController
         self.childCoordinators = []
+        
+        let firestoreService = DefaultFireStoreService()
+        let userRepository = DefaultUserRepository(firestoreService: firestoreService)
+        let chatroomRepository = DefaultChatroomRepository(firebaseStoreService: firestoreService)
+        
+        self.chatRepository = DefaultChatRepository(firestoreService: firestoreService)
+        
+        self.observeChatPreviewsUseCase = DefaultObserveChatPreviewsUseCase(
+            chatroomRepository: chatroomRepository,
+            userRepository: userRepository
+        )
+        
+        self.observeChatUseCase = DefaultObserveChatUseCase(
+            chatRepository: chatRepository,
+            userRepository: userRepository
+        )
     }
     
     // MARK: - Methods
@@ -29,10 +49,37 @@ final class ChatCoordinator: Coordinator {
 }
 
 extension ChatCoordinator {
+    
     func showChatPreviewsViewController() {
-        // TODO: 추후 UI를 구현한 ViewController로 교체
-        let viewController = MockChatViewController()
+        let chatPreviewsViewModel = ChatPreviewsViewModel(
+            coordinator: self,
+            observeChatPreviewsUseCase: observeChatPreviewsUseCase,
+            observeChatUseCase: observeChatUseCase
+        )
+        let viewController = ChatPreviewsViewController(viewModel: chatPreviewsViewModel)
+        
         self.navigationController.setNavigationBarHidden(true, animated: false)
         self.navigationController.pushViewController(viewController, animated: true)
+    }
+    
+    func showChatDetailViewController(chatroomId: String) {
+        let uploadImageRepository = DefaultUploadImageRepository()
+        
+        let sendChatUseCase = DefaultSendChatUseCase(chatRepository: chatRepository)
+        let uploadImageUseCase = DefaultUploadImageUseCase(uploadImageRepository: uploadImageRepository)
+        
+        let chatDetailViewModel = ChatDetailViewModel(
+            coordinator: self,
+            chatroomId: chatroomId,
+            observeChatUseCase: observeChatUseCase,
+            sendChatUseCase: sendChatUseCase,
+            uploadImageUseCase: uploadImageUseCase
+        )
+        let viewController = ChatDetailViewController(viewModel: chatDetailViewModel)
+        
+        self.navigationController.setNavigationBarHidden(false, animated: false)
+        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(viewController, animated: true)
+        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
     }
 }
