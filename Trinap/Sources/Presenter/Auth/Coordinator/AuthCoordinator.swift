@@ -38,7 +38,7 @@ extension AuthCoordinator {
             )
         )
         self.navigationController.setNavigationBarHidden(true, animated: false)
-        self.navigationController.pushViewController(viewController, animated: true)
+        self.navigationController.pushViewController(viewController, animated: false)
     }
     
     // TODO: CreateUserViewController로 이동하는 Method 구현

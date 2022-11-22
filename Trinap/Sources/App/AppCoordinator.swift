@@ -23,15 +23,28 @@ final class AppCoordinator: Coordinator {
     
     // MARK: - Methods
     func start() {
-        let splashViewController = SplashViewController()
-        navigationController.pushViewController(splashViewController, animated: false)
+        showSplachViewController()
     }
 }
 
-// MARK: - Private Methods
-private extension AppCoordinator {
+// MARK: - connectFlow Methods
+extension AppCoordinator {
+    
+    func showSplachViewController() {
+        let splashViewController = SplashViewController(
+            viewModel: SplashViewModel(
+                signInUseCase: DefaultSignInUseCase(
+                    authRepository: DefaultAuthRepository()
+                ),
+                coordinator: self
+            )
+        )
+        navigationController.setNavigationBarHidden(true, animated: false)
+        navigationController.pushViewController(splashViewController, animated: false)
+    }
     
     func connectAuthFlow() {
+        self.navigationController.viewControllers.removeAll()
         let authCoordinator = AuthCoordinator(self.navigationController)
         authCoordinator.delegate = self
         authCoordinator.start()
@@ -39,6 +52,7 @@ private extension AppCoordinator {
     }
     
     func connectTabBarFlow() {
+        self.navigationController.viewControllers.removeAll()
         let tabBarCoordinator = TabBarCoordinator(self.navigationController)
         tabBarCoordinator.delegate = self
         tabBarCoordinator.start()
