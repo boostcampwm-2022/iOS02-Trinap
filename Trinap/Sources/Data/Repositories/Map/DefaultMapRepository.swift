@@ -41,13 +41,12 @@ final class DefaultMapRepository: NSObject, MapRepository {
         searchCompleter.queryFragment = searchText
     }
     
-    func fetchCurrentLocation() -> Observable<Coordinate> {
+    func fetchCurrentLocation() -> Result<Coordinate, Error> {
         guard let lat = locationManager.location?.coordinate.latitude,
-              let lng = locationManager.location?.coordinate.longitude
-        // 오류 처리 어떻게 하면 좋을까요?
-        else { return Observable.just(Coordinate(lat: 0.0, lng: 0.0)) }
+            let lng = locationManager.location?.coordinate.longitude
+        else { return  .failure(LocalError.locationAuthError) }
         
-        return Observable.just(Coordinate(lat: lat, lng: lng))
+        return .success(Coordinate(lat: lat, lng: lng))
     }
     
     private func fetchSelectedLocationInfo(with selectedResult: MKLocalSearchCompletion) -> Single<Space?> {
