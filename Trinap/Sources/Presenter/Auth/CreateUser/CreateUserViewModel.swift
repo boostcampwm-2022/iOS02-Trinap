@@ -20,15 +20,12 @@ final class CreateUserViewModel: ViewModelType {
     
     struct Output {
         let signUpButtonEnable: Driver<Bool>
-        let signUpFailure: Signal<Void>
         let randomNickName: Observable<String>
     }
     
     // MARK: - Properties
     weak var coordinator: AuthCoordinator?
     private let createUserUseCase: CreateUserUseCase
-    private let signUpFailure = PublishRelay<Void>()
-    private let randomNickName = PublishRelay<String>()
     let disposeBag = DisposeBag()
     
     
@@ -54,17 +51,11 @@ final class CreateUserViewModel: ViewModelType {
             })
             .disposed(by: disposeBag)
         
-        input.generateButtonTap
+        let nickname = input.generateButtonTap
             .withUnretained(self)
             .flatMap { owner, _ in
                 return owner.createUserUseCase.createRandomNickname()
             }
-            .withUnretained(self)
-            .subscribe { owner, nickname in
-                owner.randomNickName.accept(nickname)
-            }
-            .disposed(by: disposeBag)
-            
         
         let signUpButtonEnable = input.nickname
             .map { nickname in
@@ -75,8 +66,7 @@ final class CreateUserViewModel: ViewModelType {
         
         return Output(
             signUpButtonEnable: signUpButtonEnable,
-            signUpFailure: signUpFailure.asSignal(),
-            randomNickName: randomNickName.asObservable()
+            randomNickName: nickname
         )
     }
 }

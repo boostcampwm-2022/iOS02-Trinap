@@ -76,12 +76,6 @@ final class SignInViewController: BaseViewController {
         )
         let output = viewModel.transform(input: input)
         
-        output.signInFailure
-            .asObservable()
-            .subscribe { _ in
-                Logger.print("로그인 실패")
-            }
-            .disposed(by: disposeBag)
         
         output.presentSignInWithApple
             .asObservable()
