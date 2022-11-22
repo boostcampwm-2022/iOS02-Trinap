@@ -6,6 +6,8 @@
 //  Copyright © 2022 Trinap. All rights reserved.
 //
 
+import Foundation
+
 import RxCocoa
 import RxRelay
 import RxSwift
@@ -27,16 +29,19 @@ final class ChatDetailViewModel: ViewModelType {
     private let chatroomId: String
     private let observeChatUseCase: ObserveChatUseCase
     private let sendChatUseCase: SendChatUseCase
+    private let uploadImageUseCase: UploadImageUseCase
     
     // MARK: - Initializer
     init(
         chatroomId: String,
         observeChatUseCase: ObserveChatUseCase,
-        sendChatUseCase: SendChatUseCase
+        sendChatUseCase: SendChatUseCase,
+        uploadImageUseCase: UploadImageUseCase
     ) {
         self.chatroomId = chatroomId
         self.observeChatUseCase = observeChatUseCase
         self.sendChatUseCase = sendChatUseCase
+        self.uploadImageUseCase = uploadImageUseCase
         
         observeChatUseCase.execute(chatroomId: chatroomId)
             .bind(to: chats)
@@ -65,6 +70,14 @@ final class ChatDetailViewModel: ViewModelType {
         
         return prevChat.senderUserId == currentChat.senderUserId
     }
+    
+    func uploadImageAndSendChat(_ imageData: Data) -> Observable<Void> {
+        return uploadImageUseCase.execute(imageData)
+            .withUnretained(self)
+            .flatMap { owner, imageURL in
+                return owner.sendImageChat(imageURL)
+            }
+    }
 }
 
 // MARK: - Privates
@@ -72,5 +85,9 @@ private extension ChatDetailViewModel {
     
     func sendChat(_ chat: String) -> Observable<Void> {
         return sendChatUseCase.execute(chatType: .text, content: chat, chatroomId: chatroomId)
+    }
+    
+    func sendImageChat(_ imageURL: String) -> Observable<Void> {
+        return sendChatUseCase.execute(chatType: .image, content: imageURL, chatroomId: chatroomId)
     }
 }
