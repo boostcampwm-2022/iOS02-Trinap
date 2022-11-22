@@ -78,6 +78,9 @@ class BaseProjectFactory: ProjectFactory {
                    "Item 3": "Pretendard-Bold.otf"
                ],
                "NSPhotoLibraryUsageDescription": "Trinap이 앨범에서 사진을 가져올 수 있도록 허용해주세요.",
+               "Privacy - Location Always Usage Description": "위치 권한 요청",
+               "Privacy - Location Always and When In Use Usage Description": "위치 권한 요청",
+               "NSLocationWhenInUseUsageDescription": "위치 권한 요청",
            ]
 
     
