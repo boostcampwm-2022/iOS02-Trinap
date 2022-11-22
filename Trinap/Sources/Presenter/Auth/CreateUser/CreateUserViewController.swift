@@ -108,14 +108,6 @@ final class CreateUserViewController: BaseViewController {
             .bind(to: self.signUpButton.rx.enabled)
             .disposed(by: disposeBag)
         
-        output.signUpFailure
-            .asObservable()
-            .subscribe {
-                Logger.print("회원가입 실패")
-                // TODO: - 실패 처리
-            }
-            .disposed(by: disposeBag)
-        
         output.randomNickName
             .observe(on: MainScheduler.instance)
             .withUnretained(self)
