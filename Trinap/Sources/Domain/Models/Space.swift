@@ -9,8 +9,15 @@
 import Foundation
 
 struct Space {
-    var name: String
-    var address: String
-    var lat: Double
-    var lng: Double
+    let id = UUID().uuidString
+    let name: String
+    let address: String
+    let lat: Double
+    let lng: Double
+}
+
+extension Space: Hashable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
 }
