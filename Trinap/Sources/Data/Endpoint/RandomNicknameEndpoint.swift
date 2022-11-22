@@ -11,11 +11,9 @@ import Foundation
 enum RandomNicknameEndpoint: String, Endpoint {
     case main
     
+    // MARK: - Properties
     var baseURL: URL? { return URL(string: "https://nickname.hwanmoo.kr") }
-    
     var method: HTTPMethod { return .GET }
-    
     var path: String { return "" }
-    
     var parameters: HTTPRequestParameter? { return .query(["format": "json", "count": "1", "max_length": "8"])}
 }
