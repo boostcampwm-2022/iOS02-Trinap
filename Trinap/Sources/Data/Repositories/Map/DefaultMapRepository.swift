@@ -76,16 +76,10 @@ final class DefaultMapRepository: NSObject, MapRepository {
             return Disposables.create()
         }
     }
-
 }
 
 extension DefaultMapRepository: CLLocationManagerDelegate {
-//    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-//        if let location = locations.first {
-//            self.curCoordinate.accept(Coordinate(lat: location.coordinate.latitude, lng: location.coordinate.longitude))
-//        }
-//    }
-//
+
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         self.curCoordinate.accept(Coordinate(lat: 0.0, lng: 0.0))
         Logger.print(error)
