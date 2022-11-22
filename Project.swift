@@ -36,6 +36,7 @@ class BaseProjectFactory: ProjectFactory {
         .external(name: "RxGesture"),
         .external(name: "Lottie"),
         .external(name: "SnapKit"),
+        .external(name: "HorizonCalendar"),
         .target(name: "Queenfisher"),
         .target(name: "FirestoreService"),
         .target(name: "Than")
