@@ -15,4 +15,5 @@ protocol SignInUseCase {
     
     // MARK: - Methods
     func signIn(with credential: OAuthCredential) -> Observable<SignInResult>
+    func autoSignIn() -> Observable<Bool>
 }

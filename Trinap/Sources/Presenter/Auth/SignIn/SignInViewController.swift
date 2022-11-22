@@ -13,6 +13,7 @@ import FirebaseAuth
 import RxCocoa
 import RxSwift
 import SnapKit
+import Than
 
 final class SignInViewController: BaseViewController {
     
@@ -24,13 +25,12 @@ final class SignInViewController: BaseViewController {
         return imageView
     }()
     
-    // TODO: SignInButton UI 수정
-    private lazy var appleSignInButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("Apple로 시작하기", for: .normal)
-        button.backgroundColor = .black
-        return button
-    }()
+    private lazy var appleSignInButton = TrinapButton(style: .black).than {
+        $0.setImage(TrinapAsset.logoApple.image, for: .normal)
+        $0.setTitle("Apple로 시작하기", for: .normal)
+        $0.setTitleColor(TrinapAsset.white.color, for: .normal)
+        $0.titleLabel?.font = TrinapFontFamily.Pretendard.bold.font(size: 14)
+    }
     
     // MARK: - Properties
     private var currentNonce: String?
