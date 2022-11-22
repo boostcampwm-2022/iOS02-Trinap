@@ -30,6 +30,7 @@ final class MyPageCoordinator: Coordinator {
 }
 
 extension MyPageCoordinator {
+    
     func showMyPageViewController() {
         let useCase = DefaultFetchUserUseCase(
             userRepository: DefaultUserRepository(firestoreService: DefaultFireStoreService())
@@ -37,7 +38,6 @@ extension MyPageCoordinator {
         let viewModel = MyPageViewModel(fetchUserUseCase: useCase)
         let viewController = MyPageViewController(viewModel: viewModel)
         viewController.coordinator = self
-        self.navigationController.setNavigationBarHidden(true, animated: false)
         self.navigationController.pushViewController(viewController, animated: true)
     }
     
@@ -45,9 +45,21 @@ extension MyPageCoordinator {
         switch state {
         case .nofiticationAuthorization, .photoAuthorization, .locationAuthorization:
             showAuthorizationSetting(state: state)
+        case .profile(user: let user):
+            showEditViewController(user: user)
         default:
             return
         }
+    }
+    
+    func showEditViewController(user: User) {
+
+        let useCase = DefaultEditUserUseCase(userRepository: DefaultUserRepository())
+        let viewModel = EditProfileViewModel(user: user, editUserUseCase: useCase)
+        let viewController = EditProfileViewController(viewModel: viewModel)
+        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
+        self.navigationController.setNavigationBarHidden(false, animated: false)
+        self.navigationController.pushViewController(viewController, animated: true)
     }
 }
 
