@@ -17,13 +17,13 @@ final class CreateUserViewController: BaseViewController {
     
     // MARK: - UI
     private lazy var titleLabel = UILabel().than {
-        $0.text = "만나서 반가워요!\nTrinap과 추억을 만들어 보세요"
+        $0.text = "만나서 반가워요!\n트리냅과 추억을 만들어 보세요"
         $0.numberOfLines = 0
         $0.font = TrinapFontFamily.Pretendard.bold.font(size: 24)
     }
     
     private lazy var subTitleLabel = UILabel().than {
-        $0.text = "Trinap 이용을 위해 닉네임을 설정해 주세요."
+        $0.text = "트리냅 이용을 위해 닉네임을 설정해 주세요."
         $0.font = TrinapFontFamily.Pretendard.regular.font(size: 14)
     }
     
@@ -35,7 +35,6 @@ final class CreateUserViewController: BaseViewController {
         $0.setTitle("가입 완료", for: .normal)
         $0.setTitleColor(TrinapAsset.white.color, for: .normal)
         $0.titleLabel?.font = TrinapFontFamily.Pretendard.bold.font(size: 16)
-        $0.isEnabled = false
     }
 
     // MARK: - Properties
@@ -99,12 +98,14 @@ final class CreateUserViewController: BaseViewController {
     override func bind() {
         let input = CreateUserViewModel.Input(
             nickname: nicknameTextFieldView.textField.rx.text.orEmpty.asObservable(),
-            signUpButtonTap: signUpButton.rx.tap.asObservable())
+            signUpButtonTap: signUpButton.rx.tap.asObservable(),
+            generateButtonTap: nicknameTextFieldView.generateButton.rx.tap.asObservable())
         
         let output = viewModel.transform(input: input)
         
         output.signUpButtonEnable
             .drive { [weak self] result in
+                self?.signUpButton.rx.enabled.onNext(result)
                 self?.signUpButton.isEnabled = result
             }
             .disposed(by: disposeBag)
@@ -113,6 +114,16 @@ final class CreateUserViewController: BaseViewController {
             .asObservable()
             .subscribe {
                 Logger.print("회원가입 실패")
+                // TODO: - 실패 처리
+            }
+            .disposed(by: disposeBag)
+        
+        output.randomNickName
+            .observe(on: MainScheduler.instance)
+            .withUnretained(self)
+            .subscribe { owner, nickname in
+                owner.nicknameTextFieldView.textField.text = nickname
+                owner.nicknameTextFieldView.textField.sendActions(for: .valueChanged)
             }
             .disposed(by: disposeBag)
     }

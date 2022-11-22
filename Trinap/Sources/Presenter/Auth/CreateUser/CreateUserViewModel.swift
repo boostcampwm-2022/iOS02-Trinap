@@ -15,11 +15,13 @@ final class CreateUserViewModel: ViewModelType {
     struct Input {
         let nickname: Observable<String>
         let signUpButtonTap: Observable<Void>
+        let generateButtonTap: Observable<Void>
     }
     
     struct Output {
         let signUpButtonEnable: Driver<Bool>
         let signUpFailure: Signal<Void>
+        let randomNickName: Observable<String>
     }
     
     // MARK: - Properties
@@ -27,6 +29,7 @@ final class CreateUserViewModel: ViewModelType {
     private let createUserUseCase: CreateUserUseCase
     private let signUpSuccess = PublishRelay<Void>()
     private let signUpFailure = PublishRelay<Void>()
+    private let randomNickName = PublishRelay<String>()
     let disposeBag = DisposeBag()
     
     
@@ -47,11 +50,22 @@ final class CreateUserViewModel: ViewModelType {
             .flatMap { owner, nickname in
                 return owner.createUserUseCase.createUser(with: nickname)
             }
-            .subscribe { [weak self] in
-                Logger.print("유저 생성 성공!")
+            .subscribe(onNext: { [weak self] in
                 self?.coordinator?.finish()
+            })
+            .disposed(by: disposeBag)
+        
+        input.generateButtonTap
+            .withUnretained(self)
+            .flatMap { owner, _ in
+                return owner.createUserUseCase.createRandomNickname()
+            }
+            .withUnretained(self)
+            .subscribe { owner, nickname in
+                owner.randomNickName.accept(nickname)
             }
             .disposed(by: disposeBag)
+            
         
         let signUpButtonEnable = input.nickname
             .map { nickname in
@@ -60,10 +74,10 @@ final class CreateUserViewModel: ViewModelType {
             .distinctUntilChanged()
             .asDriver(onErrorJustReturn: false)
         
-        
         return Output(
             signUpButtonEnable: signUpButtonEnable,
-            signUpFailure: signUpFailure.asSignal()
+            signUpFailure: signUpFailure.asSignal(),
+            randomNickName: randomNickName.asObservable()
         )
     }
 }
