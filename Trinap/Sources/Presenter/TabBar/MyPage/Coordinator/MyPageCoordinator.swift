@@ -8,6 +8,8 @@
 
 import UIKit
 
+import FirestoreService
+
 final class MyPageCoordinator: Coordinator {
     
     // MARK: - Properties
@@ -29,9 +31,29 @@ final class MyPageCoordinator: Coordinator {
 
 extension MyPageCoordinator {
     func showMyPageViewController() {
-        let viewModel = MyPageViewModel(fetchUserUseCase: DefaultFetchUserUseCase(userRepository: DefaultUserRepository()))
+        let useCase = DefaultFetchUserUseCase(
+            userRepository: DefaultUserRepository(firestoreService: DefaultFireStoreService())
+        )
+        let viewModel = MyPageViewModel(fetchUserUseCase: useCase)
         let viewController = MyPageViewController(viewModel: viewModel)
+        viewController.coordinator = self
         self.navigationController.setNavigationBarHidden(true, animated: false)
         self.navigationController.pushViewController(viewController, animated: true)
+    }
+    
+    func showNextView(state: MyPageCellType) {
+        switch state {
+        case .nofiticationAuthorization, .photoAuthorization, .locationAuthorization:
+            showAuthorizationSetting(state: state)
+        default:
+            return
+        }
+    }
+}
+
+private extension MyPageCoordinator {
+    private func showAuthorizationSetting(state: MyPageCellType) {
+        guard let url = state.url else { return }
+        UIApplication.shared.open(url)
     }
 }
