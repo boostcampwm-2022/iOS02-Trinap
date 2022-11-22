@@ -18,4 +18,5 @@ protocol UserRepository {
     func fetchUsers(userIds: [String]) -> Observable<[User]>
     func fetchUsersWithMine(userIds: [String]) -> Observable<[User]>
     func update(profileImage: URL?, nickname: String?, isPhotographer: Bool?) -> Observable<Void>
+    func createRandomNickname() -> Observable<String>
 }

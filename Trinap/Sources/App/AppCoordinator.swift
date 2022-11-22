@@ -50,13 +50,11 @@ private extension AppCoordinator {
 extension AppCoordinator: CoordinatorDelegate {
     
     func didFinish(childCoordinator: Coordinator) {
-        // TODO: AuthFlow <-> TabBarFlow로 전환 구현
-        self.navigationController.viewControllers.removeAll()
+        self.navigationController.popToRootViewController(animated: true)
         if childCoordinator is AuthCoordinator {
             self.connectTabBarFlow()
         } else {
             self.connectAuthFlow()
         }
-        Logger.print("끝")
     }
 }

@@ -47,7 +47,7 @@ final class SignInViewModel: ViewModelType {
             .flatMap { owner, credentail in
                 owner.signInUseCase.signIn(with: credentail)
             }
-            .subscribe( onNext: { [weak self] reuslt in
+            .subscribe(onNext: { [weak self] reuslt in
                 switch reuslt {
                 case.signUp:
                     self?.coordinator?.showCreateUserViewController()

@@ -16,13 +16,16 @@ final class DefaultUserRepository: UserRepository {
     // MARK: - Properties
     private let firestoreService: FireStoreService
     private let tokenManager: TokenManager
+    private let networkService: NetworkService
     
     // MARK: - Methods
     init(
-        firestoreService: FireStoreService,
-        tokenManager: TokenManager = KeychainTokenManager()
+        tokenManager: TokenManager = KeychainTokenManager(),
+        firestoreService: DefaultFireStoreService = DefaultFireStoreService(),
+        networkService: DefaultNetworkService = DefaultNetworkService()
     ) {
         self.firestoreService = firestoreService
+        self.networkService = networkService
         self.tokenManager = tokenManager
     }
     
@@ -83,5 +86,12 @@ final class DefaultUserRepository: UserRepository {
         return self.firestoreService
             .updateDocument(collection: .users, document: userId, values: values)
             .asObservable()
+    }
+    
+    func createRandomNickname() -> Observable<String> {
+        let endpoint = RandomNicknameEndpoint.main
+        return self.networkService.request(endpoint)
+            .decode(type: NicknameDTO.self, decoder: JSONDecoder())
+            .compactMap { $0.words.first }
     }
 }

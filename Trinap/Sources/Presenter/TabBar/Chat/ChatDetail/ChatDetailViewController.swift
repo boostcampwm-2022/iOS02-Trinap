@@ -8,7 +8,6 @@
 
 import UIKit
 
-import MessageKit
 import RxCocoa
 import RxSwift
 import SnapKit

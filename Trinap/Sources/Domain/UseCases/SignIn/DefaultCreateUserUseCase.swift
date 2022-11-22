@@ -14,14 +14,20 @@ final class DefaultCreateUserUseCase: CreateUserUseCase {
     
     // MARK: - Properties
     private let authRepository: AuthRepository
+    private let userRepository: UserRepository
     
     // MARK: - Initializers
-    init(authRepository: AuthRepository) {
+    init(authRepository: AuthRepository, userRepository: UserRepository) {
         self.authRepository = authRepository
+        self.userRepository = userRepository
     }
     
     // MARK: - Methods
     func createUser(with nickName: String) -> Observable<Void> {
         return self.authRepository.createUser(nickname: nickName)
+    }
+    
+    func createRandomNickname() -> Observable<String> {
+        return self.userRepository.createRandomNickname()
     }
 }
