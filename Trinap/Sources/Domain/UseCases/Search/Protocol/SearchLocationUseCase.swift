@@ -9,7 +9,7 @@
 import RxSwift
 
 protocol SearchLocationUseCase {
-    
+
     // MARK: Methods
     func fetchSearchList(with searchText: String) -> Observable<[Space]>
 }

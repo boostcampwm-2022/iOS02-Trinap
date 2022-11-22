@@ -54,6 +54,7 @@ private extension DefaultObserveChatPreviewsUseCase {
                         chatroomId: chatroom.chatroomId,
                         profileImage: user.profileImage,
                         nickname: user.nickname,
+                        chatType: .text,
                         content: "",
                         date: chatroom.updatedAt,
                         isChecked: false
