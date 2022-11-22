@@ -33,4 +33,13 @@ final class DefaultSignInUseCase: SignInUseCase {
             .asObservable()
             .catchAndReturn(SignInResult.failure)
     }
+    
+    func autoSignIn() -> Observable<Bool> {
+        if Auth.auth().currentUser != nil {
+            return self.authRepository.checkUser()
+                .asObservable()
+        } else {
+            return Observable.just(false)
+        }
+    }
 }
