@@ -84,7 +84,6 @@ class BaseProjectFactory: ProjectFactory {
         ]
     ]
     
-    
     func generateConfigurations() -> Settings {
         return Settings.settings(configurations: [
             .debug(name: "Debug", xcconfig: .relativeToRoot("\(projectName)/Sources/Config/Debug.xcconfig")),

@@ -11,4 +11,6 @@ import Foundation
 enum LocalError: Error {
     case structToDictionaryError
     case signInError
+    case addressError
+    case locationAuthError
 }

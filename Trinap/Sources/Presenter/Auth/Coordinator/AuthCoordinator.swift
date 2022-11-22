@@ -43,8 +43,16 @@ extension AuthCoordinator {
     
     // TODO: CreateUserViewController로 이동하는 Method 구현
     func showCreateUserViewController() {
-        let viewController = CreateUserViewController()
-        self.navigationController.setNavigationBarHidden(true, animated: false)
-        self.navigationController.pushViewController(viewController, animated: false)
+        let viewController = CreateUserViewController(
+            viewModel: CreateUserViewModel(
+                createUserUseCase: DefaultCreateUserUseCase(
+                    authRepository: DefaultAuthRepository(),
+                    userRepository: DefaultUserRepository()
+                ),
+                coordinator: self
+            )
+        )
+        self.navigationController.setNavigationBarHidden(false, animated: false)
+        self.navigationController.pushViewController(viewController, animated: true)
     }
 }

@@ -23,15 +23,28 @@ final class AppCoordinator: Coordinator {
     
     // MARK: - Methods
     func start() {
-        let splashViewController = SplashViewController()
-        navigationController.pushViewController(splashViewController, animated: false)
+        showSplashViewController()
     }
 }
 
-// MARK: - Private Methods
-private extension AppCoordinator {
+// MARK: - connectFlow Methods
+extension AppCoordinator {
+    
+    func showSplashViewController() {
+        let splashViewController = SplashViewController(
+            viewModel: SplashViewModel(
+                signInUseCase: DefaultSignInUseCase(
+                    authRepository: DefaultAuthRepository()
+                ),
+                coordinator: self
+            )
+        )
+        navigationController.setNavigationBarHidden(true, animated: false)
+        navigationController.pushViewController(splashViewController, animated: false)
+    }
     
     func connectAuthFlow() {
+        self.navigationController.viewControllers.removeAll()
         let authCoordinator = AuthCoordinator(self.navigationController)
         authCoordinator.delegate = self
         authCoordinator.start()
@@ -39,6 +52,7 @@ private extension AppCoordinator {
     }
     
     func connectTabBarFlow() {
+        self.navigationController.viewControllers.removeAll()
         let tabBarCoordinator = TabBarCoordinator(self.navigationController)
         tabBarCoordinator.delegate = self
         tabBarCoordinator.start()
@@ -50,13 +64,11 @@ private extension AppCoordinator {
 extension AppCoordinator: CoordinatorDelegate {
     
     func didFinish(childCoordinator: Coordinator) {
-        // TODO: AuthFlow <-> TabBarFlow로 전환 구현
-        self.navigationController.viewControllers.removeAll()
+        self.navigationController.popToRootViewController(animated: true)
         if childCoordinator is AuthCoordinator {
             self.connectTabBarFlow()
         } else {
             self.connectAuthFlow()
         }
-        Logger.print("끝")
     }
 }
