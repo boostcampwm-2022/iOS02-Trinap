@@ -53,9 +53,12 @@ extension MyPageCoordinator {
     }
     
     func showEditViewController(user: User) {
-
         let useCase = DefaultEditUserUseCase(userRepository: DefaultUserRepository())
-        let viewModel = EditProfileViewModel(user: user, editUserUseCase: useCase)
+        let viewModel = EditProfileViewModel(
+            user: user,
+            editUserUseCase: useCase,
+            uploadImageUseCase: DefaultUploadImageUseCase(uploadImageRepository: DefaultUploadImageRepository())
+        )
         let viewController = EditProfileViewController(viewModel: viewModel)
         self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
         self.navigationController.setNavigationBarHidden(false, animated: false)
