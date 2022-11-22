@@ -46,7 +46,8 @@ extension AuthCoordinator {
         let viewController = CreateUserViewController(
             viewModel: CreateUserViewModel(
                 createUserUseCase: DefaultCreateUserUseCase(
-                    authRepository: DefaultAuthRepository()
+                    authRepository: DefaultAuthRepository(),
+                    userRepository: DefaultUserRepository()
                 ),
                 coordinator: self
             )
