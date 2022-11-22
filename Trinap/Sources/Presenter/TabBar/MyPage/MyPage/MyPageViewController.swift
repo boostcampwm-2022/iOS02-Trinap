@@ -67,6 +67,7 @@ final class MyPageViewController: BaseViewController {
         
         tableView.rx
             .itemSelected
+            .throttle(.microseconds(500), scheduler: MainScheduler.instance)
             .withUnretained(self)
             .subscribe { owner, indexPath in
                 owner.showNextViewController(indexPath: indexPath)
@@ -96,6 +97,7 @@ extension MyPageViewController: UITableViewDelegate {
                         self?.showNextViewController(indexPath: IndexPath(row: 0, section: 0))
                     })
                     .disposed(by: self.disposeBag)
+                cell.selectionStyle = .none
                 return cell
             } else {
                 guard let cell = tableView.dequeueCell(MyPageInfoCell.self, for: indexPath) else {
