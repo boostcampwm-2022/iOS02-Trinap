@@ -60,8 +60,9 @@ final class DefaultMapRepository: NSObject, MapRepository {
             let locale = Locale(identifier: "Ko-kr")
             
             geocoder.reverseGeocodeLocation(location) { placemarks, error in
+                
                 guard let address: [CLPlacemark] = placemarks,
-                      let name = address.last?.name
+                      let name = address.first?.name
                 else {
                     observable.onError(LocalError.addressError)
                     return
