@@ -11,6 +11,8 @@ import UIKit
 final class MyPageViewController: BaseViewController {
     
     // MARK: - Properties
+    weak var coordinator: MyPageCoordinator?
+    
     private let viewModel: MyPageViewModel
     private lazy var tableView = UITableView(frame: .zero, style: .plain)
     
@@ -57,7 +59,7 @@ final class MyPageViewController: BaseViewController {
             .itemSelected
             .withUnretained(self)
             .subscribe { owner, indexPath in
-                owner.generate(indexPath: indexPath)
+                owner.showNextViewController(indexPath: indexPath)
             }
             .disposed(by: disposeBag)
     }
@@ -134,13 +136,10 @@ extension MyPageViewController: UITableViewDelegate {
         return indexPath.section == 0 ? 185 : self.trinapOffset * 6
     }
     
-    func generate(indexPath: IndexPath) {
-        let section = indexPath.section
-        
-        guard let cell = self.tableView.cellForRow(at: indexPath) as? MyPageInfoCell,
-                let type = cell.type else {
+    func showNextViewController(indexPath: IndexPath) {
+        guard let cell = self.tableView.cellForRow(at: indexPath) as? MyPageInfoCell, let type = cell.type else {
             return
         }
-        print(type)
+        self.coordinator?.showNextView(state: type)
     }
 }
