@@ -104,10 +104,8 @@ final class CreateUserViewController: BaseViewController {
         let output = viewModel.transform(input: input)
         
         output.signUpButtonEnable
-            .drive { [weak self] result in
-                self?.signUpButton.rx.enabled.onNext(result)
-                self?.signUpButton.isEnabled = result
-            }
+            .asObservable()
+            .bind(to: self.signUpButton.rx.enabled)
             .disposed(by: disposeBag)
         
         output.signUpFailure

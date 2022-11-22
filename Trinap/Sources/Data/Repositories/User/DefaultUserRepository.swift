@@ -19,9 +19,13 @@ final class DefaultUserRepository: UserRepository {
     private let networkService: NetworkService
     
     // MARK: - Methods
-    init(tokenManager: TokenManager = KeychainTokenManager()) {
-        self.firestoreService = DefaultFireStoreService()
-        self.networkService = DefaultNetworkService()
+    init(
+        tokenManager: TokenManager = KeychainTokenManager(),
+        firestoreService: DefaultFireStoreService = DefaultFireStoreService(),
+        networkService: DefaultNetworkService = DefaultNetworkService()
+    ) {
+        self.firestoreService = firestoreService
+        self.networkService = networkService
         self.tokenManager = tokenManager
     }
     
@@ -80,9 +84,7 @@ final class DefaultUserRepository: UserRepository {
     func createRandomNickname() -> Observable<String> {
         let endpoint = RandomNicknameEndpoint.main
         return self.networkService.request(endpoint)
-            .compactMap { data in
-                let nickName = try? JSONDecoder().decode(NicknameDTO.self, from: data)
-                return nickName?.words.first
-            }
+            .decode(type: NicknameDTO.self, decoder: JSONDecoder())
+            .compactMap { $0.words.first }
     }
 }
