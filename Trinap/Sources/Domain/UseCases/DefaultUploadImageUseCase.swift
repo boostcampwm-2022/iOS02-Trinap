@@ -15,8 +15,13 @@ final class DefaultUploadImageUseCase: UploadImageUseCase {
     // MARK: - Properties
     private let uploadImageRepository: UploadImageRepository
     
+    // MARK: - Initializer
+    init(uploadImageRepository: UploadImageRepository) {
+        self.uploadImageRepository = uploadImageRepository
+    }
+    
     // MARK: - Methods
-    func execute(_ imageData: Data) -> Observable<Void> {
-        
+    func execute(_ imageData: Data) -> Observable<String> {
+        return self.uploadImageRepository.upload(image: imageData)
     }
 }

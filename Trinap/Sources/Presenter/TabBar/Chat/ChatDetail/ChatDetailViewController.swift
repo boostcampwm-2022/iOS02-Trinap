@@ -130,7 +130,7 @@ extension ChatDetailViewController {
         self.imagePicker
             .pickImage()
             .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] image in self?.presentUploadImageAlert(image) })
+            .subscribe(onNext: { [weak self] image in self?.requestUploadImage(image) })
             .disposed(by: disposeBag)
     }
     
@@ -146,6 +146,8 @@ extension ChatDetailViewController {
         guard let imageData = image.jpegData(compressionQuality: 1) else { return }
         
         self.viewModel.uploadImageAndSendChat(imageData)
+            .subscribe()
+            .disposed(by: disposeBag)
     }
 }
 

@@ -1,5 +1,5 @@
 //
-//  UploadImageUseCase.swift
+//  UploadImageRepository.swift
 //  Trinap
 //
 //  Created by 김세영 on 2022/11/22.
@@ -10,7 +10,7 @@ import Foundation
 
 import RxSwift
 
-protocol UploadImageUseCase {
+protocol UploadImageRepository {
     
-    func execute(_ imageData: Data) -> Observable<String>
+    func upload(image data: Data) -> Observable<String>
 }
