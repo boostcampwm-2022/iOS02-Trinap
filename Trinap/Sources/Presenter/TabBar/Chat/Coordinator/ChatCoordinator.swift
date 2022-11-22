@@ -58,7 +58,7 @@ extension ChatCoordinator {
         )
         let viewController = ChatPreviewsViewController(viewModel: chatPreviewsViewModel)
         
-        self.navigationController.setNavigationBarHidden(true, animated: false)
+        self.navigationController.setNavigationBarHidden(false, animated: false)
         self.navigationController.pushViewController(viewController, animated: true)
     }
     
