@@ -16,7 +16,9 @@ extension QueenfisherWrapper where Base: QFImageView {
         indicator: QFIndicator? = QFIndicator(),
         cachePolicy: ImageCache.Policy? = .memory,
         downsampling: Bool = true,
-        scale: CGFloat = 1.5
+        targetSize: CGSize? = nil,
+        scale: CGFloat = 1.5,
+        completion: (() -> Void)? = nil
     ) {
         guard let url else {
             base.image = placeholder
@@ -28,7 +30,10 @@ extension QueenfisherWrapper where Base: QFImageView {
         
         maybeCache.fetch(at: url) { data in
             DispatchQueue.main.async {
-                defer { self.stopIndicator(indicator) }
+                defer {
+                    self.stopIndicator(indicator)
+                    completion?()
+                }
                 
                 guard let data else {
                     base.image = placeholder
@@ -36,7 +41,10 @@ extension QueenfisherWrapper where Base: QFImageView {
                 }
                 
                 if downsampling {
-                    self.base.image = data.imageWithDownsampling(to: self.base.frame.size, scale: scale)
+                    self.base.image = data.imageWithDownsampling(
+                        to: targetSize ?? self.base.frame.size,
+                        scale: scale
+                    )
                 } else {
                     self.base.image = UIImage(data: data)
                 }

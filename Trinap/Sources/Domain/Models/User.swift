@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct User {
+struct User: Hashable {
     
     enum Status: String, Codable {
         case activate, deactivate

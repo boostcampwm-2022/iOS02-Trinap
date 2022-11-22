@@ -29,8 +29,8 @@ final class MyPageCoordinator: Coordinator {
 
 extension MyPageCoordinator {
     func showMyPageViewController() {
-        // TODO: 추후 UI를 구현한 ViewController로 교체
-        let viewController = MockMyPageViewController()
+        let viewModel = MyPageViewModel(fetchUserUseCase: DefaultFetchUserUseCase(userRepository: DefaultUserRepository()))
+        let viewController = MyPageViewController(viewModel: viewModel)
         self.navigationController.setNavigationBarHidden(true, animated: false)
         self.navigationController.pushViewController(viewController, animated: true)
     }
