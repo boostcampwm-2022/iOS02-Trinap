@@ -108,9 +108,8 @@ extension SearchViewController {
     func configureDataSource() -> UITableViewDiffableDataSource<Section, Space> {
         return UITableViewDiffableDataSource(
             tableView: searchTableView
-        ) { [weak self] tableView, indexPath, itemIdentifier in
-            guard let self = self,
-                  let cell = tableView.dequeueCell(UITableViewCell.self, for: indexPath)
+        ) { tableView, indexPath, itemIdentifier in
+            guard let cell = tableView.dequeueCell(UITableViewCell.self, for: indexPath)
             else { return UITableViewCell() }
             var content = cell.defaultContentConfiguration()
             content.text = itemIdentifier.name
