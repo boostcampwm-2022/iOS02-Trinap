@@ -10,6 +10,11 @@ import UIKit
 
 extension UIViewController {
     
+    /// offset 기본 단위
+    var trinapOffset: CGFloat {
+        return UIScreen.main.bounds.width / 50
+    }
+    
     func hideKeyboardWhenTapped() {
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         tap.cancelsTouchesInView = false
@@ -20,5 +25,13 @@ extension UIViewController {
     
     @objc func dismissKeyboard() {
         self.view.endEditing(true)
+    }
+}
+
+extension UIView {
+    
+    /// offset 기본 단위 
+    var trinapOffset: CGFloat {
+        return UIScreen.main.bounds.width / 50
     }
 }

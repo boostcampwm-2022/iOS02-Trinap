@@ -20,10 +20,7 @@ final class TrinapButton: UIButton {
         set { self.layer.cornerRadius = newValue }
     }
     
-    var style: ColorType {
-        didSet { configureColorSet() }
-    }
-    
+    var style: ColorType
     private var fillType: FillType
     private var isCircle: Bool
     
@@ -127,7 +124,7 @@ extension Reactive where Base: TrinapButton {
     var enabled: Binder<Bool> {
         return Binder(self.base) { trinapButton, enabled in
             trinapButton.isEnabled = enabled
-            trinapButton.style = enabled ? .primary : .disabled
+            trinapButton.backgroundColor = enabled ? trinapButton.style.color : TrinapAsset.disabled.color
         }
     }
 }
