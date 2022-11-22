@@ -76,7 +76,10 @@ class BaseProjectFactory: ProjectFactory {
                    "Item 1": "Pretendard-Regular.otf",
                    "Item 2": "Pretendard-SemiBold.otf",
                    "Item 3": "Pretendard-Bold.otf"
-               ]
+               ],
+               "Privacy - Location Always Usage Description": "위치 권한 요청",
+               "Privacy - Location Always and When In Use Usage Description": "위치 권한 요청",
+               "NSLocationWhenInUseUsageDescription": "위치 권한 요청",
            ]
 
     

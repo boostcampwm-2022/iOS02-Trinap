@@ -9,8 +9,8 @@
 import MapKit
 import Foundation
 
-import RxSwift
 import RxRelay
+import RxSwift
 
 protocol MapRepository {
     // MARK: Properties
@@ -18,5 +18,6 @@ protocol MapRepository {
     
     // MARK: Methods
     func setSearchText(with searchText: String)
-    func fetchCurrentLocation() -> Observable<Coordinate>
+    func fetchCurrentLocation() -> Result<Coordinate, Error>
+    func fetchLocationName(using coordinate: Coordinate) -> Observable<String>
 }
