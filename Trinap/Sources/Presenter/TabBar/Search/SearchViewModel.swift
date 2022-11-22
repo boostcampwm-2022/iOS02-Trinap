@@ -46,7 +46,7 @@ final class SearchViewModel: ViewModelType {
         input.selectedSpace
             .withUnretained(self)
             .subscribe(onNext: { owner, space in
-                print("쨔스! \(space) 선택됨")
+                Logger.print("쨔스! \(space) 선택됨"))
                 //TODO: coordinator로 space 전달하고 pop
             })
             .disposed(by: disposeBag)
