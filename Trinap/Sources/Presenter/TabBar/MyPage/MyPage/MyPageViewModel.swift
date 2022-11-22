@@ -43,10 +43,6 @@ final class MyPageViewModel: ViewModelType {
             .map { $0.0 + $0.1 }
             .asDriver(onErrorJustReturn: [])
         
-        dataSource.drive { data in
-            print(data)
-        }
-        
         return Output(dataSource: dataSource)
     }
 }
@@ -72,9 +68,9 @@ extension MyPageViewModel {
     
     private func generateUserSettings() -> MyPageDataSource {
         let data: [MyPageCellType] = [
-            .userAlarm,
-            .userImageAuthorization,
-            .userLocation,
+            .nofiticationAuthorization,
+            .photoAuthorization,
+            .locationAuthorization,
             .userBlock
         ]
         

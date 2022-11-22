@@ -33,9 +33,9 @@ enum MyPageCellType: Hashable {
     case phohographerProfile
     case photographerDate
     case photographerExposure(isExposure: Bool)
-    case userAlarm
-    case userImageAuthorization
-    case userLocation
+    case nofiticationAuthorization
+    case photoAuthorization
+    case locationAuthorization
     case userBlock
     case contact
     case version(version: String)
@@ -48,14 +48,14 @@ enum MyPageCellType: Hashable {
         case .phohographerProfile:
             return "작가 프로필 설정"
         case .photographerDate:
-            return "작가 영엉빌 설정"
+            return "작가 영업일 설정"
         case .photographerExposure:
             return "작가 프로필 노출"
-        case .userAlarm:
+        case .nofiticationAuthorization:
             return "알람 설정"
-        case .userImageAuthorization:
+        case .photoAuthorization:
             return "이미지 권한 설정"
-        case .userLocation:
+        case .locationAuthorization:
             return "위치정보 설정"
         case .userBlock:
             return "차단목록 관리"
@@ -71,6 +71,19 @@ enum MyPageCellType: Hashable {
             return "탈퇴하기"
         default:
             return ""
+        }
+    }
+    
+    var url: URL? {
+        switch self {
+        case .nofiticationAuthorization:
+            return URL(string: URLConstants.notificationAuthorization)
+        case .photoAuthorization:
+            return URL(string: URLConstants.photoAuthorization)
+        case .locationAuthorization:
+            return URL(string: URLConstants.locationAuthorization)
+        default:
+            return nil
         }
     }
 }
