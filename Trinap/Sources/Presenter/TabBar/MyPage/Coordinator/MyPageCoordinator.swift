@@ -55,10 +55,9 @@ extension MyPageCoordinator {
     }
     
     private func showEditViewController(user: User) {
-        let useCase = DefaultEditUserUseCase(userRepository: DefaultUserRepository())
         let viewModel = EditProfileViewModel(
-            user: user,
-            editUserUseCase: useCase,
+            fetchUserUseCase: DefaultFetchUserUseCase(userRepository: DefaultUserRepository()),
+            editUserUseCase: DefaultEditUserUseCase(userRepository: DefaultUserRepository()),
             uploadImageUseCase: DefaultUploadImageUseCase(uploadImageRepository: DefaultUploadImageRepository())
         )
         let viewController = EditProfileViewController(viewModel: viewModel)

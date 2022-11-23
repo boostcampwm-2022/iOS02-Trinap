@@ -43,6 +43,7 @@ final class EditProfileViewController: BaseViewController {
         
         super.init()
     }
+    
     override func viewWillAppear(_ animated: Bool) {
         
     }
