@@ -18,6 +18,13 @@ final class EditProfileViewController: BaseViewController {
     private let viewModel: EditProfileViewModel
     
     private lazy var profileImageView = ProfileImageView()
+    
+    private var editIconView = UIImageView().than {
+        $0.image = UIImage(systemName: "camera.fill")
+        $0.backgroundColor = TrinapAsset.white.color
+        $0.contentMode = .scaleAspectFill
+    }
+    
     private lazy var nickNameLabel = UILabel().than {
         $0.text = "닉네임"
         $0.font = TrinapFontFamily.Pretendard.bold.font(size: 16)
@@ -39,7 +46,7 @@ final class EditProfileViewController: BaseViewController {
     
     // MARK: - Configure
     override func configureHierarchy() {
-        self.view.addSubviews([profileImageView, nickNameLabel, nickNameInputView])
+        self.view.addSubviews([profileImageView, editIconView, nickNameLabel, nickNameInputView])
     }
     
     override func configureConstraints() {
