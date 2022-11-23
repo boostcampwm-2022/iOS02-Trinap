@@ -18,13 +18,12 @@ final class LocationShareViewController: BaseViewController {
     
     // MARK: - UI
     private lazy var mapView = MKMapView().than {
-        $0.delegate = self
+        $0.showsUserLocation = true
     }
     
-    private lazy var locationManager = CLLocationManager().than {
-        $0.delegate = self
-        $0.requestWhenInUseAuthorization()
-        $0.startUpdatingLocation()
+    private lazy var currentLocationButton = TrinapButton(style: .primary, isCircle: true).than {
+        $0.setImage(UIImage(systemName: "location.fill"), for: .normal)
+        $0.tintColor = TrinapAsset.white.color
     }
     
     // MARK: - Properties
@@ -42,37 +41,85 @@ final class LocationShareViewController: BaseViewController {
         super.viewDidLoad()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        let currentLocation = mapView.userLocation
+        self.updateLocation(currentLocation, animated: true)
+    }
+    
     override func configureHierarchy() {
-        self.view.addSubviews([mapView])
+        self.view
+            .addSubviews([mapView, currentLocationButton])
     }
     
     override func configureConstraints() {
         mapView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+        
+        currentLocationButton.snp.makeConstraints { make in
+            make.trailing.equalTo(self.view.safeAreaLayoutGuide).inset(30)
+            make.bottom.equalTo(self.view.safeAreaLayoutGuide).inset(50)
+            make.width.height.equalTo(40)
+        }
     }
     
     override func configureAttributes() {
-        
+        super.configureAttributes()
     }
     
     override func bind() {
+        let willChangeRegionWithScroll = mapView.rx
+            .regionWillChange
+            .filter { !$0 }
+            .map { _ in return }
         
+        let input = LocationShareViewModel.Input(
+            didTapCurrentLocation: currentLocationButton.rx.tap.asSignal(),
+            willChangeRegionWithScroll: willChangeRegionWithScroll.asSignal(onErrorJustReturn: ())
+        )
+        
+        let output = viewModel.transform(input: input)
+        
+        let isFollowCurrentLocation = output.isFollowCurrentLocation.share()
+        
+        mapView.rx.didUpdateUserLocation
+            .withLatestFrom(isFollowCurrentLocation) { (location: $0, isFollow: $1) }
+            .filter { $0.isFollow }
+            .bind(onNext: { [weak self] location, _ in self?.updateLocation(location) })
+            .disposed(by: disposeBag)
+        
+        isFollowCurrentLocation
+            .map { $0 ? TrinapButton.ColorType.primary : .black }
+            .bind(to: currentLocationButton.rx.style)
+            .disposed(by: disposeBag)
+    }
+}
+
+private extension LocationShareViewController {
+    
+    func updateLocation(_ location: MKUserLocation, animated: Bool = true) {
+        let span = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+        let region = MKCoordinateRegion(center: location.coordinate, span: span)
+        
+        mapView.setRegion(region, animated: animated)
     }
 }
 
 // MARK: - MKMapView Delegate
-extension LocationShareViewController: MKMapViewDelegate {
-    
-    func mapView(_ mapView: MKMapView, didUpdate userLocation: MKUserLocation) {
-        
-    }
-}
-
-// MARK: - LocationShare Delegate
-extension LocationShareViewController: CLLocationManagerDelegate {
-    
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        
-    }
-}
+//extension LocationShareViewController: MKMapViewDelegate {
+//
+//    func mapView(_ mapView: MKMapView, didUpdate userLocation: MKUserLocation) {
+//        let span = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+//        let region = MKCoordinateRegion(center: userLocation.coordinate, span: span)
+//
+//        if isFollowingCurrentLocation {
+//            mapView.setRegion(region, animated: true)
+//        }
+//    }
+//
+//    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+//        return nil
+//    }
+//}
