@@ -399,7 +399,7 @@ public extension DefaultFireStoreService {
 // MARK: functions 사용하는 메소드
 public extension DefaultFireStoreService {
 
-    func useFunctions(functionName: String, data: FirebaseData) -> Single<FirebaseData> {
+    func useFunctions(functionName: String, data: FirebaseData) -> Single<[FirebaseData]> {
         return Single.create { [weak self] single in
             self?.functions.httpsCallable(functionName).call(data) { result, error in
                 if let error {
@@ -407,7 +407,8 @@ public extension DefaultFireStoreService {
                     return
                 }
                 
-                guard let data = result?.data as? [String: Any] else { return single(.failure(FireStoreError.decodeError))}
+                guard let data = result?.data as? [FirebaseData] else { return single(.failure(FireStoreError.decodeError))}
+                
                 single(.success(data))
                 return
             }
