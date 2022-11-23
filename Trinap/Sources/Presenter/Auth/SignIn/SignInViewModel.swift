@@ -48,11 +48,16 @@ final class SignInViewModel: ViewModelType {
                 owner.signInUseCase.signIn(with: credentail)
             }
             .subscribe(onNext: { [weak self] reuslt in
+                guard let self else { return }
                 switch reuslt {
                 case.signUp:
-                    self?.coordinator?.showCreateUserViewController()
+                    self.coordinator?.showCreateUserViewController()
                 case .signIn:
-                    self?.coordinator?.finish()
+                    self.signInUseCase.updateFcmToken()
+                        .subscribe(onNext: {
+                            self.coordinator?.finish()
+                        })
+                        .disposed(by: self.disposeBag)
                 case .failure:
                     Logger.print("Sign 실패")
                 }

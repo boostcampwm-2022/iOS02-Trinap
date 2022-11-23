@@ -42,4 +42,8 @@ final class DefaultSignInUseCase: SignInUseCase {
             return Observable.just(false)
         }
     }
+    
+    func updateFcmToken() -> Observable<Void> {
+        return authRepository.updateFcmToken()
+    }
 }
