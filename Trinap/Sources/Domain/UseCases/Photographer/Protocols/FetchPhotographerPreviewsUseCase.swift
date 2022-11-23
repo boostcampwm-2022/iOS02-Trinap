@@ -10,7 +10,7 @@ import Foundation
 
 import RxSwift
 
-protocol FetchPhotographersUseCase {
+protocol FetchPhotographerPreviewsUseCase {
     
     // MARK: Methods
     func fetch(type: TagType) -> Observable<[PhotographerPreview]>
