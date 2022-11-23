@@ -11,6 +11,7 @@ import Foundation
 import FirebaseCore
 import FirebaseFirestore
 import FirebaseStorage
+import FirebaseFunctions
 import RxSwift
 
 public enum FireStoreError: Error, LocalizedError {
