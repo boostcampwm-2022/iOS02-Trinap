@@ -69,6 +69,54 @@ final class DefaultAuthRepository: AuthRepository {
         .asObservable()
     }
     
+    func removeUser() -> Observable<Void> {
+        guard let userId = tokenManager.getToken(with: .userId) else {
+            return .error(TokenManagerError.notFound)
+        }
+        self.tokenManager.deleteToken(with: .userId)
+        self.tokenManager.deleteToken(with: .fcmToken)
+        return firebaseStoreService.deleteDocument(
+            collection: .users,
+            document: userId
+        )
+        .asObservable()
+    }
+    
+    func updateFcmToken() -> Observable<Void> {
+        guard
+            let userId = tokenManager.getToken(with: .userId),
+            let fcmToken = tokenManager.getToken(with: .fcmToken)
+        else {
+            return .error(TokenManagerError.notFound)
+        }
+        
+        let values = ["fcmToken": fcmToken]
+        
+        return firebaseStoreService.updateDocument(
+            collection: .users,
+            document: userId,
+            values: values
+        )
+        .asObservable()
+    }
+    
+    func deleteFcmToken() -> Observable<Void> {
+        guard
+            let userId = tokenManager.getToken(with: .userId)
+        else {
+            return .error(TokenManagerError.notFound)
+        }
+        
+        let values = ["fcmToken": ""]
+        
+        return firebaseStoreService.updateDocument(
+            collection: .users,
+            document: userId,
+            values: values
+        )
+        .asObservable()
+    }
+    
     func signIn(with cretencial: OAuthCredential) -> Single<String> {
         return Single.create { single in
                         
@@ -79,7 +127,6 @@ final class DefaultAuthRepository: AuthRepository {
                 }
                 
                 guard let userId = authResult?.user.uid else {
-                    // TODO: 인증 관련 에러를 구현하여 교체
                     single(.failure(LocalError.signInError))
                     return
                 }
@@ -91,10 +138,13 @@ final class DefaultAuthRepository: AuthRepository {
     }
     
     func signOut() -> Single<Void> {
-        return Single.create { single in
-
+        return Single.create { [weak self] single in
+            guard let self else { return Disposables.create() }
+            
             do {
                 try Auth.auth().signOut()
+                self.tokenManager.deleteToken(with: .userId)
+                self.tokenManager.deleteToken(with: .fcmToken)
                 single(.success(()))
             } catch let error {
                 single(.failure(error))
@@ -109,7 +159,7 @@ final class DefaultAuthRepository: AuthRepository {
             return .error(FireStoreError.unknown)
         }
         
-        return Single.create { single in
+        return Single.create { [weak self] single in
             user.delete { error in
                 if let error = error {
                     single(.failure(error))
