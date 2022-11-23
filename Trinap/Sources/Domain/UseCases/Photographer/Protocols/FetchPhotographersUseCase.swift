@@ -14,6 +14,5 @@ protocol FetchPhotographersUseCase {
     
     // MARK: Methods
     func fetch(type: TagType) -> Observable<[Photographer]>
-    //TODO: 지역으로 검색하는 메소드 MapService 구현 후 적용
-//    func fetch(filter: String) -> Observable<[Photographer]>
+    func fetch(coordinate: Coordinate) -> Observable<[Photographer]>
 }
