@@ -13,6 +13,6 @@ import RxSwift
 protocol FetchPhotographersUseCase {
     
     // MARK: Methods
-    func fetch(type: TagType) -> Observable<[Photographer]>
-    func fetch(coordinate: Coordinate) -> Observable<[Photographer]>
+    func fetch(type: TagType) -> Observable<[PhotographerPreview]>
+    func fetch(coordinate: Coordinate) -> Observable<[PhotographerPreview]>
 }
