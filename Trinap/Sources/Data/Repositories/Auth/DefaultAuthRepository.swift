@@ -73,6 +73,8 @@ final class DefaultAuthRepository: AuthRepository {
         guard let userId = tokenManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
         }
+        self.tokenManager.deleteToken(with: .userId)
+        self.tokenManager.deleteToken(with: .fcmToken)
         return firebaseStoreService.deleteDocument(
             collection: .users,
             document: userId
@@ -158,15 +160,11 @@ final class DefaultAuthRepository: AuthRepository {
         }
         
         return Single.create { [weak self] single in
-            guard let self else { return Disposables.create() }
-            
             user.delete { error in
                 if let error = error {
                     single(.failure(error))
                     return
                 }
-                self.tokenManager.deleteToken(with: .userId)
-                self.tokenManager.deleteToken(with: .fcmToken)
                 single(.success(()))
             }
             
