@@ -35,7 +35,17 @@ final class DefaultPhotographerRepository: PhotographerRepository {
             .asObservable()
     }
     
-    //TODO: 지역으로 검색하는 메소드 MapService 구현 후 적용
+    func fetchPhotographers(coordinate: Coordinate) -> Observable<[Photographer]> {
+        guard let data = coordinate.asDictionary else { return Observable.just([]) }
+        return fireStoreService.useFunctions(
+            functionName: "nearPhotographer",
+            data: data
+        )
+        .map {
+            $0.compactMap { $0.toObject(PhotographerDTO.self)?.toModel() }
+        }
+        .asObservable()
+    }
     
     func fetchDetailPhotographer(of photograhperId: String) -> Observable<Photographer> {
         return fireStoreService.getDocument(

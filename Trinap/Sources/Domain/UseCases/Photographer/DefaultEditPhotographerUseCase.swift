@@ -25,17 +25,17 @@ final class DefaultEditPhotographerUseCase: EditPhotographerUseCase {
     }
     
     func createPhotographer(
-        location: String,
+        coordinate: Coordinate,
         introduction: String,
         tags: [TagType],
         pricePerHalfHour: Int
     ) -> Observable<Void> {
-        //TODO: 현재 photographerUserId를 repository에서 넣어줘야해서 빈 값으로 넘기고 repository에서 값을 넣어준느데 수정할 방안이 있을지?
         let photographer = Photographer(
             photographerId: UUID().uuidString,
             photographerUserId: "",
-            location: location,
             introduction: introduction,
+            latitude: coordinate.lat,
+            longitude: coordinate.lng,
             tags: tags,
             pictures: [],
             pricePerHalfHour: pricePerHalfHour,

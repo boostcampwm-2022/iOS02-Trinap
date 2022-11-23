@@ -15,6 +15,7 @@ protocol PhotographerRepository {
     // MARK: Methods
     func fetchPhotographers(type: TagType) -> Observable<[Photographer]>
     func fetchPhotographers(ids: [String]) -> Observable<[Photographer]>
+    func fetchPhotographers(coordinate: Coordinate) -> Observable<[Photographer]>
     func fetchDetailPhotographer(of photograhperId: String) -> Observable<Photographer>
     
     func create(photographer: Photographer) -> Observable<Void>

@@ -21,7 +21,7 @@ final class ProfileCell: BaseTableViewCell {
     private lazy var nickNameLabel = UILabel().than {
         $0.text = "어디로든떠나요"
         $0.textAlignment = .center
-        $0.font = TrinapFontFamily.Pretendard.bold.font(size: 24)
+        $0.font = TrinapFontFamily.Pretendard.bold.font(size: 20)
     }
     
     private lazy var editButton = TrinapButton(style: .disabled, fillType: .border, isCircle: true).than {
