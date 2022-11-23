@@ -43,6 +43,8 @@ extension MyPageCoordinator {
     
     func showNextView(state: MyPageCellType) {
         switch state {
+        case .phohographerProfile:
+            showEditPhotographerProfile()
         case .nofiticationAuthorization, .photoAuthorization, .locationAuthorization:
             showAuthorizationSetting(state: state)
         case .profile(user: let user):
@@ -52,7 +54,7 @@ extension MyPageCoordinator {
         }
     }
     
-    func showEditViewController(user: User) {
+    private func showEditViewController(user: User) {
         let useCase = DefaultEditUserUseCase(userRepository: DefaultUserRepository())
         let viewModel = EditProfileViewModel(
             user: user,
@@ -62,6 +64,14 @@ extension MyPageCoordinator {
         let viewController = EditProfileViewController(viewModel: viewModel)
         self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
         self.navigationController.setNavigationBarHidden(false, animated: false)
+        self.navigationController.pushViewController(viewController, animated: true)
+    }
+    
+    private func showEditPhotographerProfile() {
+        let viewModel = EditPhotographerViewModel()
+        let viewController = EditPhotographerViewController(viewModel: viewModel)
+        self.navigationController.setNavigationBarHidden(false, animated: false)
+        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
         self.navigationController.pushViewController(viewController, animated: true)
     }
 }
