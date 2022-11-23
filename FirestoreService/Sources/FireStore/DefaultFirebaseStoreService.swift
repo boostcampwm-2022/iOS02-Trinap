@@ -11,16 +11,19 @@ import Foundation
 import FirebaseCore
 import FirebaseFirestore
 import FirebaseStorage
+import FirebaseFunctions
 import RxSwift
 
 public enum FireStoreError: Error, LocalizedError {
     case unknown
+    case decodeError
 }
 
 public final class DefaultFireStoreService: FireStoreService {
     
     // MARK: Properties
     private let database: Firestore
+    private lazy var functions = Functions.functions()
     
     // MARK: Methods
     public init(
@@ -388,6 +391,27 @@ public extension DefaultFireStoreService {
                     
                     observable.onNext(data)
                 }
+            return Disposables.create()
+        }
+    }
+}
+
+// MARK: functions 사용하는 메소드
+public extension DefaultFireStoreService {
+
+    func useFunctions(functionName: String, data: FirebaseData) -> Single<[FirebaseData]> {
+        return Single.create { [weak self] single in
+            self?.functions.httpsCallable(functionName).call(data) { result, error in
+                if let error {
+                    single(.failure(error))
+                    return
+                }
+                
+                guard let data = result?.data as? [FirebaseData] else { return single(.failure(FireStoreError.decodeError))}
+                
+                single(.success(data))
+                return
+            }
             return Disposables.create()
         }
     }
