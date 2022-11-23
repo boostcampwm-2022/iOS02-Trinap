@@ -8,6 +8,7 @@
   <img src="https://img.shields.io/github/last-commit/boostcampwm-2022/iOS02-Trinap">
   <br><br>
 </p>
+
 > _**우리가 여행을 추억하는 방법 📷, Trinap**_
 
 ## 290km 팀 소개 👨‍👨‍👦‍👦
