@@ -106,20 +106,3 @@ private extension LocationShareViewController {
         mapView.setRegion(region, animated: animated)
     }
 }
-
-// MARK: - MKMapView Delegate
-//extension LocationShareViewController: MKMapViewDelegate {
-//
-//    func mapView(_ mapView: MKMapView, didUpdate userLocation: MKUserLocation) {
-//        let span = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
-//        let region = MKCoordinateRegion(center: userLocation.coordinate, span: span)
-//
-//        if isFollowingCurrentLocation {
-//            mapView.setRegion(region, animated: true)
-//        }
-//    }
-//
-//    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-//        return nil
-//    }
-//}
