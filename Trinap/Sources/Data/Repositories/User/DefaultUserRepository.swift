@@ -64,7 +64,7 @@ final class DefaultUserRepository: UserRepository {
             .asObservable()
     }
     
-    func update(profileImage: URL?, nickname: String?, isPhotographer: Bool?) -> Observable<Void> {
+    func update(profileImage: String?, nickname: String?, isPhotographer: Bool?) -> Observable<Void> {
         guard let userId = tokenManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
         }
