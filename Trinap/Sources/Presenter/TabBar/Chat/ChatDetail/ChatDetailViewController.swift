@@ -165,7 +165,7 @@ extension ChatDetailViewController {
     }
     
     private func downsamplingImageWithSize(_ image: UIImage) -> (image: UIImage, size: CGSize) {
-        let widthLimit = 300.0
+        let widthLimit = 200.0
         var width = image.size.width
         var height = image.size.height
         
@@ -176,7 +176,7 @@ extension ChatDetailViewController {
         }
         
         return (
-            image.downsampling(to: CGSize(width: width, height: height), scale: 1.5),
+            image.downsampling(to: CGSize(width: width, height: height), scale: 2),
             CGSize(width: width, height: height)
         )
     }
