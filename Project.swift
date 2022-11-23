@@ -53,6 +53,7 @@ class BaseProjectFactory: ProjectFactory {
         .external(name: "FirebaseFirestore"),
         .external(name: "FirebaseMessaging"),
         .external(name: "FirebaseStorage"),
+        .external(name: "FirebaseFunctions"),
         .external(name: "RxSwift")
     ]
     

@@ -14,9 +14,11 @@ final class DefaultFetchPhotographersUseCase: FetchPhotographersUseCase {
     
     // MARK: Properties
     private let photographerRepository: PhotographerRepository
-    
+
     // MARK: Initializers
-    init(photographerRepository: PhotographerRepository) {
+    init(
+        photographerRepository: PhotographerRepository
+    ) {
         self.photographerRepository = photographerRepository
     }
     
@@ -25,4 +27,10 @@ final class DefaultFetchPhotographersUseCase: FetchPhotographersUseCase {
         return photographerRepository
             .fetchPhotographers(type: type)
     }
+    
+    func fetch(coordinate: Coordinate) -> Observable<[Photographer]> {
+        return photographerRepository
+            .fetchPhotographers(coordinate: coordinate)
+    }
+
 }

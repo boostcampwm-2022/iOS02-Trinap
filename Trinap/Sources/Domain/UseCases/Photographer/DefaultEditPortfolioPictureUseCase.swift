@@ -32,8 +32,9 @@ final class DefaultEditPortfolioPictureUseCase: EditPortfolioPictureUseCase {
         let updated = Photographer(
             photographerId: photographer.photographerId,
             photographerUserId: photographer.photographerUserId,
-            location: photographer.location,
             introduction: photographer.introduction,
+            latitude: photographer.latitude,
+            longitude: photographer.longitude,
             tags: photographer.tags,
             pictures: photos,
             pricePerHalfHour: photographer.pricePerHalfHour,
