@@ -74,11 +74,11 @@ final class ChatDetailViewModel: ViewModelType {
         return prevChat.senderUserId == currentChat.senderUserId
     }
     
-    func uploadImageAndSendChat(_ imageData: Data) -> Observable<Void> {
+    func uploadImageAndSendChat(_ imageData: Data, width: Double, height: Double) -> Observable<Void> {
         return uploadImageUseCase.execute(imageData)
             .withUnretained(self)
             .flatMap { owner, imageURL in
-                return owner.sendImageChat(imageURL)
+                return owner.sendImageChat(imageURL, width: width, height: height)
             }
     }
     
@@ -109,8 +109,13 @@ private extension ChatDetailViewModel {
         return sendChatUseCase.execute(chatType: .text, content: chat, chatroomId: chatroomId)
     }
     
-    func sendImageChat(_ imageURL: String) -> Observable<Void> {
-        return sendChatUseCase.execute(chatType: .image, content: imageURL, chatroomId: chatroomId)
+    func sendImageChat(_ imageURL: String, width: Double, height: Double) -> Observable<Void> {
+        return sendChatUseCase.execute(
+            imageURL: imageURL,
+            chatroomId: chatroomId,
+            imageWidth: width,
+            imageHeight: height
+        )
     }
     
     func sendLocationShareChat() -> Observable<Void> {

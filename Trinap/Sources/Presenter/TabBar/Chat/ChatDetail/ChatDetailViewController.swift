@@ -11,6 +11,7 @@ import UIKit
 import RxCocoa
 import RxSwift
 import SnapKit
+import Queenfisher
 
 final class ChatDetailViewController: BaseViewController {
     
@@ -150,11 +151,34 @@ extension ChatDetailViewController {
     }
     
     private func requestUploadImage(_ image: UIImage) {
-        guard let imageData = image.jpegData(compressionQuality: 1) else { return }
+        let downsampledImage = downsamplingImageWithSize(image)
         
-        self.viewModel.uploadImageAndSendChat(imageData)
-            .subscribe()
-            .disposed(by: disposeBag)
+        guard let imageData = downsampledImage.image.jpegData(compressionQuality: 1) else { return }
+        
+        self.viewModel.uploadImageAndSendChat(
+            imageData,
+            width: downsampledImage.size.width,
+            height: downsampledImage.size.height
+        )
+        .subscribe()
+        .disposed(by: disposeBag)
+    }
+    
+    private func downsamplingImageWithSize(_ image: UIImage) -> (image: UIImage, size: CGSize) {
+        let widthLimit = 300.0
+        var width = image.size.width
+        var height = image.size.height
+        
+        if width > widthLimit {
+            let ratio = widthLimit / width
+            width *= ratio
+            height *= ratio
+        }
+        
+        return (
+            image.downsampling(to: CGSize(width: width, height: height), scale: 1.5),
+            CGSize(width: width, height: height)
+        )
     }
     
     private func sendLocationShareChat() {
@@ -191,7 +215,10 @@ extension ChatDetailViewController {
             }
             
             let hasMyChatBefore = self.viewModel.hasMyChat(before: indexPath.row)
-            cell.configureCell(by: item, hasMyChatBefore: hasMyChatBefore)
+            cell.configureCell(by: item, hasMyChatBefore: hasMyChatBefore) {
+                guard var snapshot = self.dataSource?.snapshot() else { return }
+                snapshot.reloadItems([item])
+            }
             
             self.observeTapActionIfPossible(cell, disposedBy: item.chatId)
             
