@@ -36,7 +36,7 @@ final class RxCLLocationManagerDelegateProxy:
     CLLocationManagerDelegate {
     
     // MARK: - Properties
-    fileprivate lazy var didUpdateLocations = PublishSubject<[CLLocation]>()
+    lazy var didUpdateLocations = PublishSubject<[CLLocation]>()
     
     // MARK: - Methods
     deinit {
