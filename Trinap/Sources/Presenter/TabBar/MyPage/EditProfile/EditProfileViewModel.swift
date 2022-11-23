@@ -76,8 +76,8 @@ final class EditProfileViewModel: ViewModelType {
 }
 
 extension EditProfileViewModel {
+    
     private func requestUpdate(image: Data?, nickName: String) -> Observable<Void> {
-        print(nickName)
         guard let image else {
             return editUserUseCase.updateProfielInfo(profileImage: nil, nickName: nickName)
         }

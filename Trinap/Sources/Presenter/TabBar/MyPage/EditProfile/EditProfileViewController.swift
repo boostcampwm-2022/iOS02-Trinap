@@ -34,7 +34,7 @@ final class EditProfileViewController: BaseViewController {
     
     private lazy var doneButton = UIButton().than {
         $0.setTitle("확인", for: .normal)
-        $0.setTitleColor(.black, for: .normal)
+        $0.setTitleColor(TrinapAsset.primary.color, for: .normal)
     }
     
     // MARK: - Initialize
@@ -42,6 +42,9 @@ final class EditProfileViewController: BaseViewController {
         self.viewModel = viewModel
         
         super.init()
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        
     }
     
     // MARK: - Configure
