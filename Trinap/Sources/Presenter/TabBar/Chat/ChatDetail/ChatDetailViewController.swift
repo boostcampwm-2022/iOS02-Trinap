@@ -127,7 +127,7 @@ extension ChatDetailViewController {
     private func presentActionAlert() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             .appendingAction(title: "포토 라이브러리") { [weak self] in self?.presentPhotoLibrary() }
-            .appendingAction(title: "위치 공유")
+            .appendingAction(title: "위치 공유") { [weak self] in self?.sendLocationShareChat() }
             .appendingCancel()
         
         self.present(alert, animated: true)
@@ -153,6 +153,12 @@ extension ChatDetailViewController {
         guard let imageData = image.jpegData(compressionQuality: 1) else { return }
         
         self.viewModel.uploadImageAndSendChat(imageData)
+            .subscribe()
+            .disposed(by: disposeBag)
+    }
+    
+    private func sendLocationShareChat() {
+        self.viewModel.sendLocationShareChatAndPresent()
             .subscribe()
             .disposed(by: disposeBag)
     }

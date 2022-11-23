@@ -90,6 +90,13 @@ final class ChatDetailViewModel: ViewModelType {
         }
     }
     
+    func sendLocationShareChatAndPresent() -> Observable<Void> {
+        return self.sendLocationShareChat()
+            .withUnretained(self) { owner, _ in
+                owner.presentLocationShare()
+            }
+    }
+    
     func presentLocationShare() {
         coordinator?.showLocationShareViewController()
     }
@@ -104,5 +111,9 @@ private extension ChatDetailViewModel {
     
     func sendImageChat(_ imageURL: String) -> Observable<Void> {
         return sendChatUseCase.execute(chatType: .image, content: imageURL, chatroomId: chatroomId)
+    }
+    
+    func sendLocationShareChat() -> Observable<Void> {
+        return sendChatUseCase.execute(chatType: .location, content: "location", chatroomId: chatroomId)
     }
 }
