@@ -21,9 +21,14 @@ final class PhotographerListViewController: BaseViewController {
     }
     
     private lazy var filterView = FilterView(filterMode: .main)
+    
+//    private lazy var containerViewController = ContainerView
+    
     // MARK: - Properties
     private let viewModel: PhotographerListViewModel
-
+    var searchText = BehaviorRelay<String>(value: "")
+    var coordinate = BehaviorRelay<Coordinate?>(value: nil)
+    
     // MARK: - Initializers
     init(viewModel: PhotographerListViewModel) {
         self.viewModel = viewModel
@@ -58,10 +63,28 @@ final class PhotographerListViewController: BaseViewController {
     }
 
     override func configureAttributes() {
-        <#code#>
+        searchBar.isUserInteractionEnabled = false
     }
 
     override func bind() {
-        <#code#>
+        
+        searchText.bind(to: searchBar.searchTextField.rx.text)
+            .disposed(by: disposeBag)
+        
+        let type = self.filterView.rx.itemSelected
+            .map { TagType(index: $0.row) }
+        let searchTrigger = searchBar.rx.tapGesture()
+            .when(.recognized).asObservable()
+            .map { _ in return () }
+        
+        let input = PhotographerListViewModel.Input(
+            searchTrigger: searchTrigger,
+            coordinate: coordinate.asObservable(),
+            tagType: type,
+            searchText: searchText
+        )
+        
+        let output = viewModel.transform(input: input)
+        
     }
 }
