@@ -17,7 +17,6 @@ final class DefaultFetchPhotographerPreviewsUseCase: FetchPhotographerPreviewsUs
     private let mapRepository: MapRepository
     private let userRepository: UserRepository
     private let reviewRepository: ReviewRepository
-    private let disposebag = DisposeBag()
     
     // MARK: Initializers
     init(
@@ -33,22 +32,32 @@ final class DefaultFetchPhotographerPreviewsUseCase: FetchPhotographerPreviewsUs
     }
     
     // MARK: Methods
-    func fetch(type: TagType) -> Observable<[PhotographerPreview]> {
-        return photographerRepository
-            .fetchPhotographers(type: type)
-            .withUnretained(self)
-            .flatMap { owner, photographers in
-                Observable.zip(
-                    photographers.map { photographer in
-                        owner.convertPreview(photographer: photographer)
-                    }
-                )
-            }
+    
+    func fetch(coordinate: Coordinate?, type: TagType) -> Observable<[PhotographerPreview]> {
+        let coordinate = matchCoordinate(coordinate: coordinate)
+        
+        let photographers = fetch(coordinate: coordinate)
+        if type == .all {
+            return toPreviews(photographers: photographers)
+        }
+        
+        let previews = photographers
+            .map { $0.filter { $0.tags.contains(type) } }
+        return toPreviews(photographers: previews)
     }
     
-    func fetch(coordinate: Coordinate) -> Observable<[PhotographerPreview]> {
+    private func fetch(type: TagType) -> Observable<[PhotographerPreview]> {
+        let photographers = photographerRepository.fetchPhotographers(type: type)
+        return toPreviews(photographers: photographers)
+    }
+    
+    private func fetch(coordinate: Coordinate) -> Observable<[Photographer]> {
         return photographerRepository
             .fetchPhotographers(coordinate: coordinate)
+    }
+    
+    private func toPreviews(photographers: Observable<[Photographer]>) -> Observable<[PhotographerPreview]> {
+        return photographers
             .withUnretained(self)
             .flatMap { owner, photographers in
                 Observable.zip(
