@@ -5,7 +5,6 @@
   <img src="https://img.shields.io/github/issues/boostcampwm-2022/iOS02-Trinap"/>
   <img src="https://img.shields.io/github/issues-closed/boostcampwm-2022/iOS02-Trinap"/>
   <img src="https://img.shields.io/github/commit-activity/w/boostcampwm-2022/iOS02-Trinap">
-  <img src="https://img.shields.io/github/last-commit/boostcampwm-2022/iOS02-Trinap">
   <br><br>
 </p>
 
