@@ -70,5 +70,31 @@ final class CreateReservationDateUseCase {
         return newDate
     }
     
+    func selectedStartDate(startDate: ReservationDate, endDate: ReservationDate) -> ReservationDate? {
+        if startDate.date >= endDate.date {
+            return createReservationDate(
+                date: startDate.date,
+                minute: 30,
+                type: .endDate
+            )
+        }
+        
+        return nil
+    }
     
+    func selectedEndDate(startDate: ReservationDate, endDate: ReservationDate) -> ReservationDate? {
+        if startDate.date >= endDate.date {
+            return createReservationDate(
+                date: endDate.date,
+                minute: -30,
+                type: .startDate)
+        }
+        
+        return nil
+    }
+    
+    func createReservationDate(date: Date, minute: Int, type: TimeSection) -> ReservationDate {
+        let newEndDate = self.calculateMinuteDate(date: date, minute: minute)
+        return ReservationDate(date: newEndDate, type: type)
+    }
 }

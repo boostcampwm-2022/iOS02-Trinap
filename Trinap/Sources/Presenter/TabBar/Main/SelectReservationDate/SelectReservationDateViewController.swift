@@ -18,8 +18,8 @@ enum TimeSection: String, Hashable {
 }
 
 struct ReservationDate: Hashable {
-    let type: TimeSection
     let date: Date
+    let type: TimeSection
 }
 
 final class SelectReservationDateViewController: BaseViewController {
@@ -58,8 +58,8 @@ final class SelectReservationDateViewController: BaseViewController {
     private lazy var calendar = Calendar.current
     let creatDateUseCase = CreateReservationDateUseCase()
     var dataSource: ReservationDateDataSource?
-    let selctedTime = PublishRelay<SelectedTime>()
     let viewModel = SelectReservationDateViewModel()
+    
     // MARK: - Initializers
     //    init() {
     //        super.init()
@@ -78,51 +78,66 @@ final class SelectReservationDateViewController: BaseViewController {
                 let startDate = self.creatDateUseCase.createStartDate(date: date)
                 let endDate = self.creatDateUseCase.createEndDate(date: startDate.first ?? Date())
                 self.loadData(
-                    startDate.map { ReservationDate(type: .startDate, date: $0) },
-                    endDate.map { ReservationDate(type: .endDate, date: $0) }
+                    startDate.map { ReservationDate(date: $0, type: .startDate) },
+                    endDate.map { ReservationDate(date: $0, type: .endDate) }
                 )
             })
             .disposed(by: disposeBag)
     }
     
     override func bind() {
-        //        let input = SelectReservationDateViewModel.Input(
-        //            selectDoneButtonTap: self.selectDoneButton.rx.tap.asObservable(),
-        //            startDate: self.collectionView.rx.itemSelected
-        //                .asObservable()
-        //                .compactMap { indexPath -> SelectedTime? in
-        //                    guard let date = self.dataSource?.itemIdentifier(for: indexPath)?.date else {
-        //                        return nil
-        //                    }
-        //                    if indexPath.section == 0 {
-        //                        return SelectedTime(
-        //                            date: date,
-        //                            indexPath:
-        //                                indexPath,
-        //                            type: .startDate
-        //                        )
-        //                    }
-        //                    return nil
-        //                },
-        //            endDate: self.collectionView.rx.itemSelected
-        //                .asObservable()
-        //                .compactMap { indexPath -> SelectedTime? in
-        //                    guard let date = self.dataSource?.itemIdentifier(for: indexPath)?.date else {
-        //                        return nil
-        //                    }
-        //                    if indexPath.section == 1 {
-        //                        return SelectedTime(
-        //                            date: date,
-        //                            indexPath:
-        //                                indexPath,
-        //                            type: .endDate
-        //                        )
-        //                    }
-        //                    return nil
-        //                }
-        //        )
-        //
-        //        viewModel.transform(input: input)
+        let input = SelectReservationDateViewModel.Input(
+            selectDoneButtonTap: self.selectDoneButton.rx.tap.asObservable(),
+            selectedDate: self.collectionView.rx.itemSelected
+                .asObservable()
+                .compactMap { [weak self] indexPath -> ReservationDate? in
+                    guard let self,
+                          let selectedDate = self.dataSource?.itemIdentifier(for: indexPath)
+                    else {
+                        return nil
+                    }
+                    
+                    switch indexPath.section {
+                    case 0:
+                        return ReservationDate(
+                            date: selectedDate.date,
+                            type: .startDate
+                        )
+                    case 1:
+                        return ReservationDate(
+                            date: selectedDate.date,
+                            type: .endDate
+                        )
+                    default:
+                        return nil
+                    }
+                },
+            deselectedDate: self.collectionView.rx.itemDeselected
+                .asObservable()
+                .compactMap { indexPath -> TimeSection? in
+                    switch indexPath.section {
+                    case 0:
+                        return TimeSection.startDate
+                    case 1:
+                        return TimeSection.endDate
+                    default:
+                        return nil
+                    }
+                }
+        )
+        
+        let output = viewModel.transform(input: input)
+        output.newSelectDate
+            .compactMap { $0 }
+            .withUnretained(self)
+            .subscribe(onNext: { owner, reservationDate in
+                guard let indexPath = owner.dataSource?.indexPath(for: reservationDate) else {
+                    return
+                }
+                owner.deselectSectionItem(owner.collectionView, indexPath: indexPath)
+                owner.collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .centeredHorizontally)
+            })
+            .disposed(by: disposeBag)
     }
     
     override func configureHierarchy() {
@@ -178,13 +193,14 @@ extension SelectReservationDateViewController {
         )
         
         dataSource?.supplementaryViewProvider = { collectionView, kind, indexPath in
-            guard kind == UICollectionView.elementKindSectionHeader,
-                  let view = collectionView.dequeueReusableSupplementaryView(
+            guard
+                kind == UICollectionView.elementKindSectionHeader,
+                let view = collectionView.dequeueReusableSupplementaryView(
                     ofKind: kind,
                     withReuseIdentifier: TitleSectionHeaderView.reuseIdentifier,
                     for: indexPath
                   ) as? TitleSectionHeaderView,
-                  let section = self.dataSource?.snapshot().sectionIdentifiers[indexPath.section]
+                let section = self.dataSource?.snapshot().sectionIdentifiers[indexPath.section]
             else {
                 return UICollectionReusableView()
             }
@@ -251,66 +267,21 @@ extension SelectReservationDateViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
         deselectSectionItem(collectionView, indexPath: indexPath)
         collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
-        if let selectedDate = dataSource?.itemIdentifier(for: indexPath) {
-            switch indexPath.section {
-            case 0:
-                // startDate 트리거
-                if let otherIndexPath = getOtherSelectedIndexPath(collectionView, indexPath: indexPath),
-                   let otherDate = dataSource?.itemIdentifier(for: otherIndexPath) {
-                    if selectedDate.date >= otherDate.date {
-                        let newEndDate = self.creatDateUseCase.calculateMinuteDate(date: selectedDate.date, minute: 30)
-                        let endReservationDate = ReservationDate(type: .endDate, date: newEndDate)
-                        let endReservationDateIndexPath = dataSource?.indexPath(for: endReservationDate)
-                        self.deselectSectionItem(collectionView, indexPath: endReservationDateIndexPath)
-                        collectionView.selectItem(at: endReservationDateIndexPath, animated: true, scrollPosition: .centeredHorizontally)
-                    }
-                } else {
-                    let newEndDate = self.creatDateUseCase.calculateMinuteDate(date: selectedDate.date, minute: 30)
-                    let endReservationDate = ReservationDate(type: .endDate, date: newEndDate)
-                    let endReservationDateIndexPath = dataSource?.indexPath(for: endReservationDate)
-                    collectionView.selectItem(at: endReservationDateIndexPath, animated: true, scrollPosition: .centeredHorizontally)
-                }
-            case 1:
-                if let otherIndexPath = getOtherSelectedIndexPath(collectionView, indexPath: indexPath),
-                   let otherDate = dataSource?.itemIdentifier(for: otherIndexPath) {
-                    if selectedDate.date <= otherDate.date {
-                        let newEndDate = self.creatDateUseCase.calculateMinuteDate(date: selectedDate.date, minute: -30)
-                        let startReservationDate = ReservationDate(type: .startDate, date: newEndDate)
-                        let startReservationDateIndexPath = dataSource?.indexPath(for: startReservationDate)
-                        self.deselectSectionItem(collectionView, indexPath: startReservationDateIndexPath)
-                        collectionView.selectItem(at: startReservationDateIndexPath, animated: true, scrollPosition: .centeredHorizontally)
-                    }
-                } else {
-                    let newEndDate = self.creatDateUseCase.calculateMinuteDate(date: selectedDate.date, minute: -30)
-                    let startReservationDate = ReservationDate(type: .startDate, date: newEndDate)
-                    let startReservationDateIndexPath = dataSource?.indexPath(for: startReservationDate)
-                    collectionView.selectItem(at: startReservationDateIndexPath, animated: true, scrollPosition: .centeredHorizontally)
-                }
-            default:
-                break
-            }
-        }
-        
+
         return true
     }
     
-    func getOtherSelectedIndexPath(_ collectionView: UICollectionView, indexPath: IndexPath) -> IndexPath? {
-        return collectionView.indexPathsForSelectedItems?.filter { $0.section != indexPath.section }.first
-    }
-    
     func deselectSectionItem(_ collectionView: UICollectionView, indexPath: IndexPath?) {
-        guard let selectedItemSection = collectionView.indexPathsForSelectedItems,
-              let indexPath = indexPath else { return }
+        guard
+            let selectedItemSection = collectionView.indexPathsForSelectedItems,
+            let indexPath = indexPath
+        else {
+            return
+        }
         let selectedItemIndexPath = selectedItemSection.filter { $0.section == indexPath.section }
         
         if let indexPath = selectedItemIndexPath.last {
             collectionView.deselectItem(at: indexPath, animated: false)
         }
     }
-}
-
-struct SelectedTime {
-    let date: Date
-    let indexPath: IndexPath
-    let type: TimeSection
 }
