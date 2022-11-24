@@ -69,8 +69,10 @@ final class DefaultFetchPhotographerPreviewsUseCase: FetchPhotographerPreviewsUs
         let rating = fetchAverageReview(photographerId: photographer.photographerUserId)
 
         return Observable.zip(name, user, rating)
+            .filter { location, user, rating in
+                return user.isPhotographer
+            }
             .map{ location, user, rating in
-                
                 Logger.print(rating)
                 return PhotographerPreview(
                     photographer: photographer,
