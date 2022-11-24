@@ -9,6 +9,7 @@
 import Foundation
 
 import HorizonCalendar
+import RxRelay
 import SnapKit
 
 final class TrinapCalendarView: BaseView {
@@ -17,6 +18,7 @@ final class TrinapCalendarView: BaseView {
         case singleSelect
         case multiSelect
     }
+    
     // MARK: - UI
     private lazy var calendarView = CalendarView(initialContent: configureCalendarView()).than {
         $0.backgroundColor = TrinapAsset.background.color
@@ -25,7 +27,9 @@ final class TrinapCalendarView: BaseView {
     
     // MARK: - Properties
     private lazy var calendar = Calendar.current
-    private var selectedDates: [Date] = []
+    private var selectedMultiDate: [Date] = [Date()]
+    private var possibleDate: [Date] = []
+    let selectedSingleDate = BehaviorRelay<Date>(value: Date())
     
     lazy var dayDateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
@@ -34,15 +38,15 @@ final class TrinapCalendarView: BaseView {
         dateFormatter.dateFormat = DateFormatter.dateFormat(
             fromTemplate: "EEEE, MMM d, yyyy",
             options: 0,
-            locale: calendar.locale ?? Locale(identifier: "ko"))
+            locale: calendar.locale ?? Locale(identifier: "ko_KR"))
         return dateFormatter
     }()
     
     
     // MARK: - Initializers
-    init(type: CalendarType) {
+    init(type: CalendarType, possibleDate: [Date] = []) {
         super.init(frame: .zero)
-        self.calendar.locale = Locale(identifier: "ko")
+        
         switch type {
         case .singleSelect:
             self.configureSingleDaySelectionHandler()
@@ -66,18 +70,18 @@ final class TrinapCalendarView: BaseView {
         calendarView.daySelectionHandler = { [weak self] day in
             guard
                 let self,
-                let day = self.calendar.date(from: day.components)
+                let date = self.calendar.date(from: day.components),
+                day.day >= self.calendar.component(.day, from: Date())
             else {
                 return
             }
             
-            
-            if self.selectedDates.contains(day) {
-                if let index = self.selectedDates.firstIndex(of: day) {
-                    self.selectedDates.remove(at: index)
+            if self.selectedMultiDate.contains(date) {
+                if let index = self.selectedMultiDate.firstIndex(of: date) {
+                    self.selectedMultiDate.remove(at: index)
                 }
             } else {
-                self.selectedDates.append(day)
+                self.selectedMultiDate.append(date)
             }
             
             self.calendarView.setContent(self.configureCalendarView())
@@ -88,17 +92,22 @@ final class TrinapCalendarView: BaseView {
         calendarView.daySelectionHandler = { [weak self] day in
             guard
                 let self,
-                let day = self.calendar.date(from: day.components)
+                day.day >= self.calendar.component(.day, from: Date())
             else {
                 return
             }
+            var date = self.calendar.date(from: day.components) ?? Date()
+            if day.day == self.calendar.component(.day, from: Date()) {
+                date = Date()
+            }
             
-            if self.selectedDates.contains(day) {
-                if let index = self.selectedDates.firstIndex(of: day) {
-                    self.selectedDates.remove(at: index)
+            if self.selectedMultiDate.contains(date) {
+                if let index = self.selectedMultiDate.firstIndex(of: date) {
+                    self.selectedMultiDate.remove(at: index)
                 }
             } else {
-                self.selectedDates = [day]
+                self.selectedMultiDate = [date]
+                self.selectedSingleDate.accept(date)
             }
             
             self.calendarView.setContent(self.configureCalendarView())
@@ -108,7 +117,7 @@ final class TrinapCalendarView: BaseView {
     func configureCalendarView() -> CalendarViewContent {
         let (startDate, endDate) = self.calculateCurrentMonth()
         
-        let selectedDates = self.selectedDates
+        let selectedDates = self.selectedMultiDate
         
         return CalendarViewContent(
             calendar: calendar,
@@ -118,13 +127,20 @@ final class TrinapCalendarView: BaseView {
         .verticalDayMargin(8)
         .horizontalDayMargin(8)
         .dayItemProvider { [calendar, dayDateFormatter] day in
-            var invariantViewProperties = DayView.InvariantViewProperties.baseInteractive
-            
             let date = calendar.date(from: day.components)
-            if selectedDates.contains(date ?? Date()) {
+            var invariantViewProperties = DayView.InvariantViewProperties.baseInteractive
+            if day.day < calendar.component(.day, from: Date()) {
+                invariantViewProperties = DayView.InvariantViewProperties.baseNonInteractive
                 invariantViewProperties.font = TrinapFontFamily.Pretendard.bold.font(size: 16)
-                invariantViewProperties.textColor = TrinapAsset.white.color
-                invariantViewProperties.backgroundShapeDrawingConfig.fillColor = TrinapAsset.primary.color
+                invariantViewProperties.textColor = TrinapAsset.disabled.color
+            } else {
+                if selectedDates.contains(where: {
+                    return calendar.component(.day, from: $0) == day.day
+                }) {
+                    invariantViewProperties.font = TrinapFontFamily.Pretendard.bold.font(size: 16)
+                    invariantViewProperties.textColor = TrinapAsset.white.color
+                    invariantViewProperties.backgroundShapeDrawingConfig.fillColor = TrinapAsset.primary.color
+                }
             }
             
             return DayView.calendarItemModel(
@@ -142,15 +158,13 @@ final class TrinapCalendarView: BaseView {
         let month = calendar.component(.month, from: date)
         
         let startDate = calendar.date(from: DateComponents(year: year, month: month)) ?? Date()
-        
         let nextMonth = calendar.date(byAdding: .month, value: +1, to: startDate) ?? Date()
-        
         let endDate = calendar.date(byAdding: .day, value: -1, to: nextMonth) ?? Date()
         
         return (startDate, endDate)
     }
     
     func getSeletedDate() -> [Date] {
-        return selectedDates
+        return selectedMultiDate
     }
 }
