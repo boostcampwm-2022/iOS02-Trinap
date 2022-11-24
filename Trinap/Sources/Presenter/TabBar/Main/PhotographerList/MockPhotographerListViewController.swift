@@ -21,5 +21,7 @@ final class MockPhotographerListViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemRed
+        let viewController = SelectReservationDateViewController()
+        self.present(viewController, animated: true)
     }
 }
