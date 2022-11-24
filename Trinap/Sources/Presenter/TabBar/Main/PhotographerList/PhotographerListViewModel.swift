@@ -14,12 +14,15 @@ final class PhotographerListViewModel: ViewModelType {
     
     struct Input {
         let searchTrigger: Observable<Void>
+        var coordinate: Observable<Coordinate?>
+        var tagType: Observable<TagType>
+        var searchText: BehaviorRelay<String>
     }
-    
+
     struct Output {
-        photographers
+        var previews: Driver<[PhotographerPreview]>
     }
-    
+
     // MARK: - Properties
     let disposeBag = DisposeBag()
     let searchText = BehaviorRelay<String>(value: "")
