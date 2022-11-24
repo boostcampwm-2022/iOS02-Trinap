@@ -17,6 +17,8 @@ struct ChatDTO: Codable {
     let content: String
     let isChecked: Bool
     let createdAt: String
+    let imageWidth: Double?
+    let imageHeight: Double?
     
     // MARK: - Methods
     func toModel(clientId: String) -> Chat {
@@ -27,7 +29,9 @@ struct ChatDTO: Codable {
             chatType: chatType,
             content: content,
             isChecked: isChecked,
-            createdAt: Date.fromStringOrNow(createdAt)
+            createdAt: Date.fromStringOrNow(createdAt),
+            imageWidth: imageWidth,
+            imageHeight: imageHeight
         )
     }
     

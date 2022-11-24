@@ -27,9 +27,17 @@ class ActionChatCell: ChatCell {
         return actionButton.rx.tap
     }
     
+    var actionDisposeBag = DisposeBag()
+    
     // MARK: - Initializers
     
     // MARK: - Methods
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        actionDisposeBag = DisposeBag()
+    }
+    
     override func configureHierarchy() {
         super.configureHierarchy()
         
