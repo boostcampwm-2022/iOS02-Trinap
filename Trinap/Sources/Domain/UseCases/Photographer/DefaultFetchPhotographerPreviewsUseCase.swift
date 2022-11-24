@@ -81,6 +81,17 @@ final class DefaultFetchPhotographerPreviewsUseCase: FetchPhotographerPreviewsUs
             }
     }
     
+    private func matchCoordinate(coordinate: Coordinate?) -> Coordinate {
+        if let coordinate { return coordinate }
+        let coordinate = mapRepository.fetchCurrentLocation()
+        switch coordinate {
+        case .success(let coor):
+            return coor
+        case .failure(_):
+            return Coordinate(lat: 37.5642135, lng: 127.269311)
+        }
+    }
+    
     private func fetchAverageReview(photographerId: String) -> Observable<Double> {
         return reviewRepository.fetchReviews(id: photographerId, target: .photographer)
             .map {
