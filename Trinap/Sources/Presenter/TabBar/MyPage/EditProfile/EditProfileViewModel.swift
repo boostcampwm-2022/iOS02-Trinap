@@ -14,7 +14,7 @@ final class EditProfileViewModel: ViewModelType {
     
     var disposeBag = DisposeBag()
     
-    private let user: User
+    private let fetchUserUseCase: FetchUserUseCase
     private let editUserUseCase: EditUserUseCase
     private let uploadImageUseCase: UploadImageUseCase
     
@@ -31,22 +31,30 @@ final class EditProfileViewModel: ViewModelType {
         let result: Observable<Void>
     }
     
-    private lazy var nicknameSubject = BehaviorSubject<String>(value: self.user.nickname)
+    private lazy var nicknameSubject = PublishSubject<String>()
     private lazy var imageData = BehaviorSubject<Data?>(value: nil)
     
     init(
-        user: User,
+        fetchUserUseCase: FetchUserUseCase,
         editUserUseCase: EditUserUseCase,
         uploadImageUseCase: UploadImageUseCase
     ) {
-        self.user = user
+        self.fetchUserUseCase = fetchUserUseCase
         self.editUserUseCase = editUserUseCase
         self.uploadImageUseCase = uploadImageUseCase
     }
     
     func transform(input: Input) -> Output {
-        nicknameSubject.onNext(user.nickname)
-
+        
+        let user = fetchUserUseCase
+            .fetchUserInfo()
+            .share()
+        
+        user.subscribe(onNext: { [weak self] user in
+            self?.nicknameSubject.onNext(user.nickname)
+        })
+        .disposed(by: disposeBag)
+        
         input.nicknameTrigger
             .withUnretained(self)
             .flatMap { owner, _ in
@@ -71,13 +79,13 @@ final class EditProfileViewModel: ViewModelType {
                 return owner.requestUpdate(image: image, nickName: nickname)
             }
         
-        return Output(nickName: nicknameSubject, defaultImage: .just(user.profileImage), result: result)
+        return Output(nickName: nicknameSubject, defaultImage: user.map { $0.profileImage }, result: result)
     }
 }
 
 extension EditProfileViewModel {
+    
     private func requestUpdate(image: Data?, nickName: String) -> Observable<Void> {
-        print(nickName)
         guard let image else {
             return editUserUseCase.updateProfielInfo(profileImage: nil, nickName: nickName)
         }

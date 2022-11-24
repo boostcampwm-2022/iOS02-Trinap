@@ -17,4 +17,21 @@ enum TagType: String, CaseIterable {
     case pet = "반려동물"
     case wedding = "웨딩 촬영"
     case filmCamera = "필카감성"
+    
+    var title: String {
+        switch self {
+        case .all:
+            return "전체"
+        case .profile:
+            return "프로필 사진"
+        case .instagram:
+            return "인스타"
+        case .pet:
+            return "반려동물"
+        case .wedding:
+            return "웨딩 촬영"
+        case .filmCamera:
+            return "필카 감성"
+        }
+    }
 }
