@@ -45,16 +45,20 @@ extension MainCoordinator {
         self.navigationController.pushViewController(viewController, animated: true)
     }
     
-    func showSearchViewController(searchText: BehaviorRelay<String>) {
+    func showSearchViewController(
+        searchText: BehaviorRelay<String>,
+        coordinate: BehaviorRelay<Coordinate?>
+    ) {
         let viewModel = SearchViewModel(
             searchLocationUseCase: DefaultSearchLocationUseCase(
                 mapService: DefaultMapRepository()
             ),
-            coordinator: self
+            coordinator: self,
+            searchText: searchText,
+            coordinate: coordinate
         )
         let viewController = SearchViewController(
-            viewModel: viewModel,
-            searchText: searchText
+            viewModel: viewModel
         )
         
         self.navigationController.setNavigationBarHidden(false, animated: false)
