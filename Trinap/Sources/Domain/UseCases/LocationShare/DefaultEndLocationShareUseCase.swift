@@ -1,14 +1,14 @@
 //
-//  DefaultObserveLocationUseCase.swift
+//  DefaultEndLocationShareUseCase.swift
 //  Trinap
 //
-//  Created by 김세영 on 2022/11/23.
+//  Created by 김세영 on 2022/11/25.
 //  Copyright © 2022 Trinap. All rights reserved.
 //
 
 import RxSwift
 
-final class DefaultObserveLocationUseCase: ObserveLocationUseCase {
+final class DefaultEndLocationShareUseCase: EndLocationShareUseCase {
     
     // MARK: - Properties
     private let locationRepository: LocationRepository
@@ -19,7 +19,7 @@ final class DefaultObserveLocationUseCase: ObserveLocationUseCase {
     }
     
     // MARK: - Methods
-    func execute(chatroomId: String) -> Observable<[SharedLocation]> {
-        return locationRepository.observe(chatroomId: chatroomId)
+    func execute(chatroomId: String) -> Observable<Void> {
+        return locationRepository.endShare(chatroomId: chatroomId)
     }
 }

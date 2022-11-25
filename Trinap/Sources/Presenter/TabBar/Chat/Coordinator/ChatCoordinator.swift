@@ -83,8 +83,17 @@ extension ChatCoordinator {
         self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
     }
     
-    func showLocationShareViewController() {
-        let locationShareViewModel = LocationShareViewModel()
+    func showLocationShareViewController(chatroomId: String) {
+        let locationRepository = DefaultLocationRepository()
+        let observeLocationUseCase = DefaultObserveLocationUseCase(locationRepository: locationRepository)
+        let updateLocationUseCase = DefaultUpdateLocationUseCase(locationRepository: locationRepository)
+        let endLocationShareUseCase = DefaultEndLocationShareUseCase(locationRepository: locationRepository)
+        let locationShareViewModel = LocationShareViewModel(
+            chatroomId: chatroomId,
+            observeLocationUseCase: observeLocationUseCase,
+            updateLocationUseCase: updateLocationUseCase,
+            endLocationShareUseCase: endLocationShareUseCase
+        )
         let locationShareViewController = LocationShareViewController(viewModel: locationShareViewModel)
 
         self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true

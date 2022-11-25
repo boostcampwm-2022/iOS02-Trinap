@@ -17,15 +17,15 @@ final class DefaultLocationRepository: LocationRepository {
     
     // MARK: - Initializers
     init(
-        firestoreService: FireStoreService,
-        tokenManager: TokenManager
+        firestoreService: FireStoreService = DefaultFireStoreService(),
+        tokenManager: TokenManager = KeychainTokenManager()
     ) {
         self.firestoreService = firestoreService
         self.tokenManager = tokenManager
     }
     
     // MARK: - Methods
-    func observe(chatroomId: String) -> Observable<SharedLocation> {
+    func observe(chatroomId: String) -> Observable<[SharedLocation]> {
         guard let userId = tokenManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
         }
@@ -33,8 +33,16 @@ final class DefaultLocationRepository: LocationRepository {
         return self.firestoreService
             .observe(documents: ["chatrooms", chatroomId, "locations"])
             .map { $0.compactMap { $0.toObject(SharedLocation.self) } }
-            .compactMap { sharedLocations in
-                return sharedLocations.filter { $0.userId != userId }.first
+            .map { sharedLocations in
+                var mutableSharedLocations: [SharedLocation] = []
+                
+                sharedLocations.forEach { location in
+                    var sharedLocation = location
+                    sharedLocation.isMine = (userId == location.userId)
+                    
+                    mutableSharedLocations.append(sharedLocation)
+                }
+                return mutableSharedLocations
             }
             .asObservable()
     }
@@ -55,6 +63,16 @@ final class DefaultLocationRepository: LocationRepository {
                 documents: ["chatrooms", chatroomId, "locations", sharedLocation.userId],
                 values: values
             )
+            .asObservable()
+    }
+    
+    func endShare(chatroomId: String) -> Observable<Void> {
+        guard let userId = tokenManager.getToken(with: .userId) else {
+            return .error(TokenManagerError.notFound)
+        }
+        
+        return self.firestoreService
+            .deleteDocument(documents: ["chatrooms", chatroomId, "locations", userId])
             .asObservable()
     }
 }
