@@ -34,10 +34,12 @@ final class SearchViewController: BaseViewController {
     // MARK: - Properties
     private let viewModel: SearchViewModel
 
+    
     // MARK: - Initializers
-    init(viewModel: SearchViewModel) {
+    init(
+        viewModel: SearchViewModel
+    ) {
         self.viewModel = viewModel
-        
         super.init()
     }
     
@@ -65,12 +67,22 @@ final class SearchViewController: BaseViewController {
     }
     
     override func bind() {
+        
+        viewModel.searchText?
+            .bind(to: searchBar.searchTextField.rx.text)
+            .disposed(by: disposeBag)
+        
         let selectedSpace = searchTableView.rx.itemSelected
             .asObservable()
             .map { [weak self] index -> Space? in
                 self?.dataSource?.itemIdentifier(for: index)
             }
             .compactMap{ $0 }
+
+        selectedSpace
+            .map { $0.name }
+            .bind(to: viewModel.searchText ?? BehaviorRelay<String>(value: ""))
+            .disposed(by: disposeBag)
         
         let input = SearchViewModel.Input(
             searchText: searchBar.rx.text.orEmpty.asObservable(),

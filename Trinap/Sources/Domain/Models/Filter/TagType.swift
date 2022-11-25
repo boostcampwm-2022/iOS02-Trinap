@@ -34,4 +34,16 @@ enum TagType: String, CaseIterable {
             return "필카 감성"
         }
     }
+    
+    init(index: Int) {
+        switch index {
+        case 0: self = .all
+        case 1: self = .profile
+        case 2: self = .instagram
+        case 3: self = .pet
+        case 4: self = .wedding
+        case 5: self = .filmCamera
+        default: self = .all
+        }
+    }
 }
