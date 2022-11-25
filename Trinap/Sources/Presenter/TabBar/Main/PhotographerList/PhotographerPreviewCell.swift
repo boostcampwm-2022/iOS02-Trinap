@@ -162,9 +162,9 @@ extension PhotographerPreviewCell {
         for (index, name) in imageNames.enumerated() {
             guard let url = URL(string: name) else { continue }
             let imageView = UIImageView()
-            imageView.qf.setImage(at: url) { [weak self] in
+            imageView.qf.setImage(at: url) { [weak self] _ in
                 guard
-                    let width =               self?.thumbnailScrollView.frame.width,
+                    let width = self?.thumbnailScrollView.frame.width,
                     let y = self?.thumbnailScrollView.frame.minY,
                     let side = self?.thumbnailScrollView.frame.width
                 else { return }
