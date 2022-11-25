@@ -9,7 +9,7 @@
 import Foundation
 
 struct Photographer {
-        
+    
     // MARK: - Properties
     let photographerId, photographerUserId, introduction: String
     let latitude, longitude: Double
@@ -17,4 +17,19 @@ struct Photographer {
     let pictures: [String]
     let pricePerHalfHour: Int
     let possibleDate: [Date]
+    
+    // MARK: - Methods
+    static func createDefaultPhotographer() -> Photographer {
+        return Photographer(
+            photographerId: UUID().uuidString,
+            photographerUserId: "",
+            introduction: "",
+            latitude: 37.7,
+            longitude: 127,
+            tags: [],
+            pictures: [],
+            pricePerHalfHour: 0,
+            possibleDate: []
+        )
+    }
 }

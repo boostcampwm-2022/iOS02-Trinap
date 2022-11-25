@@ -34,17 +34,7 @@ final class DefaultCreateUserUseCase: CreateUserUseCase {
             .withUnretained(self)
             .flatMap { owner, _ in
                 owner.photographerRepository.create(
-                    photographer: Photographer(
-                        photographerId: UUID().uuidString,
-                        photographerUserId: "",
-                        introduction: "",
-                        latitude: 37.7,
-                        longitude: 127,
-                        tags: [],
-                        pictures: [],
-                        pricePerHalfHour: 0,
-                        possibleDate: []
-                    )
+                    photographer: Photographer.createDefaultPhotographer()
                 )
             }
             .retry(3)
