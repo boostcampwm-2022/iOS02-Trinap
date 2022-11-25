@@ -60,11 +60,15 @@ final class DefaultFetchPhotographerPreviewsUseCase: FetchPhotographerPreviewsUs
         return photographers
             .withUnretained(self)
             .flatMap { owner, photographers in
-                Observable.zip(
+                
+                return Observable.zip(
                     photographers.map { photographer in
                         owner.convertPreview(photographer: photographer)
                     }
                 )
+                .map { previews in
+                    previews.filter { !$0.name.isEmpty }
+                }
             }
     }
     
@@ -74,19 +78,18 @@ final class DefaultFetchPhotographerPreviewsUseCase: FetchPhotographerPreviewsUs
             lng: photographer.longitude
         )
         let name = mapRepository.fetchLocationName(using: coor)
-        let user = userRepository.fetch(userId: photographer.photographerUserId)
+        let user = userRepository.fetch(userId: photographer.photographerUserId).map { userr -> User? in
+            if !userr.isPhotographer { return nil }
+            return userr
+        }
         let rating = fetchAverageReview(photographerId: photographer.photographerUserId)
-
+        
         return Observable.zip(name, user, rating)
-            .filter { location, user, rating in
-                return user.isPhotographer
-            }
-            .map{ location, user, rating in
-                Logger.print(rating)
+            .map { (location, user, rating) -> PhotographerPreview in
                 return PhotographerPreview(
                     photographer: photographer,
                     location: location,
-                    name: user.nickname,
+                    name: user?.nickname ?? "",
                     rating: rating
                 )
             }
