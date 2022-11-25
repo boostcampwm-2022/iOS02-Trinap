@@ -13,13 +13,11 @@ import RxSwift
 final class PhotographerListViewModel: ViewModelType {
     
     struct Input {
-        // searchTrigger -> 화면 전환
-        // 검색어 다 치고 다시 돌어왔을 때 값 받아서 검색어에 저장 <- 얘를 어떻게 해야하지..?
-        // 필터 고를 때마다 필터 값 저장
         let searchTrigger: Observable<Void>
-        var coordinate: Observable<Coordinate?>
+//        var coordinate: Observable<Coordinate?>
+//        var tagType: Observable<TagType>
         var tagType: Observable<TagType>
-        var searchText: BehaviorRelay<String>
+//        var searchText: BehaviorRelay<String>
     }
 
     struct Output {
@@ -30,6 +28,9 @@ final class PhotographerListViewModel: ViewModelType {
     let disposeBag = DisposeBag()
     private weak var coordinator: MainCoordinator?
     private let previewsUseCase: FetchPhotographerPreviewsUseCase
+    
+    var searchText = BehaviorRelay<String>(value: "")
+    var coordinate = BehaviorRelay<Coordinate?>(value: nil)
 
     // MARK: - Initializer
     init(
@@ -42,23 +43,42 @@ final class PhotographerListViewModel: ViewModelType {
 
     // MARK: - Methods
     func transform(input: Input) -> Output {
+//        coordinate
+//            .subscribe(onNext: { print("야!@#!@#!@#!@!#\($0)")})
+//            .disposed(by: disposeBag)
+//        input.tagType.do(onNext: {})
+//        input.tagType
+//            .drive(onNext: { print($0)})
+//            .disposed(by: disposeBag)
         
         input.searchTrigger
             .subscribe(onNext: { [weak self] _ in
-                self?.coordinator?.showSearchViewController(searchText: input.searchText)
+                guard let self else { return }
+                self.coordinator?.showSearchViewController(
+                    searchText: self.searchText,
+                    coordinate: self.coordinate
+                )
             })
             .disposed(by: disposeBag)
         
+        //TODO: tagtype 초기 값이 .all로 설정이 안돼서 coordinate가 들어와도 실행이 되지 않는 상황
         let previews = Observable.combineLatest(
-            input.coordinate,
-            input.tagType
-                .debounce(.seconds(1), scheduler: MainScheduler.instance)
+            self.coordinate,
+            input.tagType.startWith(.all)
+//                .debounce(.seconds(1), scheduler: MainScheduler.instance)
         )
             .withUnretained(self)
             .flatMap { (owner, val) -> Observable<[PhotographerPreview]> in
                 let (coordinate, type) = val
+                print("와 여기까지 들어와? \(val)")
                 return owner.previewsUseCase.fetch(coordinate: coordinate, type: type)
             }
+            .debug()
+            .map { i -> [PhotographerPreview] in
+                print("패치됨. \(i)")
+                return i
+            }
+            .debug()
             .asDriver(onErrorJustReturn: [])
         
         return Output(previews: previews)

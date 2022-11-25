@@ -26,8 +26,6 @@ final class PhotographerListViewController: BaseViewController {
     
     // MARK: - Properties
     private let viewModel: PhotographerListViewModel
-    var searchText = BehaviorRelay<String>(value: "")
-    var coordinate = BehaviorRelay<Coordinate?>(value: nil)
     
     // MARK: - Initializers
     init(viewModel: PhotographerListViewModel) {
@@ -68,7 +66,7 @@ final class PhotographerListViewController: BaseViewController {
 
     override func bind() {
         
-        searchText.bind(to: searchBar.searchTextField.rx.text)
+        viewModel.searchText.bind(to: searchBar.searchTextField.rx.text)
             .disposed(by: disposeBag)
         
         let type = self.filterView.rx.itemSelected
@@ -79,12 +77,14 @@ final class PhotographerListViewController: BaseViewController {
         
         let input = PhotographerListViewModel.Input(
             searchTrigger: searchTrigger,
-            coordinate: coordinate.asObservable(),
-            tagType: type,
-            searchText: searchText
+            tagType: type
         )
         
         let output = viewModel.transform(input: input)
+        
+        output.previews
+            .drive(onNext: { print("drive: \($0)")})
+            .disposed(by: disposeBag)
         
     }
 }

@@ -33,16 +33,13 @@ final class SearchViewController: BaseViewController {
 
     // MARK: - Properties
     private let viewModel: SearchViewModel
-    // TODO: 얘 weak? 안 weak?
-    private weak var searchText: BehaviorRelay<String>?
+
     
     // MARK: - Initializers
     init(
-        viewModel: SearchViewModel,
-        searchText: BehaviorRelay<String>
+        viewModel: SearchViewModel
     ) {
         self.viewModel = viewModel
-        self.searchText = searchText
         super.init()
     }
     
@@ -71,7 +68,7 @@ final class SearchViewController: BaseViewController {
     
     override func bind() {
         
-        searchText?
+        viewModel.searchText?
             .bind(to: searchBar.searchTextField.rx.text)
             .disposed(by: disposeBag)
         
@@ -84,7 +81,7 @@ final class SearchViewController: BaseViewController {
 
         selectedSpace
             .map { $0.name }
-            .bind(to: searchText ?? BehaviorRelay<String>(value: ""))
+            .bind(to: viewModel.searchText ?? BehaviorRelay<String>(value: ""))
             .disposed(by: disposeBag)
         
         let input = SearchViewModel.Input(

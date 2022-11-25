@@ -25,13 +25,19 @@ final class SearchViewModel: ViewModelType {
     private weak var coordinator: MainCoordinator?
     private let searchLocationUseCase: SearchLocationUseCase
     
+    weak var searchText: BehaviorRelay<String>?
+    weak var coordinate: BehaviorRelay<Coordinate?>?
     // MARK: - Initializer
     init(
         searchLocationUseCase: SearchLocationUseCase,
-        coordinator: MainCoordinator
+        coordinator: MainCoordinator,
+        searchText: BehaviorRelay<String>,
+        coordinate: BehaviorRelay<Coordinate?>
     ) {
         self.searchLocationUseCase = searchLocationUseCase
         self.coordinator = coordinator
+        self.searchText = searchText
+        self.coordinate = coordinate
     }
     
     // MARK: - Methods
@@ -53,6 +59,12 @@ final class SearchViewModel: ViewModelType {
                 owner.coordinator?.popViewController()
             })
             .disposed(by: disposeBag)
+        
+        guard let coordinate else { return Output(spaces: spaces) }
+        input.selectedSpace
+            .map { Coordinate(lat: $0.lat, lng: $0.lng) }
+            .bind(to: coordinate)
+        
         return Output(spaces: spaces)
     }
 }
