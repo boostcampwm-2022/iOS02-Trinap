@@ -87,10 +87,12 @@ extension ChatCoordinator {
         let locationRepository = DefaultLocationRepository()
         let observeLocationUseCase = DefaultObserveLocationUseCase(locationRepository: locationRepository)
         let updateLocationUseCase = DefaultUpdateLocationUseCase(locationRepository: locationRepository)
+        let endLocationShareUseCase = DefaultEndLocationShareUseCase(locationRepository: locationRepository)
         let locationShareViewModel = LocationShareViewModel(
             chatroomId: chatroomId,
             observeLocationUseCase: observeLocationUseCase,
-            updateLocationUseCase: updateLocationUseCase
+            updateLocationUseCase: updateLocationUseCase,
+            endLocationShareUseCase: endLocationShareUseCase
         )
         let locationShareViewController = LocationShareViewController(viewModel: locationShareViewModel)
 

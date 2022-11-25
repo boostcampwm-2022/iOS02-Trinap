@@ -29,6 +29,7 @@ final class LocationShareViewModel: ViewModelType {
     private let chatroomId: String
     private let observeLocationUseCase: ObserveLocationUseCase
     private let updateLocationUseCase: UpdateLocationUseCase
+    private let endLocationShareUseCase: EndLocationShareUseCase
     private var isFollowCurrentLocation = true
     
     #if targetEnvironment(simulator)
@@ -41,11 +42,13 @@ final class LocationShareViewModel: ViewModelType {
     init(
         chatroomId: String,
         observeLocationUseCase: ObserveLocationUseCase,
-        updateLocationUseCase: UpdateLocationUseCase
+        updateLocationUseCase: UpdateLocationUseCase,
+        endLocationShareUseCase: EndLocationShareUseCase
     ) {
         self.chatroomId = chatroomId
         self.observeLocationUseCase = observeLocationUseCase
         self.updateLocationUseCase = updateLocationUseCase
+        self.endLocationShareUseCase = endLocationShareUseCase
     }
     
     // MARK: - Methods
@@ -72,6 +75,12 @@ final class LocationShareViewModel: ViewModelType {
             myCoordinate: myCoordinate,
             otherCoordinate: otherCoordinate
         )
+    }
+    
+    func endLocationShare() {
+        endLocationShareUseCase.execute(chatroomId: chatroomId)
+            .subscribe()
+            .disposed(by: disposeBag)
     }
 }
 
