@@ -17,8 +17,23 @@ import Than
 final class LocationShareViewController: BaseViewController {
     
     // MARK: - UI
+    private lazy var myAnnotationView = TrinapAnnotationView().than {
+        $0.isMine = true
+    }
+    
+    private lazy var otherAnnotationView = TrinapAnnotationView().than {
+        $0.isMine = false
+    }
+    
     private lazy var mapView = MKMapView().than {
-        $0.showsUserLocation = true
+        $0.register(TrinapAnnotationView.self)
+        $0.addAnnotation(myAnnotationView)
+        $0.addAnnotation(otherAnnotationView)
+        $0.delegate = self
+    }
+    
+    private lazy var locationManager = CLLocationManager().than {
+        $0.startUpdatingLocation()
     }
     
     private lazy var currentLocationButton = TrinapButton(style: .primary, isCircle: true).than {
@@ -44,8 +59,8 @@ final class LocationShareViewController: BaseViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        let currentLocation = mapView.userLocation
-        self.updateLocation(currentLocation, animated: true)
+        let currentLocation = mapView.userLocation.coordinate
+        self.moveCameraToCoordinate(currentLocation, animated: true)
     }
     
     override func configureHierarchy() {
@@ -61,7 +76,7 @@ final class LocationShareViewController: BaseViewController {
         currentLocationButton.snp.makeConstraints { make in
             make.trailing.equalTo(self.view.safeAreaLayoutGuide).inset(30)
             make.bottom.equalTo(self.view.safeAreaLayoutGuide).inset(50)
-            make.width.height.equalTo(40)
+            make.width.height.equalTo(50)
         }
     }
     
@@ -75,34 +90,97 @@ final class LocationShareViewController: BaseViewController {
             .filter { !$0 }
             .map { _ in return }
         
+        let myCoordinate = locationManager.rx
+            .didUpdateLocations
+            .compactMap(\.last)
+            .map { Coordinate(lat: $0.coordinate.latitude, lng: $0.coordinate.longitude) }
+        
         let input = LocationShareViewModel.Input(
             didTapCurrentLocation: currentLocationButton.rx.tap.asSignal(),
-            willChangeRegionWithScroll: willChangeRegionWithScroll.asSignal(onErrorJustReturn: ())
+            willChangeRegionWithScroll: willChangeRegionWithScroll.asSignal(onErrorJustReturn: ()),
+            myCoordinate: myCoordinate
         )
         
         let output = viewModel.transform(input: input)
         
         let isFollowCurrentLocation = output.isFollowCurrentLocation.share()
         
-        mapView.rx.didUpdateUserLocation
+        locationManager.rx.didUpdateLocations
+            .compactMap(\.last)
             .withLatestFrom(isFollowCurrentLocation) { (location: $0, isFollow: $1) }
             .filter { $0.isFollow }
-            .bind(onNext: { [weak self] location, _ in self?.updateLocation(location) })
+            .bind(onNext: { [weak self] location, _ in self?.moveCameraToCoordinate(location.coordinate) })
             .disposed(by: disposeBag)
         
         isFollowCurrentLocation
             .map { $0 ? TrinapButton.ColorType.primary : .black }
             .bind(to: currentLocationButton.rx.style)
             .disposed(by: disposeBag)
+        
+        currentLocationButton.rx.tap
+            .bind(onNext: { [weak self] _ in
+                guard
+                    let self = self,
+                    let currentLocation = self.locationManager.location
+                else { return }
+                
+                self.moveCameraToCoordinate(currentLocation.coordinate)
+            })
+            .disposed(by: disposeBag)
+        
+        output.myCoordinate
+            .compactMap { $0 }
+            .bind(onNext: { [weak self] coordinate in self?.updateMyAnnotation(to: coordinate) })
+            .disposed(by: disposeBag)
+        
+        output.otherCoordinate
+            .compactMap { $0 }
+            .bind(onNext: { [weak self] coordinate in self?.updateOtherAnnotation(to: coordinate) })
+            .disposed(by: disposeBag)
     }
 }
 
+// MARK: - Privates
 private extension LocationShareViewController {
     
-    func updateLocation(_ location: MKUserLocation, animated: Bool = true) {
+    func moveCameraToCoordinate(_ coordinate: CLLocationCoordinate2D, animated: Bool = true) {
+        guard !(coordinate.latitude == .zero) else { return }
+        
         let span = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
-        let region = MKCoordinateRegion(center: location.coordinate, span: span)
+        let region = MKCoordinateRegion(center: coordinate, span: span)
         
         mapView.setRegion(region, animated: animated)
+    }
+    
+    func updateMyAnnotation(to coordinate: Coordinate) {
+        updateAnnotation(to: coordinate, annotationView: myAnnotationView)
+    }
+    
+    func updateOtherAnnotation(to coordinate: Coordinate) {
+        updateAnnotation(to: coordinate, annotationView: otherAnnotationView)
+    }
+    
+    func updateAnnotation(to coordinate: Coordinate, annotationView: TrinapAnnotationView) {
+        annotationView.coordinate = CLLocationCoordinate2D(latitude: coordinate.lat, longitude: coordinate.lng)
+    }
+}
+
+// MARK: - MapView Delegate
+extension LocationShareViewController: MKMapViewDelegate {
+    
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        guard
+            let annotationView = mapView.dequeueAnnotationView(TrinapAnnotationView.self),
+            let annotation = annotation as? TrinapAnnotationView
+        else {
+            return nil
+        }
+        
+        if annotation.isMine {
+            annotationView.image = TrinapAsset.customerPin.image
+        } else {
+            annotationView.image = TrinapAsset.photographerPin.image
+        }
+        return annotationView
     }
 }
