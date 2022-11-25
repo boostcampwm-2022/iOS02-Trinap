@@ -10,6 +10,6 @@ import RxSwift
 
 protocol LocationRepository {
     
-    func observe(chatroomId: String) -> Observable<SharedLocation>
+    func observe(chatroomId: String) -> Observable<[SharedLocation]>
     func update(chatroomId: String, location: Coordinate) -> Observable<Void>
 }

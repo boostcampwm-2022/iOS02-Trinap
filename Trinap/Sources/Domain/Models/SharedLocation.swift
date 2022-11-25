@@ -13,4 +13,9 @@ struct SharedLocation: Codable {
     let userId: String
     let latitude: Double
     let longitude: Double
+    var isMine = false
+    
+    private enum CodingKeys: String, CodingKey {
+        case userId, latitude, longitude
+    }
 }
