@@ -98,7 +98,7 @@ final class ChatDetailViewModel: ViewModelType {
     }
     
     func presentLocationShare() {
-        coordinator?.showLocationShareViewController()
+        coordinator?.showLocationShareViewController(chatroomId: chatroomId)
     }
 }
 
