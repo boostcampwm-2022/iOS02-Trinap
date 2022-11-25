@@ -65,4 +65,14 @@ final class DefaultLocationRepository: LocationRepository {
             )
             .asObservable()
     }
+    
+    func endShare(chatroomId: String) -> Observable<Void> {
+        guard let userId = tokenManager.getToken(with: .userId) else {
+            return .error(TokenManagerError.notFound)
+        }
+        
+        return self.firestoreService
+            .deleteDocument(documents: ["chatrooms", chatroomId, "locations", userId])
+            .asObservable()
+    }
 }

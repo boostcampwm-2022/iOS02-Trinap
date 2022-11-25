@@ -12,4 +12,5 @@ protocol LocationRepository {
     
     func observe(chatroomId: String) -> Observable<[SharedLocation]>
     func update(chatroomId: String, location: Coordinate) -> Observable<Void>
+    func endShare(chatroomId: String) -> Observable<Void>
 }
