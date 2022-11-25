@@ -98,7 +98,7 @@ final class DefaultFetchPhotographerPreviewsUseCase: FetchPhotographerPreviewsUs
         switch coordinate {
         case .success(let coor):
             return coor
-        case .failure(_):
+        case .failure:
             return Coordinate(lat: 37.5642135, lng: 127.269311)
         }
     }
