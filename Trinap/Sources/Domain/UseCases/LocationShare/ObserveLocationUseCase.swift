@@ -10,5 +10,5 @@ import RxSwift
 
 protocol ObserveLocationUseCase {
     
-    func execute(chatroomId: String) -> Observable<SharedLocation>
+    func execute(chatroomId: String) -> Observable<[SharedLocation]>
 }

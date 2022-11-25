@@ -19,7 +19,7 @@ final class DefaultObserveLocationUseCase: ObserveLocationUseCase {
     }
     
     // MARK: - Methods
-    func execute(chatroomId: String) -> Observable<SharedLocation> {
+    func execute(chatroomId: String) -> Observable<[SharedLocation]> {
         return locationRepository.observe(chatroomId: chatroomId)
     }
 }
