@@ -10,6 +10,7 @@ excluded:
   - ./**/SceneDelegate.swift
   - Plugins
   - Project.swift
+  - ./TrinapTests
 
 disabled_rules:
   - discarded_notification_center_observer
@@ -17,6 +18,7 @@ disabled_rules:
   - orphaned_doc_comment
   - unused_capture_list
   - trailing_whitespace
+  - line_length
 
 opt_in_rules:
   - array_init
