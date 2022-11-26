@@ -22,7 +22,6 @@ final class DefaultFetchPhotographerUseCase: FetchPhotographerUseCase {
     
     // MARK: Methods
     func fetch(photographerId: String) -> Observable<Photographer> {
-        return photographerRespository
-            .fetchDetailPhotographer(of: photographerId)
+        return photographerRespository.fetchDetailPhotographer(userId: photographerId)
     }
 }
