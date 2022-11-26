@@ -8,6 +8,22 @@
 
 import Foundation
 
+enum PhotographerSection: Int, Hashable {
+    
+    case profile = 0
+    case photo
+    case detail
+    case review
+    
+    enum Item: Hashable {
+        case profile(PhotographerProfile)
+        case photo(Picture?)
+        case detail(PhotographerDetailIntroduction)
+        case summaryReview(ReviewSummary)
+        case review(PhotographerReview)
+    }
+}
+
 struct Photographer {
         
     // MARK: - Properties
