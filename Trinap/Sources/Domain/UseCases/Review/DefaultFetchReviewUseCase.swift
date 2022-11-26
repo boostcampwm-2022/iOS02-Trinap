@@ -29,12 +29,13 @@ final class DefaultFetchReviewUseCase: FetchReviewUseCase {
     
     // MARK: - Methods
     /// 리뷰 평균 별점
-    func fetchAverageReview(photographerId: String) -> Observable<Double> {
+    func fetchAverageReview(photographerId: String) -> Observable<ReviewSummary> {
         return reviewRepository.fetchReviews(id: photographerId, target: .photographer)
             .map {
                 let reviewRatings = $0.map { $0.rating }
                 let averageRating = Double(reviewRatings.reduce(0, +)) / Double(reviewRatings.count)
-                return round(averageRating * 10) / 10
+                
+                return ReviewSummary(rating: round(averageRating * 10) / 10, count: reviewRatings.count)
             }
             .asObservable()
     }
@@ -49,7 +50,8 @@ final class DefaultFetchReviewUseCase: FetchReviewUseCase {
     }
     
     /// 작가에게 작성된 리뷰 확인
-    func fetchReviews(photographerId: String) -> Observable<[PhotographerReview]> {        
+    func fetchReviews(photographerId: String) -> Observable<[PhotographerReview]> {
+        Logger.print(photographerId)
         return reviewRepository.fetchReviews(id: photographerId, target: .photographer)
             .flatMap { reviews in
                 return self.mappingReviewOfPhotographer(reviews: reviews)
@@ -63,7 +65,7 @@ extension DefaultFetchReviewUseCase {
         
         /// 중복된 id제거
         let photographerIds = reviews.map { $0.photographerUserId }.removingDuplicates()
-
+        
         return photographerIds.isEmpty ? .just([]) : photographerRepository.fetchPhotographers(ids: photographerIds)
             .map { photographers in
                 var userReviews: [UserReview] = []
@@ -87,9 +89,10 @@ extension DefaultFetchReviewUseCase {
     
     private func mappingReviewOfPhotographer(reviews: [Review]) -> Observable<[PhotographerReview]> {
         
+        print(reviews)
         /// 중복된 id제거
         let userIds = reviews.map { $0.creatorUserId }.removingDuplicates()
-
+        
         return userIds.isEmpty ? .just([]) : userRepository.fetchUsers(userIds: userIds)
             .map { users in
                 

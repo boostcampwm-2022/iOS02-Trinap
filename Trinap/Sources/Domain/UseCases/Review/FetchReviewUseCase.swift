@@ -11,7 +11,7 @@ import Foundation
 import RxSwift
 
 protocol FetchReviewUseCase {
-    func fetchAverageReview(photographerId: String) -> Observable<Double>
+    func fetchAverageReview(photographerId: String) -> Observable<ReviewSummary>
     func fetchReviews(userId: String) -> Observable<[UserReview]>
     func fetchReviews(photographerId: String) -> Observable<[PhotographerReview]>
 }
