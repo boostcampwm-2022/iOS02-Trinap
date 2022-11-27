@@ -8,19 +8,8 @@
 
 import UIKit
 
-import RxRelay
-import HorizonCalendar
+import RxSwift
 import SnapKit
-
-enum TimeSection: String, Hashable {
-    case startDate = "시작 시간"
-    case endDate = "종료 시간"
-}
-
-struct ReservationDate: Hashable {
-    let date: Date
-    let type: TimeSection
-}
 
 final class SelectReservationDateViewController: BaseViewController {
     
@@ -31,9 +20,7 @@ final class SelectReservationDateViewController: BaseViewController {
         $0.numberOfLines = 0
     }
     
-    private lazy var trinapCalenderView = TrinapCalendarView(
-        type: TrinapCalendarView.CalendarType.singleSelect
-    )
+    private lazy var trinapCalenderView = TrinapSingleSelectionCalendarView()
     
     private lazy var selectDoneButton = TrinapButton(style: .primary).than {
         $0.setTitle("선택 완료", for: .normal)
@@ -55,44 +42,36 @@ final class SelectReservationDateViewController: BaseViewController {
     }
     
     // MARK: - Properties
-    private lazy var calendar = Calendar.current
-    let creatDateUseCase = CreateReservationDateUseCase()
-    var dataSource: ReservationDateDataSource?
-    let viewModel = SelectReservationDateViewModel()
+    private var dataSource: ReservationDateDataSource?
+    private var viewModel: SelectReservationDateViewModel
     
     // MARK: - Initializers
-    //    init() {
-    //        super.init()
-    //
-    //    }
+    init(viewModel: SelectReservationDateViewModel) {
+        self.viewModel = viewModel
+        super.init()
+    }
     
     // MARK: - Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         createDataSource()
         
-        trinapCalenderView.selectedSingleDate
-            .asObservable()
-            .subscribe(onNext: { [weak self] date in
-                guard let self else { return }
-                let startDate = self.creatDateUseCase.createStartDate(date: date)
-                let endDate = self.creatDateUseCase.createEndDate(date: startDate.first ?? Date())
-                self.loadData(
-                    startDate.map { ReservationDate(date: $0, type: .startDate) },
-                    endDate.map { ReservationDate(date: $0, type: .endDate) }
-                )
-            })
-            .disposed(by: disposeBag)
+        // TODO: test code 제거
+        self.trinapCalenderView.configurePossibleDate(possibleDate: factoryDate())
     }
     
     override func bind() {
         let input = SelectReservationDateViewModel.Input(
+            calendarDateTap: self.trinapCalenderView.selectedSingleDate
+                .asObservable()
+                .compactMap { $0 },
             selectDoneButtonTap: self.selectDoneButton.rx.tap.asObservable(),
             selectedDate: self.collectionView.rx.itemSelected
                 .asObservable()
                 .compactMap { [weak self] indexPath -> ReservationDate? in
-                    guard let self,
-                          let selectedDate = self.dataSource?.itemIdentifier(for: indexPath)
+                    guard
+                        let self,
+                        let selectedDate = self.dataSource?.itemIdentifier(for: indexPath)
                     else {
                         return nil
                     }
@@ -114,12 +93,12 @@ final class SelectReservationDateViewController: BaseViewController {
                 },
             deselectedDate: self.collectionView.rx.itemDeselected
                 .asObservable()
-                .compactMap { indexPath -> TimeSection? in
+                .compactMap { indexPath -> ReservationTimeSection? in
                     switch indexPath.section {
                     case 0:
-                        return TimeSection.startDate
+                        return ReservationTimeSection.startDate
                     case 1:
-                        return TimeSection.endDate
+                        return ReservationTimeSection.endDate
                     default:
                         return nil
                     }
@@ -137,6 +116,22 @@ final class SelectReservationDateViewController: BaseViewController {
                 owner.deselectSectionItem(owner.collectionView, indexPath: indexPath)
                 owner.collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .centeredHorizontally)
             })
+            .disposed(by: disposeBag)
+        
+        output.reservationTime
+            .asObservable()
+            .withUnretained(self)
+            .subscribe(onNext: { owner, date in
+                let (startDate, endDate) = date
+                owner.loadData(
+                    startDate.map { ReservationDate(date: $0, type: .startDate) },
+                    endDate.map { ReservationDate(date: $0, type: .endDate) }
+                )
+            })
+            .disposed(by: disposeBag)
+        
+        output.selectDoneButtonEnable
+            .bind(to: self.selectDoneButton.rx.enabled)
             .disposed(by: disposeBag)
     }
     
@@ -179,8 +174,8 @@ final class SelectReservationDateViewController: BaseViewController {
 
 extension SelectReservationDateViewController {
     
-    typealias ReservationDateDataSource = UICollectionViewDiffableDataSource<TimeSection, ReservationDate>
-    typealias ReservationDateSnapshot = NSDiffableDataSourceSnapshot<TimeSection, ReservationDate>
+    typealias ReservationDateDataSource = UICollectionViewDiffableDataSource<ReservationTimeSection, ReservationDate>
+    typealias ReservationDateSnapshot = NSDiffableDataSourceSnapshot<ReservationTimeSection, ReservationDate>
     
     func createDataSource() {
         dataSource = ReservationDateDataSource(
@@ -199,7 +194,7 @@ extension SelectReservationDateViewController {
                     ofKind: kind,
                     withReuseIdentifier: TitleSectionHeaderView.reuseIdentifier,
                     for: indexPath
-                  ) as? TitleSectionHeaderView,
+                ) as? TitleSectionHeaderView,
                 let section = self.dataSource?.snapshot().sectionIdentifiers[indexPath.section]
             else {
                 return UICollectionReusableView()
@@ -267,7 +262,7 @@ extension SelectReservationDateViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
         deselectSectionItem(collectionView, indexPath: indexPath)
         collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
-
+        
         return true
     }
     
@@ -283,5 +278,20 @@ extension SelectReservationDateViewController: UICollectionViewDelegate {
         if let indexPath = selectedItemIndexPath.last {
             collectionView.deselectItem(at: indexPath, animated: false)
         }
+    }
+    
+    // TODO: Test code 제거
+    func factoryDate() -> [Date] {
+        var calendar = Calendar.current
+        
+        let date = Date()
+        let year = calendar.component(.year, from: date)
+        let month = calendar.component(.month, from: date)
+        let day = calendar.component(.day, from: date)
+        let newDate = calendar.date(from: DateComponents(year: year, month: month, day: day)) ?? Date()
+        let newDate2 = calendar.date(from: DateComponents(year: year, month: month, day: day+2)) ?? Date()
+        let newDate3 = calendar.date(from: DateComponents(year: year, month: month, day: day+3)) ?? Date()
+        
+        return [newDate, newDate2, newDate3]
     }
 }
