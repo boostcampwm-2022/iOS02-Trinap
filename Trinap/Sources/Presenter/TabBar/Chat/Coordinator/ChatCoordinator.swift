@@ -67,13 +67,15 @@ extension ChatCoordinator {
         
         let sendChatUseCase = DefaultSendChatUseCase(chatRepository: chatRepository)
         let uploadImageUseCase = DefaultUploadImageUseCase(uploadImageRepository: uploadImageRepository)
+        let updateIsCheckedUseCase = DefaultUpdateIsCheckedUseCase(chatRepository: chatRepository)
         
         let chatDetailViewModel = ChatDetailViewModel(
             coordinator: self,
             chatroomId: chatroomId,
             observeChatUseCase: observeChatUseCase,
             sendChatUseCase: sendChatUseCase,
-            uploadImageUseCase: uploadImageUseCase
+            uploadImageUseCase: uploadImageUseCase,
+            updateIsCheckedUseCase: updateIsCheckedUseCase
         )
         let viewController = ChatDetailViewController(viewModel: chatDetailViewModel)
         

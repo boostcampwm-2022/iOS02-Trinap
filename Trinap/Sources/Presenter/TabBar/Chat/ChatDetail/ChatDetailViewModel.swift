@@ -31,6 +31,7 @@ final class ChatDetailViewModel: ViewModelType {
     private let observeChatUseCase: ObserveChatUseCase
     private let sendChatUseCase: SendChatUseCase
     private let uploadImageUseCase: UploadImageUseCase
+    private let updateIsCheckedUseCase: UpdateIsCheckedUseCase
     
     // MARK: - Initializer
     init(
@@ -38,13 +39,15 @@ final class ChatDetailViewModel: ViewModelType {
         chatroomId: String,
         observeChatUseCase: ObserveChatUseCase,
         sendChatUseCase: SendChatUseCase,
-        uploadImageUseCase: UploadImageUseCase
+        uploadImageUseCase: UploadImageUseCase,
+        updateIsCheckedUseCase: UpdateIsCheckedUseCase
     ) {
         self.coordinator = coordinator
         self.chatroomId = chatroomId
         self.observeChatUseCase = observeChatUseCase
         self.sendChatUseCase = sendChatUseCase
         self.uploadImageUseCase = uploadImageUseCase
+        self.updateIsCheckedUseCase = updateIsCheckedUseCase
     }
     
     // MARK: - Methods
@@ -59,10 +62,20 @@ final class ChatDetailViewModel: ViewModelType {
             .disposed(by: disposeBag)
         
         let chats = observeChatUseCase.execute(chatroomId: self.chatroomId)
-            .do(onNext: { [weak self] chats in
-                self?.chats = chats
-            })
-
+            .map { [weak self] chats -> [Chat] in
+                guard
+                    let self = self,
+                    let lastChat = chats.last
+                else {
+                    return []
+                }
+                
+                self.chats = chats
+                self.updateChatToRead(lastChatId: lastChat.chatId)
+                
+                return chats
+            }
+        
         return Output(chats: chats)
     }
     
@@ -119,5 +132,15 @@ private extension ChatDetailViewModel {
     
     func sendLocationShareChat() -> Observable<Void> {
         return sendChatUseCase.execute(chatType: .location, content: "location", chatroomId: chatroomId)
+    }
+    
+    func updateChatToRead(lastChatId: String) {
+        DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(500)) { [weak self] in
+            guard let self else { return }
+            
+            self.updateIsCheckedUseCase.execute(chatroomId: self.chatroomId, chatId: lastChatId, toState: true)
+                .subscribe()
+                .dispose()
+        }
     }
 }
