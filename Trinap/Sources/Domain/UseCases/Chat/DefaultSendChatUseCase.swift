@@ -22,4 +22,13 @@ final class DefaultSendChatUseCase: SendChatUseCase {
     func execute(chatType: Chat.ChatType, content: String, chatroomId: String) -> Observable<Void> {
         return chatRepository.send(chatType: chatType, content: content, at: chatroomId)
     }
+    
+    func execute(imageURL: String, chatroomId: String, imageWidth: Double, imageHeight: Double) -> Observable<Void> {
+        return chatRepository.send(
+            imageURL: imageURL,
+            chatroomId: chatroomId,
+            imageWidth: imageWidth,
+            imageHeight: imageHeight
+        )
+    }
 }

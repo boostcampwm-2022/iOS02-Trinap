@@ -40,7 +40,7 @@ class ChatCell: BaseTableViewCell {
     }
     
     override func configureHierarchy() {
-        self.addSubviews([
+        self.contentView.addSubviews([
             profileImageView,
             chatContentView
         ])

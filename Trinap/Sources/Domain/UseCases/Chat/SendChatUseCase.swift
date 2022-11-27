@@ -11,4 +11,5 @@ import RxSwift
 protocol SendChatUseCase {
     
     func execute(chatType: Chat.ChatType, content: String, chatroomId: String) -> Observable<Void>
+    func execute(imageURL: String, chatroomId: String, imageWidth: Double, imageHeight: Double) -> Observable<Void>
 }

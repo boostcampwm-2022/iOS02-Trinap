@@ -49,7 +49,34 @@ final class DefaultChatRepository: ChatRepository {
             chatType: chatType,
             content: content,
             isChecked: false,
-            createdAt: Date().toString(type: .timeStamp)
+            createdAt: Date().toString(type: .timeStamp),
+            imageWidth: nil,
+            imageHeight: nil
+        )
+        
+        guard let values = chatDTO.asDictionary else {
+            return .error(FireStoreError.unknown)
+        }
+        
+        return self.firestoreService
+            .createDocument(documents: ["chatrooms", chatroomId, "chats", chatDTO.chatId], values: values)
+            .asObservable()
+    }
+    
+    func send(imageURL: String, chatroomId: String, imageWidth: Double, imageHeight: Double) -> Observable<Void> {
+        guard let userId = tokenManager.getToken(with: .userId) else {
+            return .error(TokenManagerError.notFound)
+        }
+        
+        let chatDTO = ChatDTO(
+            chatId: UUID().uuidString,
+            senderUserId: userId,
+            chatType: .image,
+            content: imageURL,
+            isChecked: false,
+            createdAt: Date().toString(type: .timeStamp),
+            imageWidth: imageWidth,
+            imageHeight: imageHeight
         )
         
         guard let values = chatDTO.asDictionary else {

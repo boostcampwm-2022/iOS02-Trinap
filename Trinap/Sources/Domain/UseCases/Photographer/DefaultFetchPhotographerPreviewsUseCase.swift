@@ -17,7 +17,6 @@ final class DefaultFetchPhotographerPreviewsUseCase: FetchPhotographerPreviewsUs
     private let mapRepository: MapRepository
     private let userRepository: UserRepository
     private let reviewRepository: ReviewRepository
-    private let disposebag = DisposeBag()
     
     // MARK: Initializers
     init(
@@ -33,29 +32,43 @@ final class DefaultFetchPhotographerPreviewsUseCase: FetchPhotographerPreviewsUs
     }
     
     // MARK: Methods
-    func fetch(type: TagType) -> Observable<[PhotographerPreview]> {
-        return photographerRepository
-            .fetchPhotographers(type: type)
-            .withUnretained(self)
-            .flatMap { owner, photographers in
-                Observable.zip(
-                    photographers.map { photographer in
-                        owner.convertPreview(photographer: photographer)
-                    }
-                )
-            }
+    
+    func fetch(coordinate: Coordinate?, type: TagType) -> Observable<[PhotographerPreview]> {
+        let coordinate = matchCoordinate(coordinate: coordinate)
+        
+        let photographers = fetch(coordinate: coordinate)
+        if type == .all {
+            return toPreviews(photographers: photographers)
+        }
+        
+        let previews = photographers
+            .map { $0.filter { $0.tags.contains(type) } }
+        return toPreviews(photographers: previews)
     }
     
-    func fetch(coordinate: Coordinate) -> Observable<[PhotographerPreview]> {
+    private func fetch(type: TagType) -> Observable<[PhotographerPreview]> {
+        let photographers = photographerRepository.fetchPhotographers(type: type)
+        return toPreviews(photographers: photographers)
+    }
+    
+    private func fetch(coordinate: Coordinate) -> Observable<[Photographer]> {
         return photographerRepository
             .fetchPhotographers(coordinate: coordinate)
+    }
+    
+    private func toPreviews(photographers: Observable<[Photographer]>) -> Observable<[PhotographerPreview]> {
+        return photographers
             .withUnretained(self)
             .flatMap { owner, photographers in
-                Observable.zip(
+                
+                return Observable.zip(
                     photographers.map { photographer in
                         owner.convertPreview(photographer: photographer)
                     }
                 )
+                .map { previews in
+                    previews.filter { !$0.name.isEmpty }
+                }
             }
     }
     
@@ -65,20 +78,32 @@ final class DefaultFetchPhotographerPreviewsUseCase: FetchPhotographerPreviewsUs
             lng: photographer.longitude
         )
         let name = mapRepository.fetchLocationName(using: coor)
-        let user = userRepository.fetch(userId: photographer.photographerUserId)
+        let user = userRepository.fetch(userId: photographer.photographerUserId).map { userr -> User? in
+            if !userr.isPhotographer { return nil }
+            return userr
+        }
         let rating = fetchAverageReview(photographerId: photographer.photographerUserId)
-
+        
         return Observable.zip(name, user, rating)
-            .map{ location, user, rating in
-                
-                Logger.print(rating)
+            .map { (location, user, rating) -> PhotographerPreview in
                 return PhotographerPreview(
                     photographer: photographer,
                     location: location,
-                    name: user.nickname,
+                    name: user?.nickname ?? "",
                     rating: rating
                 )
             }
+    }
+    
+    private func matchCoordinate(coordinate: Coordinate?) -> Coordinate {
+        if let coordinate { return coordinate }
+        let coordinate = mapRepository.fetchCurrentLocation()
+        switch coordinate {
+        case .success(let coor):
+            return coor
+        case .failure:
+            return Coordinate(lat: 37.5642135, lng: 127.269311)
+        }
     }
     
     private func fetchAverageReview(photographerId: String) -> Observable<Double> {

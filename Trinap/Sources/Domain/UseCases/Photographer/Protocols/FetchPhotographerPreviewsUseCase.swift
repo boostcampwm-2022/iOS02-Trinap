@@ -13,6 +13,5 @@ import RxSwift
 protocol FetchPhotographerPreviewsUseCase {
     
     // MARK: Methods
-    func fetch(type: TagType) -> Observable<[PhotographerPreview]>
-    func fetch(coordinate: Coordinate) -> Observable<[PhotographerPreview]>
+    func fetch(coordinate: Coordinate?, type: TagType) -> Observable<[PhotographerPreview]>
 }

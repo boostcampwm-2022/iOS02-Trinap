@@ -30,6 +30,8 @@ struct Chat {
     let content: String
     let isChecked: Bool
     let createdAt: Date
+    let imageWidth: Double?
+    let imageHeight: Double?
     
     // TODO: Optional 제거한 다른 타입 생성하기
     var user: User?

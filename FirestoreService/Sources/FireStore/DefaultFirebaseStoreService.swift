@@ -367,6 +367,25 @@ public extension DefaultFireStoreService {
         }
     }
     
+    func deleteDocument(documents: [String]) -> Single<Void> {
+        
+        return Single.create { [weak self] single in
+            
+            guard let self else { return Disposables.create() }
+            
+            self.database
+                .document(documents.joined(separator: "/"))
+                .delete { error in
+                    if let error = error {
+                        single(.failure(error))
+                    }
+                    
+                    single(.success(()))
+                }
+            return Disposables.create()
+        }
+    }
+    
     func observe(collection: FireStoreCollection, field: String, in values: [Any]) -> Observable<[FirebaseData]> {
         return Observable.create { [weak self] observable in
             guard let self else { return Disposables.create() }
