@@ -67,11 +67,26 @@ extension MyPageCoordinator {
     }
     
     private func showEditPhotographerProfile() {
-        let viewModel = EditPhotographerViewModel()
+        let viewModel = EditPhotographerViewModel(
+            fetchUserUseCase: DefaultFetchUserUseCase(userRepository: DefaultUserRepository()),
+            fetchPhotographerUseCase: DefaultFetchPhotographerUseCase(photographerRespository: DefaultPhotographerRepository()),
+            fetchReviewUseCase: DefaultFetchReviewUseCase(
+                reviewRepositry: DefaultReviewRepository(),
+                userRepository: DefaultUserRepository(),
+                photographerRepository: DefaultPhotographerRepository()
+            ),
+            mapRepository: DefaultMapRepository()
+        )
         let viewController = EditPhotographerViewController(viewModel: viewModel)
+        viewController.coordinator = self
         self.navigationController.setNavigationBarHidden(false, animated: false)
         self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
         self.navigationController.pushViewController(viewController, animated: true)
+    }
+    
+    func showUpdatePhotographerViewController() {
+        let viewController = UpdateDetailPhotographerViewController(viewModel: UpdateDetailPhotographerViewModel())
+        navigationController.present(viewController, animated: true)
     }
 }
 

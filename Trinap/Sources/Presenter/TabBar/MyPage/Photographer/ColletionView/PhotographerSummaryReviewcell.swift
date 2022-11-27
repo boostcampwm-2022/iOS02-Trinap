@@ -41,7 +41,7 @@ final class PhotographerSummaryReviewcell: BaseCollectionViewCell {
         }
         
         starImageView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().inset(trinapOffset / 2)
+            make.leading.equalToSuperview().inset(trinapOffset * 2)
             make.centerY.equalToSuperview()
             make.width.height.equalTo(trinapOffset * 3)
         }

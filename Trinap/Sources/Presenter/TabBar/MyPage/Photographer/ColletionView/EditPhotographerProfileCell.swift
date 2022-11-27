@@ -72,4 +72,12 @@ final class EditPhotographerProfileCell: BaseCollectionViewCell {
         locationLabel.text = profile.location
         profileImage.setImage(at: profile.profielImage)
     }
+    
+    override func bind() {
+        editButton.rx.tap
+            .subscribe { [weak self] _ in
+                self?.delegate?.didTapButton?()
+            }
+            .disposed(by: disposeBag)
+    }
 }

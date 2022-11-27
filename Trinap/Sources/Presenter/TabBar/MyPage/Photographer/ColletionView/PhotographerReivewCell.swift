@@ -64,6 +64,7 @@ final class PhotographerReivewCell: BaseCollectionViewCell {
     func configure(with review: PhotographerReview) {
         self.nickNameLabel.text = review.user.nickname
         self.contentsLabel.text = review.contents
+        self.ratingView.configureRating(review.rating)
         self.profileImage.qf.setImage(at: review.user.profileImage)  
     }
 }
