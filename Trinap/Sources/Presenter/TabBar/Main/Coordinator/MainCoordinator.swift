@@ -31,7 +31,7 @@ final class MainCoordinator: Coordinator {
 extension MainCoordinator {
     func showPhotographerListViewController() {
         // TODO: 추후 UI를 구현한 ViewController로 교체
-        let viewController = MockPhotographerListViewController(coordinator: self)
+        let viewController = MockPhotographerListViewController()
         self.navigationController.setNavigationBarHidden(true, animated: false)
         self.navigationController.pushViewController(viewController, animated: true)
     }
