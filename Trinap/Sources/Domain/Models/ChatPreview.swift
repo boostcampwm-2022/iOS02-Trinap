@@ -41,7 +41,7 @@ extension ChatPreview: Hashable {
 
 extension ChatPreview: Comparable {
     
-    static func <(lhs: ChatPreview, rhs: ChatPreview) -> Bool {
+    static func < (lhs: ChatPreview, rhs: ChatPreview) -> Bool {
         return lhs.date < rhs.date
     }
 }
