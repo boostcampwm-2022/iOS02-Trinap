@@ -13,5 +13,5 @@ protocol CreateReservationDateUseCase {
     func createEndDate(date: Date) -> [Date]
     func selectedStartDate(startDate: ReservationDate, endDate: ReservationDate) -> ReservationDate?
     func selectedEndDate(startDate: ReservationDate, endDate: ReservationDate) -> ReservationDate?
-    func createReservationDate(date: Date, minute: Int, type: TimeSection) -> ReservationDate
+    func createReservationDate(date: Date, minute: Int, type: ReservationTimeSection) -> ReservationDate
 }

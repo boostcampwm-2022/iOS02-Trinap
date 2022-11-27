@@ -18,7 +18,7 @@ final class SelectReservationDateViewModel: ViewModelType {
         let calendarDateTap: Observable<Date>
         let selectDoneButtonTap: Observable<Void>
         let selectedDate: Observable<ReservationDate>
-        let deselectedDate: Observable<TimeSection>
+        let deselectedDate: Observable<ReservationTimeSection>
     }
     
     struct Output {

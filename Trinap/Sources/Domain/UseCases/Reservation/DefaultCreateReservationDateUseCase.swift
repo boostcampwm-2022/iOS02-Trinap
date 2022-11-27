@@ -92,7 +92,7 @@ final class DefaultCreateReservationDateUseCase: CreateReservationDateUseCase {
         return nil
     }
     
-    func createReservationDate(date: Date, minute: Int, type: TimeSection) -> ReservationDate {
+    func createReservationDate(date: Date, minute: Int, type: ReservationTimeSection) -> ReservationDate {
         let newEndDate = self.calculateDate(by: minute, at: date)
         return ReservationDate(date: newEndDate, type: type)
     }
