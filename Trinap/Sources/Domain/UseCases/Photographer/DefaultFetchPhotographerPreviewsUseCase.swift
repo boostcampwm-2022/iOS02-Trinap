@@ -42,7 +42,7 @@ final class DefaultFetchPhotographerPreviewsUseCase: FetchPhotographerPreviewsUs
         }
         
         let previews = photographers
-            .map { $0.filter { $0.tags.contains(type) } }
+            .map { $0.filter { $0.tags.contains(type) } }.map { Logger.printArray($0);return $0}
         return toPreviews(photographers: previews)
     }
     
@@ -102,7 +102,7 @@ final class DefaultFetchPhotographerPreviewsUseCase: FetchPhotographerPreviewsUs
         case .success(let coor):
             return coor
         case .failure:
-            return Coordinate(lat: 37.5642135, lng: 127.269311)
+            return Coordinate.seoulCoordinate
         }
     }
     

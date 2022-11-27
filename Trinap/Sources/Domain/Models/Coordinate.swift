@@ -11,4 +11,6 @@ import Foundation
 struct Coordinate: Encodable {
     let lat: Double
     let lng: Double
+    
+    static var seoulCoordinate = Coordinate(lat: 37.5642135, lng: 127.269311)
 }
