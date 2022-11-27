@@ -75,6 +75,14 @@ final class DefaultChatRepository: ChatRepository {
         
         return self.send(chatroomId: chatroomId, chatDTO: chatDTO)
     }
+    
+    func updateIsChecked(chatroomId: String, chatId: String, toState state: Bool = true) -> Observable<Void> {
+        let values = ["isChecked": state]
+        
+        return self.firestoreService
+            .updateDocument(collection: .chatrooms, document: "\(chatroomId)/chats/\(chatId)", values: values)
+            .asObservable()
+    }
 }
 
 // MARK: - Privates
