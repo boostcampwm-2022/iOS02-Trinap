@@ -14,6 +14,7 @@ final class MainCoordinator: Coordinator {
     weak var delegate: CoordinatorDelegate?
     var navigationController: UINavigationController
     var childCoordinators: [Coordinator]
+    private var selectReservationDateViewController: SelectReservationDateViewController?
     
     // MARK: - Initializers
     init(_ navigationController: UINavigationController) {
@@ -30,8 +31,27 @@ final class MainCoordinator: Coordinator {
 extension MainCoordinator {
     func showPhotographerListViewController() {
         // TODO: 추후 UI를 구현한 ViewController로 교체
-        let viewController = MockPhotographerListViewController()
+        let viewController = MockPhotographerListViewController(coordinator: self)
         self.navigationController.setNavigationBarHidden(true, animated: false)
         self.navigationController.pushViewController(viewController, animated: true)
+    }
+    
+    func showSelectReservationDateViewController(with photographerId: String) {
+        let viewModeel = SelectReservationDateViewModel(
+            createReservationDateUseCase: DefaultCreateReservationDateUseCase(),
+            coordinator: self
+        )
+        
+        self.selectReservationDateViewController = SelectReservationDateViewController(
+            viewModel: viewModeel
+        )
+        
+        guard let viewController = self.selectReservationDateViewController else { return }
+        
+        self.navigationController.present(viewController, animated: true)
+    }
+    
+    func dismissSelectReservationDateViewController() {
+        self.selectReservationDateViewController?.dismiss(animated: true)
     }
 }
