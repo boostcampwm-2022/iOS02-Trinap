@@ -1,5 +1,5 @@
 //
-//  CreateReservationDateUseCase.swift
+//  DefaultCreateReservationDateUseCase.swift
 //  Trinap
 //
 //  Created by ByeongJu Yu on 2022/11/23.
@@ -8,7 +8,9 @@
 
 import Foundation
 
-final class CreateReservationDateUseCase {
+
+// TODO: 날짜 계산 로직 리펙토링
+final class DefaultCreateReservationDateUseCase: CreateReservationDateUseCase {
     
     // MARK: - Properties
     private lazy var calendar = Calendar.current
@@ -38,6 +40,8 @@ final class CreateReservationDateUseCase {
         return dateArray
     }
     
+    
+    // TODO: EndDate와 StartDate 계산하는 로직 개선
     func createEndDate(date: Date) -> [Date] {
         var dateArray: [Date] = []
         let date = date
@@ -65,11 +69,6 @@ final class CreateReservationDateUseCase {
         return dateArray
     }
     
-    func calculateMinuteDate(date: Date, minute: Int) -> Date {
-        let newDate = self.calendar.date(byAdding: .minute, value: minute, to: date) ?? Date()
-        return newDate
-    }
-    
     func selectedStartDate(startDate: ReservationDate, endDate: ReservationDate) -> ReservationDate? {
         if startDate.date >= endDate.date {
             return createReservationDate(
@@ -84,7 +83,7 @@ final class CreateReservationDateUseCase {
     
     func selectedEndDate(startDate: ReservationDate, endDate: ReservationDate) -> ReservationDate? {
         if startDate.date >= endDate.date {
-            return createReservationDate(
+            return self.createReservationDate(
                 date: endDate.date,
                 minute: -30,
                 type: .startDate)
@@ -94,7 +93,16 @@ final class CreateReservationDateUseCase {
     }
     
     func createReservationDate(date: Date, minute: Int, type: TimeSection) -> ReservationDate {
-        let newEndDate = self.calculateMinuteDate(date: date, minute: minute)
+        let newEndDate = self.calculateDate(by: minute, at: date)
         return ReservationDate(date: newEndDate, type: type)
+    }
+}
+
+// MARK: - Private Function
+extension DefaultCreateReservationDateUseCase {
+    
+    private func calculateDate(by minute: Int, at date: Date) -> Date {
+        let newDate = self.calendar.date(byAdding: .minute, value: minute, to: date) ?? Date()
+        return newDate
     }
 }
