@@ -24,7 +24,7 @@ final class ChatDetailViewModel: ViewModelType {
     
     // MARK: - Properties
     let disposeBag = DisposeBag()
-    let chats = BehaviorRelay<[Chat]>(value: [])
+    private var chats: [Chat] = []
     
     private weak var coordinator: ChatCoordinator?
     private let chatroomId: String
@@ -45,10 +45,6 @@ final class ChatDetailViewModel: ViewModelType {
         self.observeChatUseCase = observeChatUseCase
         self.sendChatUseCase = sendChatUseCase
         self.uploadImageUseCase = uploadImageUseCase
-        
-        observeChatUseCase.execute(chatroomId: chatroomId)
-            .bind(to: chats)
-            .disposed(by: disposeBag)
     }
     
     // MARK: - Methods
@@ -63,13 +59,16 @@ final class ChatDetailViewModel: ViewModelType {
             .disposed(by: disposeBag)
         
         let chats = observeChatUseCase.execute(chatroomId: self.chatroomId)
+            .do(onNext: { [weak self] chats in
+                self?.chats = chats
+            })
 
         return Output(chats: chats)
     }
     
     func hasMyChat(before index: Int) -> Bool {
-        guard let prevChat = self.chats.value[safe: index - 1] else { return false }
-        let currentChat = self.chats.value[index]
+        guard let prevChat = self.chats[safe: index - 1] else { return false }
+        let currentChat = self.chats[index]
         
         return prevChat.senderUserId == currentChat.senderUserId
     }
@@ -83,10 +82,10 @@ final class ChatDetailViewModel: ViewModelType {
     }
     
     func lastChatIndex() -> Int {
-        if chats.value.isEmpty {
+        if chats.isEmpty {
             return 0
         } else {
-            return chats.value.count - 1
+            return chats.count - 1
         }
     }
     

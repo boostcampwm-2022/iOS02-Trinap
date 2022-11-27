@@ -92,15 +92,9 @@ final class ChatDetailViewController: BaseViewController {
         let output = viewModel.transform(input: input)
         
         output.chats
+            .filter { !$0.isEmpty }
             .compactMap { [weak self] chats in self?.generateSnapshot(chats) }
             .subscribe { [weak self] snapshot in
-                guard
-                    let chats = self?.viewModel.chats.value,
-                    !chats.isEmpty
-                else {
-                    return
-                }
-                
                 self?.dataSource?.apply(snapshot, animatingDifferences: false) {
                     self?.scrollToBottom()
                 }
