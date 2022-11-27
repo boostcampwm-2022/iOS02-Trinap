@@ -8,6 +8,8 @@
 
 import UIKit
 
+import RxRelay
+
 final class MainCoordinator: Coordinator {
     
     // MARK: - Properties
@@ -29,10 +31,18 @@ final class MainCoordinator: Coordinator {
 }
 
 extension MainCoordinator {
+    
     func showPhotographerListViewController() {
-        // TODO: 추후 UI를 구현한 ViewController로 교체
-        let viewController = MockPhotographerListViewController()
-        self.navigationController.setNavigationBarHidden(true, animated: false)
+        let viewController = PhotographerListViewController(
+            viewModel: PhotographerListViewModel(
+                previewsUseCase: DefaultFetchPhotographerPreviewsUseCase(
+                    photographerRepository: DefaultPhotographerRepository(),
+                    mapRepository: DefaultMapRepository(),
+                    userRepository: DefaultUserRepository(),
+                    reviewRepository: DefaultReviewRepository()),
+                coordinator: self
+            ))
+        self.navigationController.setNavigationBarHidden(false, animated: false)
         self.navigationController.pushViewController(viewController, animated: true)
     }
     
@@ -53,5 +63,32 @@ extension MainCoordinator {
     
     func dismissSelectReservationDateViewController() {
         self.selectReservationDateViewController?.dismiss(animated: true)
+    }
+    
+    func showSearchViewController(
+        searchText: BehaviorRelay<String>,
+        coordinate: BehaviorRelay<Coordinate?>
+    ) {
+        let viewModel = SearchViewModel(
+            searchLocationUseCase: DefaultSearchLocationUseCase(
+                mapService: DefaultMapRepository()
+            ),
+            coordinator: self,
+            searchText: searchText,
+            coordinate: coordinate
+        )
+        let viewController = SearchViewController(
+            viewModel: viewModel
+        )
+        
+        self.navigationController.setNavigationBarHidden(false, animated: false)
+//        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(viewController, animated: false)
+//        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
+
+    }
+    
+    func popViewController() {
+        navigationController.popViewController(animated: true)
     }
 }

@@ -58,7 +58,7 @@ extension ChatCoordinator {
         )
         let viewController = ChatPreviewsViewController(viewModel: chatPreviewsViewModel)
         
-        self.navigationController.setNavigationBarHidden(true, animated: false)
+        self.navigationController.setNavigationBarHidden(false, animated: false)
         self.navigationController.pushViewController(viewController, animated: true)
     }
     
@@ -81,5 +81,22 @@ extension ChatCoordinator {
         self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
         self.navigationController.pushViewController(viewController, animated: true)
         self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
+    }
+    
+    func showLocationShareViewController(chatroomId: String) {
+        let locationRepository = DefaultLocationRepository()
+        let observeLocationUseCase = DefaultObserveLocationUseCase(locationRepository: locationRepository)
+        let updateLocationUseCase = DefaultUpdateLocationUseCase(locationRepository: locationRepository)
+        let endLocationShareUseCase = DefaultEndLocationShareUseCase(locationRepository: locationRepository)
+        let locationShareViewModel = LocationShareViewModel(
+            chatroomId: chatroomId,
+            observeLocationUseCase: observeLocationUseCase,
+            updateLocationUseCase: updateLocationUseCase,
+            endLocationShareUseCase: endLocationShareUseCase
+        )
+        let locationShareViewController = LocationShareViewController(viewModel: locationShareViewModel)
+
+        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(locationShareViewController, animated: true)
     }
 }

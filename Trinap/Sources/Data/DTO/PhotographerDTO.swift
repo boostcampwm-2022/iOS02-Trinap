@@ -17,21 +17,23 @@ struct PhotographerDTO: Codable {
     // MARK: - Properties
     let photographerId: String
     var photographerUserId: String
-    let location, introduction: String
+    let introduction: String
+    let latitude, longitude: Double
     let tags, pictures: [String]
     let pricePerHalfHour: Int
-    let possibleDate: [Date]
+    let possibleDate: [String]
     let status: Status
     
     init(photographer: Photographer, status: Status) {
         self.photographerId = photographer.photographerId
         self.photographerUserId = photographer.photographerUserId
-        self.location = photographer.location
         self.introduction = photographer.introduction
+        self.latitude = photographer.latitude
+        self.longitude = photographer.longitude
         self.tags = photographer.tags.map { $0.rawValue }
         self.pictures = photographer.pictures
         self.pricePerHalfHour = photographer.pricePerHalfHour
-        self.possibleDate = photographer.possibleDate
+        self.possibleDate = photographer.possibleDate.map { $0.toString(type: .yearToDay)}
         self.status = status
     }
     
@@ -40,12 +42,13 @@ struct PhotographerDTO: Codable {
         return Photographer(
             photographerId: photographerId,
             photographerUserId: photographerUserId,
-            location: location,
             introduction: introduction,
+            latitude: latitude,
+            longitude: longitude,
             tags: tags.map { TagType(rawValue: $0) ?? .instagram },
             pictures: pictures,
             pricePerHalfHour: pricePerHalfHour,
-            possibleDate: possibleDate
+            possibleDate: possibleDate.map { Date.fromStringOrNow($0, ofFormat: .yearToDay) }
         )
     }
 }

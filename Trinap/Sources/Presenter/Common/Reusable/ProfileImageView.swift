@@ -8,6 +8,7 @@
 
 import UIKit
 
+import RxSwift
 import Queenfisher
 
 final class ProfileImageView: UIImageView {
@@ -39,5 +40,13 @@ final class ProfileImageView: UIImageView {
     
     func setImage(at profileImageURL: URL?) {
         self.qf.setImage(at: profileImageURL, scale: 2)
+    }
+}
+
+extension Reactive where Base: ProfileImageView {
+    var setImage: Binder<URL?> {
+        return Binder(self.base) { imageView, url in
+            imageView.qf.setImage(at: url, scale: 2)
+        }
     }
 }

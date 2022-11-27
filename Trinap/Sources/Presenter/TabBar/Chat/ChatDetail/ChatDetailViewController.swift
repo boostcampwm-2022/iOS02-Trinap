@@ -11,6 +11,7 @@ import UIKit
 import RxCocoa
 import RxSwift
 import SnapKit
+import Queenfisher
 
 final class ChatDetailViewController: BaseViewController {
     
@@ -127,7 +128,7 @@ extension ChatDetailViewController {
     private func presentActionAlert() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             .appendingAction(title: "포토 라이브러리") { [weak self] in self?.presentPhotoLibrary() }
-            .appendingAction(title: "사진 촬영")
+            .appendingAction(title: "위치 공유") { [weak self] in self?.sendLocationShareChat() }
             .appendingCancel()
         
         self.present(alert, animated: true)
@@ -150,9 +151,38 @@ extension ChatDetailViewController {
     }
     
     private func requestUploadImage(_ image: UIImage) {
-        guard let imageData = image.jpegData(compressionQuality: 1) else { return }
+        let downsampledImage = downsamplingImageWithSize(image)
         
-        self.viewModel.uploadImageAndSendChat(imageData)
+        guard let imageData = downsampledImage.image.jpegData(compressionQuality: 1) else { return }
+        
+        self.viewModel.uploadImageAndSendChat(
+            imageData,
+            width: downsampledImage.size.width,
+            height: downsampledImage.size.height
+        )
+        .subscribe()
+        .disposed(by: disposeBag)
+    }
+    
+    private func downsamplingImageWithSize(_ image: UIImage) -> (image: UIImage, size: CGSize) {
+        let widthLimit = 200.0
+        var width = image.size.width
+        var height = image.size.height
+        
+        if width > widthLimit {
+            let ratio = widthLimit / width
+            width *= ratio
+            height *= ratio
+        }
+        
+        return (
+            image.downsampling(to: CGSize(width: width, height: height), scale: 2),
+            CGSize(width: width, height: height)
+        )
+    }
+    
+    private func sendLocationShareChat() {
+        self.viewModel.sendLocationShareChatAndPresent()
             .subscribe()
             .disposed(by: disposeBag)
     }
@@ -185,9 +215,35 @@ extension ChatDetailViewController {
             }
             
             let hasMyChatBefore = self.viewModel.hasMyChat(before: indexPath.row)
-            cell.configureCell(by: item, hasMyChatBefore: hasMyChatBefore)
+            cell.configureCell(by: item, hasMyChatBefore: hasMyChatBefore) {
+                guard var snapshot = self.dataSource?.snapshot() else { return }
+                snapshot.reloadItems([item])
+            }
+            
+            self.observeTapActionIfPossible(cell, disposedBy: item.chatId)
             
             return cell
+        }
+    }
+    
+    private func observeTapActionIfPossible(_ cell: ChatCell, disposedBy id: String) {
+        guard let actionCell = cell as? ActionChatCell else { return }
+        
+        actionCell.didTapAction
+            .subscribe(onNext: { [weak self] _ in
+                self?.handleChatActionButtonTapped(actionCell)
+            })
+            .disposed(by: actionCell.actionDisposeBag)
+    }
+    
+    private func handleChatActionButtonTapped(_ cell: ActionChatCell) {
+        switch cell {
+        case is LocationShareChatCell:
+            viewModel.presentLocationShare()
+        case is ReservationChatCell:
+            Logger.print("Reservation")
+        default:
+            break
         }
     }
 }
@@ -200,12 +256,10 @@ private extension Chat.ChatType {
             return TextChatCell.self
         case .image:
             return ImageChatCell.self
-        default:
-            return TextChatCell.self
-//        case .reservation:
-//            <#code#>
-//        case .location:
-//            <#code#>
+        case .reservation:
+            return ReservationChatCell.self
+        case .location:
+            return LocationShareChatCell.self
         }
     }
 }

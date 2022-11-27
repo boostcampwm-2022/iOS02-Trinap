@@ -18,7 +18,7 @@ extension QueenfisherWrapper where Base: QFImageView {
         downsampling: Bool = true,
         targetSize: CGSize? = nil,
         scale: CGFloat = 1.5,
-        completion: (() -> Void)? = nil
+        completion: ((CGSize) -> Void)? = nil
     ) {
         guard let url else {
             base.image = placeholder
@@ -30,13 +30,12 @@ extension QueenfisherWrapper where Base: QFImageView {
         
         maybeCache.fetch(at: url) { data in
             DispatchQueue.main.async {
-                defer {
-                    self.stopIndicator(indicator)
-                    completion?()
-                }
+                defer { self.stopIndicator(indicator) }
+                completion?(.zero)
                 
                 guard let data else {
                     base.image = placeholder
+                    completion?(base.image?.size ?? .zero)
                     return
                 }
                 
@@ -48,6 +47,8 @@ extension QueenfisherWrapper where Base: QFImageView {
                 } else {
                     self.base.image = UIImage(data: data)
                 }
+                
+                completion?(self.base.image?.size ?? .zero)
             }
         }
     }

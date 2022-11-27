@@ -37,6 +37,7 @@ class BaseProjectFactory: ProjectFactory {
         .external(name: "Lottie"),
         .external(name: "SnapKit"),
         .external(name: "HorizonCalendar"),
+        .external(name: "Kingfisher"),
         .target(name: "Queenfisher"),
         .target(name: "FirestoreService"),
         .target(name: "Than")
@@ -54,6 +55,7 @@ class BaseProjectFactory: ProjectFactory {
         .external(name: "FirebaseFirestore"),
         .external(name: "FirebaseMessaging"),
         .external(name: "FirebaseStorage"),
+        .external(name: "FirebaseFunctions"),
         .external(name: "RxSwift")
     ]
     
@@ -61,6 +63,7 @@ class BaseProjectFactory: ProjectFactory {
         "CFBundleShortVersionString": "1.0",
         "CFBundleVersion": "1",
         "UILaunchStoryboardName": "LaunchScreen",
+        "UIUserInterfaceStyle": "Light",
         "UIApplicationSceneManifest": [
             "UIApplicationSupportsMultipleScenes": false,
             "UISceneConfigurations": [

@@ -8,6 +8,8 @@
 
 import UIKit
 
+import RxSwift
+
 final class ProfileCell: BaseTableViewCell {
     
     var user: User? {
@@ -19,7 +21,7 @@ final class ProfileCell: BaseTableViewCell {
     private lazy var nickNameLabel = UILabel().than {
         $0.text = "어디로든떠나요"
         $0.textAlignment = .center
-        $0.font = TrinapFontFamily.Pretendard.bold.font(size: 24)
+        $0.font = TrinapFontFamily.Pretendard.bold.font(size: 20)
     }
     
     private lazy var editButton = TrinapButton(style: .disabled, fillType: .border, isCircle: true).than {
@@ -32,8 +34,7 @@ final class ProfileCell: BaseTableViewCell {
     }
     
     override func configureHierarchy() {
-        [profileImageView, nickNameLabel, editButton]
-            .forEach { addSubview($0) }
+        self.contentView.addSubviews([profileImageView, nickNameLabel, editButton])
     }
     
     override func configureConstraints() {
@@ -64,5 +65,14 @@ final class ProfileCell: BaseTableViewCell {
         guard let user = self.user else { return }
         profileImageView.setImage(at: user.profileImage)
         nickNameLabel.text = user.nickname
+    }
+    
+    override func bind() {
+        editButton.rx.tap
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .subscribe { [weak self] _ in
+                self?.delegate?.didTapButton?()
+            }
+            .disposed(by: disposeBag)
     }
 }

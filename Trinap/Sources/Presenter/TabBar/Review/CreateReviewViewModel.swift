@@ -52,7 +52,11 @@ final class CreateReviewViewModel: ViewModelType {
             .withUnretained(self)
             .flatMap { owner, element in
                 let (review, rating) = element
-                return owner.createReviewUseCase.createReview(photographerId: owner.photographerId, contents: review, rating: rating)
+                return owner.createReviewUseCase.createReview(
+                    photographerId: owner.photographerId,
+                    contents: review,
+                    rating: rating
+                )
             }
 
         let buttonEnabled = Observable
