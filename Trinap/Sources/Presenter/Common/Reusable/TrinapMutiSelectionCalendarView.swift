@@ -11,7 +11,7 @@ import UIKit
 import HorizonCalendar
 import SnapKit
 
-final class TrinapMutiSelectionCalendarView: BaseView {
+final class TrinapMultiSelectionCalendarView: BaseView {
     
     // MARK: - UI
     private lazy var calendarView = CalendarView(initialContent: configureCalendarView()).than {
