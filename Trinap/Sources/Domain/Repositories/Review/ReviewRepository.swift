@@ -14,5 +14,6 @@ protocol ReviewRepository {
     
     // MARK: - Methods
     func fetchReviews(id: String, target: ReviewTarget) -> Observable<[Review]>
+    func fetchReview(target: ReviewTarget) -> Observable<[Review]>
     func createReview(to photograhperId: String, contents: String, rating: Int) -> Observable<Bool>
 }

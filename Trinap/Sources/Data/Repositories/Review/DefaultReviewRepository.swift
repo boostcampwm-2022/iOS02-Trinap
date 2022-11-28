@@ -29,6 +29,16 @@ final class DefaultReviewRepository: ReviewRepository {
             .asObservable()
     }
     
+    func fetchReview(target: ReviewTarget) -> Observable<[Review]> {
+        guard let token = keychainManager.getToken(with: .userId) else {
+            return .error(TokenManagerError.notFound)
+        }
+        
+        return fireStoreService.getDocument(collection: .reviews, field: target.rawValue, in: [token])
+            .map { $0.compactMap { $0.toObject(ReviewDTO.self)?.toModel() } }
+            .asObservable()
+    }
+    
     func createReview(to photograhperId: String, contents: String, rating: Int) -> Observable<Bool> {
         guard let token = keychainManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
