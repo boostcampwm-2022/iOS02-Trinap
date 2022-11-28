@@ -14,7 +14,7 @@ import RxCocoa
 class BaseCollectionViewCell: UICollectionViewCell {
     
     // MARK: - Properties
-    let disposeBag = DisposeBag()
+    var disposeBag = DisposeBag()
     
     // MARK: - Methods
     override init(frame: CGRect) {
