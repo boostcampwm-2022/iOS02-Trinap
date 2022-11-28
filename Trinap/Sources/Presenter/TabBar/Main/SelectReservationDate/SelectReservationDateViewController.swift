@@ -43,7 +43,7 @@ final class SelectReservationDateViewController: BaseViewController {
     
     // MARK: - Properties
     private var dataSource: ReservationDateDataSource?
-    private var viewModel: SelectReservationDateViewModel
+    private let viewModel: SelectReservationDateViewModel
     
     // MARK: - Initializers
     init(

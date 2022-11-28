@@ -60,10 +60,6 @@ extension MainCoordinator {
         self.navigationController.present(viewController, animated: true)
     }
     
-    func dismissSelectReservationDateViewController() {
-        self.selectReservationDateViewController?.dismiss(animated: true)
-    }
-    
     func showSearchViewController(
         searchText: BehaviorRelay<String>,
         coordinate: BehaviorRelay<Coordinate?>

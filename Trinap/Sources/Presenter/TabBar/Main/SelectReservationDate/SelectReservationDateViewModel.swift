@@ -38,8 +38,8 @@ final class SelectReservationDateViewModel: ViewModelType {
     private let selectedEndDate = BehaviorRelay<ReservationDate?>(value: nil)
     weak var coordinator: MainCoordinator?
     weak var delegate: SelectReservationDateViewModelDelegate?
-    private var createReservationDateUseCase: CreateReservationDateUseCase
-    private var possibleDate: BehaviorRelay<[Date]>
+    private let createReservationDateUseCase: CreateReservationDateUseCase
+    private let possibleDate: BehaviorRelay<[Date]>
     
     // MARK: - Initializers
     init(
