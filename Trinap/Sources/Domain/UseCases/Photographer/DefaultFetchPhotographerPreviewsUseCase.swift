@@ -42,7 +42,14 @@ final class DefaultFetchPhotographerPreviewsUseCase: FetchPhotographerPreviewsUs
         }
         
         let previews = photographers
-            .map { $0.filter { $0.tags.contains(type) } }.map { Logger.printArray($0);return $0}
+            .map {
+                $0.filter {
+                    $0.tags.contains(type)
+                }
+            }.map {
+                Logger.printArray($0)
+                return $0
+            }
         return toPreviews(photographers: previews)
     }
     
@@ -59,7 +66,10 @@ final class DefaultFetchPhotographerPreviewsUseCase: FetchPhotographerPreviewsUs
     private func toPreviews(photographers: Observable<[Photographer]>) -> Observable<[PhotographerPreview]> {
         return photographers
             .withUnretained(self)
-            .flatMap { owner, photographers in
+            .flatMap { owner, photographers -> Observable<[PhotographerPreview]> in
+                if photographers.isEmpty {
+                    return Observable.just([])
+                }
                 
                 return Observable.zip(
                     photographers.map { photographer in
