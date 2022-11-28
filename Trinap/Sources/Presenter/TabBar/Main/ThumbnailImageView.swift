@@ -10,6 +10,7 @@ import UIKit
 
 import SnapKit
 import Queenfisher
+import Kingfisher
 
 final class ThumbnailImageView: BaseView {
     
@@ -32,7 +33,6 @@ final class ThumbnailImageView: BaseView {
     }
     
     private lazy var thumbnailPageControl = UIPageControl().than {
-//        $0.backgroundStyle = .prominent
         $0.translatesAutoresizingMaskIntoConstraints = false
         $0.addTarget(self, action: #selector(tappedThumbnailPageControl), for: .valueChanged)
     }
@@ -65,7 +65,6 @@ final class ThumbnailImageView: BaseView {
         
         thumbnailPageControl.snp.makeConstraints { make in
             make.bottom.equalTo(thumbnailScrollView.snp.bottom)
-//            make.height.equalTo(10)
             make.centerX.equalTo(thumbnailScrollView)
         }
     }
@@ -144,8 +143,8 @@ extension ThumbnailImageView {
             let imageView = UIImageView()
             let imageSize = thumbnailScrollView.frame.size
             imageView.backgroundColor = .systemPink
-
-            imageView.qf.setImage(at: url, targetSize: imageSize) { [weak self] in
+            
+            imageView.kf.setImage(with: url) { [weak self] _ in
                 guard
                     let width = self?.thumbnailScrollView.frame.width,
                     let y = self?.thumbnailScrollView.frame.minY,
@@ -153,7 +152,6 @@ extension ThumbnailImageView {
                 else { return }
                 let x = width * CGFloat(index)
                 imageView.frame = CGRect(x: x, y: y, width: side, height: side)
-//                Logger.print("아니\(imageView.image?.pngData())")
                 self?.thumbnailScrollView.contentSize.width = imageView.frame.width * CGFloat(index + 1)
                 self?.thumbnailScrollView.addSubview(imageView)
             }
