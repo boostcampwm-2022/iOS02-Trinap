@@ -51,6 +51,7 @@ final class ChatPreviewCell: BaseTableViewCell {
     }()
     
     // MARK: - Properties
+    var previewDisposeBag = DisposeBag()
     
     // MARK: - Initializer
     
@@ -65,7 +66,7 @@ final class ChatPreviewCell: BaseTableViewCell {
             
             self.configureCell(chatPreview)
         }
-        .disposed(by: disposeBag)
+        .disposed(by: previewDisposeBag)
     }
     
     override func prepareForReuse() {
@@ -76,6 +77,7 @@ final class ChatPreviewCell: BaseTableViewCell {
         self.chatPreviewLabel.text = ""
         self.dateLabel.text = ""
         self.unreadAccessoryView.isHidden = true
+        self.previewDisposeBag = DisposeBag()
     }
     
     override func configureHierarchy() {
@@ -128,6 +130,6 @@ extension ChatPreviewCell {
         self.nicknameLabel.text = chatPreview.nickname
         self.chatPreviewLabel.text = chatPreview.content
         self.dateLabel.text = chatPreview.date.properText
-        self.unreadAccessoryView.isHidden = !chatPreview.isChecked
+        self.unreadAccessoryView.isHidden = chatPreview.isChecked
     }
 }

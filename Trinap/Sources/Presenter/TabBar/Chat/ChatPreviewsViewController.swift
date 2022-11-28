@@ -56,6 +56,7 @@ final class ChatPreviewsViewController: BaseViewController {
         let output = viewModel.transform(input: ChatPreviewsViewModel.Input())
         
         output.chatPreviews
+            .map { $0.sorted(by: >) }
             .compactMap { [weak self] chatPreviews in
                 return self?.generateSnapshot(chatPreviews)
             }

@@ -24,13 +24,14 @@ final class ChatDetailViewModel: ViewModelType {
     
     // MARK: - Properties
     let disposeBag = DisposeBag()
-    let chats = BehaviorRelay<[Chat]>(value: [])
+    private var chats: [Chat] = []
     
     private weak var coordinator: ChatCoordinator?
     private let chatroomId: String
     private let observeChatUseCase: ObserveChatUseCase
     private let sendChatUseCase: SendChatUseCase
     private let uploadImageUseCase: UploadImageUseCase
+    private let updateIsCheckedUseCase: UpdateIsCheckedUseCase
     
     // MARK: - Initializer
     init(
@@ -38,17 +39,15 @@ final class ChatDetailViewModel: ViewModelType {
         chatroomId: String,
         observeChatUseCase: ObserveChatUseCase,
         sendChatUseCase: SendChatUseCase,
-        uploadImageUseCase: UploadImageUseCase
+        uploadImageUseCase: UploadImageUseCase,
+        updateIsCheckedUseCase: UpdateIsCheckedUseCase
     ) {
         self.coordinator = coordinator
         self.chatroomId = chatroomId
         self.observeChatUseCase = observeChatUseCase
         self.sendChatUseCase = sendChatUseCase
         self.uploadImageUseCase = uploadImageUseCase
-        
-        observeChatUseCase.execute(chatroomId: chatroomId)
-            .bind(to: chats)
-            .disposed(by: disposeBag)
+        self.updateIsCheckedUseCase = updateIsCheckedUseCase
     }
     
     // MARK: - Methods
@@ -63,31 +62,57 @@ final class ChatDetailViewModel: ViewModelType {
             .disposed(by: disposeBag)
         
         let chats = observeChatUseCase.execute(chatroomId: self.chatroomId)
-
+            .map { [weak self] chats -> [Chat] in
+                guard
+                    let self = self,
+                    let lastChat = chats.last
+                else {
+                    return []
+                }
+                
+                self.chats = chats
+                self.updateChatToRead(lastChatId: lastChat.chatId)
+                
+                return chats
+            }
+        
         return Output(chats: chats)
     }
     
     func hasMyChat(before index: Int) -> Bool {
-        guard let prevChat = self.chats.value[safe: index - 1] else { return false }
-        let currentChat = self.chats.value[index]
+        guard
+            let prevChat = self.chats[safe: index - 1],
+            let currentChat = self.chats[safe: index]
+        else { return false }
         
         return prevChat.senderUserId == currentChat.senderUserId
     }
     
-    func uploadImageAndSendChat(_ imageData: Data) -> Observable<Void> {
+    func uploadImageAndSendChat(_ imageData: Data, width: Double, height: Double) -> Observable<Void> {
         return uploadImageUseCase.execute(imageData)
             .withUnretained(self)
             .flatMap { owner, imageURL in
-                return owner.sendImageChat(imageURL)
+                return owner.sendImageChat(imageURL, width: width, height: height)
             }
     }
     
     func lastChatIndex() -> Int {
-        if chats.value.isEmpty {
+        if chats.isEmpty {
             return 0
         } else {
-            return chats.value.count - 1
+            return chats.count - 1
         }
+    }
+    
+    func sendLocationShareChatAndPresent() -> Observable<Void> {
+        return self.sendLocationShareChat()
+            .withUnretained(self) { owner, _ in
+                owner.presentLocationShare()
+            }
+    }
+    
+    func presentLocationShare() {
+        coordinator?.showLocationShareViewController(chatroomId: chatroomId)
     }
 }
 
@@ -98,7 +123,26 @@ private extension ChatDetailViewModel {
         return sendChatUseCase.execute(chatType: .text, content: chat, chatroomId: chatroomId)
     }
     
-    func sendImageChat(_ imageURL: String) -> Observable<Void> {
-        return sendChatUseCase.execute(chatType: .image, content: imageURL, chatroomId: chatroomId)
+    func sendImageChat(_ imageURL: String, width: Double, height: Double) -> Observable<Void> {
+        return sendChatUseCase.execute(
+            imageURL: imageURL,
+            chatroomId: chatroomId,
+            imageWidth: width,
+            imageHeight: height
+        )
+    }
+    
+    func sendLocationShareChat() -> Observable<Void> {
+        return sendChatUseCase.execute(chatType: .location, content: "location", chatroomId: chatroomId)
+    }
+    
+    func updateChatToRead(lastChatId: String) {
+        DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(500)) { [weak self] in
+            guard let self else { return }
+            
+            self.updateIsCheckedUseCase.execute(chatroomId: self.chatroomId, chatId: lastChatId, toState: true)
+                .subscribe()
+                .dispose()
+        }
     }
 }

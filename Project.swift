@@ -36,6 +36,7 @@ class BaseProjectFactory: ProjectFactory {
         .external(name: "RxGesture"),
         .external(name: "Lottie"),
         .external(name: "SnapKit"),
+        .external(name: "Kingfisher"),
         .target(name: "Queenfisher"),
         .target(name: "FirestoreService"),
         .target(name: "Than")
@@ -61,6 +62,7 @@ class BaseProjectFactory: ProjectFactory {
         "CFBundleShortVersionString": "1.0",
         "CFBundleVersion": "1",
         "UILaunchStoryboardName": "LaunchScreen",
+        "UIUserInterfaceStyle": "Light",
         "UIApplicationSceneManifest": [
             "UIApplicationSupportsMultipleScenes": false,
             "UISceneConfigurations": [

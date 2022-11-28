@@ -9,7 +9,7 @@
 import UIKit
 
 import SnapKit
-import Queenfisher
+import Kingfisher
 
 final class ImageChatCell: ChatCell {
     
@@ -24,6 +24,8 @@ final class ImageChatCell: ChatCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         
+        self.imageContentView.kf.cancelDownloadTask()
+        self.imageContentView.kf.setImage(with: URL(string: ""))
         self.imageContentView.image = nil
     }
     
@@ -42,12 +44,39 @@ final class ImageChatCell: ChatCell {
     }
     
     override func configureCell(by chat: Chat, hasMyChatBefore: Bool, completion: (() -> Void)? = nil) {
+        guard
+            let width = chat.imageWidth,
+            let height = chat.imageHeight
+        else {
+            return
+        }
+        
         super.configureCell(by: chat, hasMyChatBefore: hasMyChatBefore, completion: nil)
         
         let url = URL(string: chat.content)
-        let defaultSize = CGSize(width: 200, height: 200)
-        self.imageContentView.qf.setImage(at: url, targetSize: defaultSize) {
-            completion?()
+        let defaultSize = CGSize(width: width, height: height)
+        self.imageContentView.kf.setImage(
+            with: url,
+            placeholder: UIView.placeholder(width: width, height: height),
+            options: [.processor(DownsamplingImageProcessor(size: defaultSize))]
+        ) { [weak self] _ in
+            self?.layoutIfNeeded()
         }
+    }
+}
+
+// MARK: - Placeholder
+private extension UIView {
+    
+    static func placeholder(width: Double, height: Double) -> UIImage {
+        let size = CGSize(width: width, height: height)
+        let renderer = UIGraphicsImageRenderer(size: size)
+        
+        let image = renderer.image { context in
+            TrinapAsset.background.color.setFill()
+            context.fill(CGRect(origin: .zero, size: size))
+        }
+        
+        return image
     }
 }

@@ -66,6 +66,7 @@ extension ChatPreviewsViewModel {
         chatPreview.content = chat.content
         chatPreview.isChecked = chat.isChecked
         chatPreview.chatType = chat.chatType
+        chatPreview.date = chat.createdAt
         
         switch chatPreview.chatType {
         case .text:
