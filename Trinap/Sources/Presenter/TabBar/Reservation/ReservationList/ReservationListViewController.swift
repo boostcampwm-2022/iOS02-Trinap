@@ -1,5 +1,5 @@
 //
-//  MockReservationList.swift
+//  ReservationListViewController.swift
 //  Trinap
 //
 //  Created by ByeongJu Yu on 2022/11/19.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-final class MockReservationListViewController: BaseViewController {
+final class ReservationListViewController: BaseViewController {
     
     // MARK: - UI
     
@@ -20,6 +20,5 @@ final class MockReservationListViewController: BaseViewController {
     // MARK: - Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemPink
     }
 }

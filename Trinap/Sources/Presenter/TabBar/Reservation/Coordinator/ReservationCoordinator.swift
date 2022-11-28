@@ -30,7 +30,7 @@ final class ReservationCoordinator: Coordinator {
 extension ReservationCoordinator {
     func showReservationListViewController() {
         // TODO: 추후 UI를 구현한 ViewController로 교체
-        let viewController = MockReservationListViewController()
+        let viewController = ReservationListViewController()
         self.navigationController.setNavigationBarHidden(true, animated: false)
         self.navigationController.pushViewController(viewController, animated: true)
     }
