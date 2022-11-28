@@ -34,8 +34,8 @@ final class SelectReservationDateViewModel: ViewModelType {
     
     // MARK: - Properties
     let disposeBag = DisposeBag()
-    private var selectedStartDate = BehaviorRelay<ReservationDate?>(value: nil)
-    private var selectedEndDate = BehaviorRelay<ReservationDate?>(value: nil)
+    private let selectedStartDate = BehaviorRelay<ReservationDate?>(value: nil)
+    private let selectedEndDate = BehaviorRelay<ReservationDate?>(value: nil)
     weak var coordinator: MainCoordinator?
     weak var delegate: SelectReservationDateViewModelDelegate?
     private var createReservationDateUseCase: CreateReservationDateUseCase

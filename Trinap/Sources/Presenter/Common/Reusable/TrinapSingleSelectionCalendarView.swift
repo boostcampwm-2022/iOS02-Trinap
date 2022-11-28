@@ -25,7 +25,7 @@ final class TrinapSingleSelectionCalendarView: BaseView {
     private var selectedDate: Date?
     private var possibleDate: [Date] = []
     let selectedSingleDate = BehaviorRelay<Date?>(value: nil)
-     
+    
     // MARK: - Initializers
     init() {
         super.init(frame: .zero)
