@@ -20,7 +20,10 @@ final class TrinapButton: UIButton {
         set { self.layer.cornerRadius = newValue }
     }
     
-    var style: ColorType
+    var style: ColorType = .primary {
+        didSet { configureColorSet() }
+    }
+    var originalStyle: ColorType
     private var fillType: FillType
     private var isCircle: Bool
     
@@ -33,12 +36,14 @@ final class TrinapButton: UIButton {
     ///   - isCircle: `cornerRadius`와 관계 없이 버튼을 원으로 구성합니다.
     init(style: ColorType, fillType: FillType = .fill, isCircle: Bool = false) {
         self.style = style
+        self.originalStyle = style
         self.fillType = fillType
         self.isCircle = isCircle
         
         super.init(frame: .zero)
         
         self.cornerRadius = 8.0
+        self.titleLabel?.font = TrinapFontFamily.Pretendard.bold.font(size: 14)
         self.configureColorSet()
     }
     
@@ -124,7 +129,7 @@ extension Reactive where Base: TrinapButton {
     var enabled: Binder<Bool> {
         return Binder(self.base) { trinapButton, enabled in
             trinapButton.isEnabled = enabled
-            trinapButton.backgroundColor = enabled ? trinapButton.style.color : TrinapAsset.disabled.color
+            trinapButton.style = enabled ? trinapButton.originalStyle : .disabled
         }
     }
 }

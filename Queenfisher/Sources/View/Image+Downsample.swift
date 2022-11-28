@@ -29,3 +29,11 @@ extension QFData {
         return UIImage(cgImage: downsampledImage)
     }
 }
+
+public extension QFImage {
+    
+    func downsampling(to targetSize: CGSize, scale: CGFloat = 1) -> QFImage {
+        return self.jpegData(compressionQuality: 1)?
+            .imageWithDownsampling(to: targetSize, scale: scale) ?? self
+    }
+}

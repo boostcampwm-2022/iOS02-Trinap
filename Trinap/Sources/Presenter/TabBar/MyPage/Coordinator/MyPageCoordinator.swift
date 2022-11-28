@@ -30,6 +30,7 @@ final class MyPageCoordinator: Coordinator {
 }
 
 extension MyPageCoordinator {
+    
     func showMyPageViewController() {
         let useCase = DefaultFetchUserUseCase(
             userRepository: DefaultUserRepository(firestoreService: DefaultFireStoreService())
@@ -37,17 +38,40 @@ extension MyPageCoordinator {
         let viewModel = MyPageViewModel(fetchUserUseCase: useCase)
         let viewController = MyPageViewController(viewModel: viewModel)
         viewController.coordinator = self
-        self.navigationController.setNavigationBarHidden(true, animated: false)
         self.navigationController.pushViewController(viewController, animated: true)
     }
     
     func showNextView(state: MyPageCellType) {
         switch state {
+        case .phohographerProfile:
+            showEditPhotographerProfile()
         case .nofiticationAuthorization, .photoAuthorization, .locationAuthorization:
             showAuthorizationSetting(state: state)
+        case .profile(user: let user):
+            showEditViewController(user: user)
         default:
             return
         }
+    }
+    
+    private func showEditViewController(user: User) {
+        let viewModel = EditProfileViewModel(
+            fetchUserUseCase: DefaultFetchUserUseCase(userRepository: DefaultUserRepository()),
+            editUserUseCase: DefaultEditUserUseCase(userRepository: DefaultUserRepository()),
+            uploadImageUseCase: DefaultUploadImageUseCase(uploadImageRepository: DefaultUploadImageRepository())
+        )
+        let viewController = EditProfileViewController(viewModel: viewModel)
+        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
+        self.navigationController.setNavigationBarHidden(false, animated: false)
+        self.navigationController.pushViewController(viewController, animated: true)
+    }
+    
+    private func showEditPhotographerProfile() {
+        let viewModel = EditPhotographerViewModel()
+        let viewController = EditPhotographerViewController(viewModel: viewModel)
+        self.navigationController.setNavigationBarHidden(false, animated: false)
+        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(viewController, animated: true)
     }
 }
 

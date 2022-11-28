@@ -30,5 +30,8 @@ final class ChatTableView: UITableView {
         self.register(ChatCell.self)
         self.register(TextChatCell.self)
         self.register(ImageChatCell.self)
+        self.register(ActionChatCell.self)
+        self.register(ReservationChatCell.self)
+        self.register(LocationShareChatCell.self)
     }
 }

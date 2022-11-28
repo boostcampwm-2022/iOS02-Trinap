@@ -47,7 +47,8 @@ extension AuthCoordinator {
             viewModel: CreateUserViewModel(
                 createUserUseCase: DefaultCreateUserUseCase(
                     authRepository: DefaultAuthRepository(),
-                    userRepository: DefaultUserRepository()
+                    userRepository: DefaultUserRepository(),
+                    photographerRepository: DefaultPhotographerRepository()
                 ),
                 coordinator: self
             )

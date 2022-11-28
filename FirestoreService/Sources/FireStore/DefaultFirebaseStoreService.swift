@@ -11,16 +11,19 @@ import Foundation
 import FirebaseCore
 import FirebaseFirestore
 import FirebaseStorage
+import FirebaseFunctions
 import RxSwift
 
 public enum FireStoreError: Error, LocalizedError {
     case unknown
+    case decodeError
 }
 
 public final class DefaultFireStoreService: FireStoreService {
     
     // MARK: Properties
     private let database: Firestore
+    private lazy var functions = Functions.functions()
     
     // MARK: Methods
     public init(
@@ -364,6 +367,25 @@ public extension DefaultFireStoreService {
         }
     }
     
+    func deleteDocument(documents: [String]) -> Single<Void> {
+        
+        return Single.create { [weak self] single in
+            
+            guard let self else { return Disposables.create() }
+            
+            self.database
+                .document(documents.joined(separator: "/"))
+                .delete { error in
+                    if let error = error {
+                        single(.failure(error))
+                    }
+                    
+                    single(.success(()))
+                }
+            return Disposables.create()
+        }
+    }
+    
     func observe(collection: FireStoreCollection, field: String, in values: [Any]) -> Observable<[FirebaseData]> {
         return Observable.create { [weak self] observable in
             guard let self else { return Disposables.create() }
@@ -388,6 +410,27 @@ public extension DefaultFireStoreService {
                     
                     observable.onNext(data)
                 }
+            return Disposables.create()
+        }
+    }
+}
+
+// MARK: functions 사용하는 메소드
+public extension DefaultFireStoreService {
+
+    func useFunctions(functionName: String, data: FirebaseData) -> Single<[FirebaseData]> {
+        return Single.create { [weak self] single in
+            self?.functions.httpsCallable(functionName).call(data) { result, error in
+                if let error {
+                    single(.failure(error))
+                    return
+                }
+                
+                guard let data = result?.data as? [FirebaseData] else { return single(.failure(FireStoreError.decodeError))}
+                
+                single(.success(data))
+                return
+            }
             return Disposables.create()
         }
     }

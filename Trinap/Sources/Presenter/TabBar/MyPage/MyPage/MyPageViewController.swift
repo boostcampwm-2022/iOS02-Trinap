@@ -8,6 +8,8 @@
 
 import UIKit
 
+import RxSwift
+
 final class MyPageViewController: BaseViewController {
     
     // MARK: - Properties
@@ -17,12 +19,18 @@ final class MyPageViewController: BaseViewController {
     private lazy var tableView = UITableView(frame: .zero, style: .plain)
     
     private lazy var dataSource: UITableViewDiffableDataSource<MyPageSection, MyPageCellType> = generateDataSource()
-    
     // MARK: - Initializers
     init(viewModel: MyPageViewModel) {
         self.viewModel = viewModel
         
         super.init()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        self.navigationController?.navigationBar.isHidden = true
+        self.tabBarController?.tabBar.isHidden = false
     }
     
     // MARK: - Methods
@@ -41,7 +49,7 @@ final class MyPageViewController: BaseViewController {
     }
     
     override func bind() {
-        let input = MyPageViewModel.Input()
+        let input = MyPageViewModel.Input(viewWillAppear: self.rx.viewWillAppear.asObservable())
         let output = viewModel.transform(input: input)
         
         output.dataSource
@@ -53,10 +61,13 @@ final class MyPageViewController: BaseViewController {
             }
             .disposed(by: disposeBag)
         
-        tableView.rx.setDelegate(self).disposed(by: disposeBag)
+        tableView.rx
+            .setDelegate(self)
+            .disposed(by: disposeBag)
         
         tableView.rx
             .itemSelected
+            .throttle(.microseconds(500), scheduler: MainScheduler.instance)
             .withUnretained(self)
             .subscribe { owner, indexPath in
                 owner.showNextViewController(indexPath: indexPath)
@@ -75,13 +86,18 @@ extension MyPageViewController: UITableViewDelegate {
     }
     
     private func generateDataSource() -> UITableViewDiffableDataSource<MyPageSection, MyPageCellType> {
-        
         return UITableViewDiffableDataSource(tableView: tableView) { tableView, indexPath, itemIdentifier in
             if case let .profile(user) = itemIdentifier {
                 guard let cell = tableView.dequeueCell(ProfileCell.self, for: indexPath) else {
                     return UITableViewCell()
                 }
                 cell.user = user
+                cell.rx.rxShowViewController
+                    .subscribe(onNext: { [weak self] _ in
+                        self?.showNextViewController(indexPath: IndexPath(row: 0, section: 0))
+                    })
+                    .disposed(by: self.disposeBag)
+                cell.selectionStyle = .none
                 return cell
             } else {
                 guard let cell = tableView.dequeueCell(MyPageInfoCell.self, for: indexPath) else {
@@ -103,7 +119,6 @@ extension MyPageViewController: UITableViewDelegate {
                 snapshot.appendItems(data, toSection: section)
             }
         }
-        
         return snapshot
     }
     
@@ -136,10 +151,9 @@ extension MyPageViewController: UITableViewDelegate {
         return indexPath.section == 0 ? 185 : self.trinapOffset * 6
     }
     
-    func showNextViewController(indexPath: IndexPath) {
-        guard let cell = self.tableView.cellForRow(at: indexPath) as? MyPageInfoCell, let type = cell.type else {
-            return
-        }
+    private func showNextViewController(indexPath: IndexPath) {
+        guard let type = dataSource.itemIdentifier(for: indexPath) else { return }
+        
         self.coordinator?.showNextView(state: type)
     }
 }

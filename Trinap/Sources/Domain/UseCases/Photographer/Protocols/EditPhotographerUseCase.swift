@@ -15,7 +15,7 @@ protocol EditPhotographerUseCase {
     // MARK: Methods
     func updatePhotographer(photographer: Photographer) -> Observable<Void>
     func createPhotographer(
-        location: String,
+        coordinate: Coordinate,
         introduction: String,
         tags: [TagType],
         pricePerHalfHour: Int

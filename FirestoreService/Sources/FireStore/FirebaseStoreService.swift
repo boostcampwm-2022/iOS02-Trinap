@@ -32,4 +32,8 @@ public protocol FireStoreService {
     func getDocuments(documents: [String]) -> Single<[FirebaseData]>
     func observe(documents: [String]) -> Observable<[FirebaseData]>
     func observe(collection: FireStoreCollection, field: String, in values: [Any]) -> Observable<[FirebaseData]>
+    func deleteDocument(documents: [String]) -> Single<Void>
+    
+    //functions 사용
+    func useFunctions(functionName: String, data: FirebaseData) -> Single<[FirebaseData]>
 }

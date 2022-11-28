@@ -8,8 +8,8 @@
 
 import Foundation
 
-enum MyPageSection: CaseIterable, Hashable {
-    case profile
+enum MyPageSection: Int, CaseIterable, Hashable {
+    case profile = 0
     case photograhper
     case setting
     case etc

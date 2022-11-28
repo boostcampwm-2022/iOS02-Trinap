@@ -110,11 +110,7 @@ final class SelectReservationDateViewModel: ViewModelType {
                 self.selectedEndDate.asObservable()
             )
             .map { startDate, endDate -> Bool in
-                if startDate != nil && endDate != nil {
-                    return true
-                }
-                
-                return false
+                return startDate != nil && endDate != nil
             }
         
         let fetchPossibleDate = self.possibleDate
