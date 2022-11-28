@@ -1,5 +1,5 @@
 //
-//  CustomerReview.swift
+//  UserReivew.swift
 //  Trinap
 //
 //  Created by Doyun Park on 2022/11/17.
@@ -8,10 +8,10 @@
 
 import Foundation
 
-/// 유저가 작성한 리뷰
+/// 작가에게 작성된 리뷰
 // TODO: - UI작업할 때 수정 필요
-struct UserReview {
-    let photorgrapher: Photographer
+struct UserReview: Hashable {
+    let user: User
     let contents: String
     let rating: Int
 }

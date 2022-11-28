@@ -16,11 +16,11 @@ enum PhotographerSection: Int, Hashable {
     case review
     
     enum Item: Hashable {
-        case profile(PhotographerProfile)
+        case profile(PhotographerUser)
         case photo(Picture?)
-        case detail(PhotographerDetailIntroduction)
+        case detail(PhotographerUser)
         case summaryReview(ReviewSummary)
-        case review(PhotographerReview)
+        case review(UserReview)
     }
 }
 

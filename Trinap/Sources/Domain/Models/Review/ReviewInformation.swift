@@ -10,7 +10,7 @@ import Foundation
 
 struct ReviewInformation {
     let summary: ReviewSummary
-    let reviews: [PhotographerReview]
+    let reviews: [UserReview]
     
     func toDataSource() -> [EditPhotographerDataSource] {
         return [
