@@ -26,14 +26,14 @@ final class DefaultReservationRepository: ReservationRepository {
     }
     
     // MARK: Methods
-    func fetchPhotographerReservations() -> Observable<[Reservation]> {
+    func fetchReceivedReservations() -> Observable<[Reservation]> {
         guard let token = keychainManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
         }
         
         return fireStore.getDocument(
             collection: .reservations,
-            field: "photograhperUserId",
+            field: "photographerUserId",
             condition: [token]
         )
         .map { datas in
@@ -42,7 +42,7 @@ final class DefaultReservationRepository: ReservationRepository {
         .asObservable()
     }
     
-    func fetchCustomerReservations() -> Observable<[Reservation]> {
+    func fetchSentReservations() -> Observable<[Reservation]> {
         guard let token = keychainManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
         }

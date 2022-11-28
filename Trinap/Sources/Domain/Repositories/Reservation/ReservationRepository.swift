@@ -13,8 +13,8 @@ import RxSwift
 protocol ReservationRepository {
     
     // MARK: Methods
-    func fetchPhotographerReservations() -> Observable<[Reservation]>
-    func fetchCustomerReservations() -> Observable<[Reservation]>
+    func fetchReceivedReservations() -> Observable<[Reservation]>
+    func fetchSentReservations() -> Observable<[Reservation]>
     func fetchDetail(reservationId: String) -> Observable<Reservation>
     func addReservation(reservation: Reservation) -> Observable<Bool>
     func deleteReservation(reservationId: String) -> Observable<Void>
