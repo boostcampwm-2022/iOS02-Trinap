@@ -13,6 +13,6 @@ import RxSwift
 protocol FetchReservationsUseCase {
     
     // MARK: Methods
-    func fetchCustomerReservations() -> Observable<[Reservation]>
-    func fetchPhotographerReservations() -> Observable<[Reservation]> 
+    func fetchSentReservations() -> Observable<[Reservation]>
+    func fetchReceivedReservations() -> Observable<[Reservation]> 
 }

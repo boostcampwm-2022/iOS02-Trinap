@@ -21,13 +21,13 @@ final class DefaultFetchReservationsUseCase: FetchReservationsUseCase {
     }
     
     // MARK: Methods
-    func fetchCustomerReservations() -> Observable<[Reservation]> {
+    func fetchSentReservations() -> Observable<[Reservation]> {
         return reservationRepository
-            .fetchCustomerReservations()
+            .fetchSentReservations()
     }
     
-    func fetchPhotographerReservations() -> Observable<[Reservation]> {
+    func fetchReceivedReservations() -> Observable<[Reservation]> {
         return reservationRepository
-            .fetchPhotographerReservations()
+            .fetchReceivedReservations()
     }
 }
