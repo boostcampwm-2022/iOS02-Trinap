@@ -18,6 +18,7 @@ disabled_rules:
   - orphaned_doc_comment
   - unused_capture_list
   - trailing_whitespace
+  - empty_count
   - line_length
 
 opt_in_rules:
