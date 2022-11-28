@@ -57,10 +57,6 @@ final class PhotographerReivewCell: BaseCollectionViewCell {
         }
     }
     
-    override func configureAttributes() {
-        
-    }
-    
     func configure(with review: PhotographerReview) {
         self.nickNameLabel.text = review.user.nickname
         self.contentsLabel.text = review.contents

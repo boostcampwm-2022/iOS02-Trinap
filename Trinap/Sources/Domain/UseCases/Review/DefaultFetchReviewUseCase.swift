@@ -51,7 +51,6 @@ final class DefaultFetchReviewUseCase: FetchReviewUseCase {
     
     /// 작가에게 작성된 리뷰 확인
     func fetchReviews(photographerId: String) -> Observable<[PhotographerReview]> {
-        Logger.print(photographerId)
         return reviewRepository.fetchReviews(id: photographerId, target: .photographer)
             .flatMap { reviews in
                 return self.mappingReviewOfPhotographer(reviews: reviews)
@@ -71,7 +70,6 @@ extension DefaultFetchReviewUseCase {
                 var userReviews: [UserReview] = []
                 
                 for photographer in photographers {
-                    print(photographer)
                     for review in reviews where review.photographerUserId == photographer.photographerUserId {
                         
                         let userReview = UserReview(
@@ -88,8 +86,6 @@ extension DefaultFetchReviewUseCase {
     }
     
     private func mappingReviewOfPhotographer(reviews: [Review]) -> Observable<[PhotographerReview]> {
-        
-        print(reviews)
         /// 중복된 id제거
         let userIds = reviews.map { $0.creatorUserId }.removingDuplicates()
         
