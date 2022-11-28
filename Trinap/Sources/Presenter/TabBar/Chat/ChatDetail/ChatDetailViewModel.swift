@@ -80,8 +80,10 @@ final class ChatDetailViewModel: ViewModelType {
     }
     
     func hasMyChat(before index: Int) -> Bool {
-        guard let prevChat = self.chats[safe: index - 1] else { return false }
-        let currentChat = self.chats[safe: index]
+        guard
+            let prevChat = self.chats[safe: index - 1],
+            let currentChat = self.chats[safe: index]
+        else { return false }
         
         return prevChat.senderUserId == currentChat.senderUserId
     }
