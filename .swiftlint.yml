@@ -17,6 +17,7 @@ disabled_rules:
   - orphaned_doc_comment
   - unused_capture_list
   - trailing_whitespace
+  - empty_count
 
 opt_in_rules:
   - array_init
@@ -28,7 +29,6 @@ opt_in_rules:
   - convenience_type
   - discouraged_object_literal
   - empty_collection_literal
-  - empty_count
   - empty_string
   - enum_case_associated_values_count
   - fatal_error_message
