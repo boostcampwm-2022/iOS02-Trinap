@@ -26,7 +26,7 @@ final class DefaultChatroomRepository: ChatroomRepository {
         self.tokenManager = tokenManager
     }
 
-    func fetch() -> Observable<[Chatroom]> {
+    func observe() -> Observable<[Chatroom]> {
         guard let userId = tokenManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
         }
@@ -39,6 +39,13 @@ final class DefaultChatroomRepository: ChatroomRepository {
                     .map { $0 + customerChatroomsDTO }
             }
             .map { $0.map { $0.toModel() } }
+    }
+    
+    func updateDate(chatroomId: String) -> Observable<Void> {
+        let values = ["updatedAt": Date().toString(type: .timeStamp)]
+        
+        return firebaseStoreService.updateDocument(collection: .chatrooms, document: chatroomId, values: values)
+            .asObservable()
     }
 
     func create(customerUserId: String, photographerUserId: String) -> Observable<Void> {
@@ -69,5 +76,6 @@ private extension DefaultChatroomRepository {
         return self.firebaseStoreService
             .observe(collection: .chatrooms, field: userType, in: [userId])
             .map { $0.compactMap { $0.toObject() } }
+            .map { $0.sorted(by: { $0.updatedAt > $1.updatedAt }) }
     }
 }
