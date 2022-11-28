@@ -38,3 +38,10 @@ extension ChatPreview: Hashable {
         hasher.combine(chatroomId)
     }
 }
+
+extension ChatPreview: Comparable {
+    
+    static func < (lhs: ChatPreview, rhs: ChatPreview) -> Bool {
+        return lhs.date < rhs.date
+    }
+}
