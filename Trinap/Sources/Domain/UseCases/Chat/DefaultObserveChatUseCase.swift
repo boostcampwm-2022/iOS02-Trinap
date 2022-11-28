@@ -34,9 +34,7 @@ final class DefaultObserveChatUseCase: ObserveChatUseCase {
                     .removingDuplicates()
                 
                 return owner.userRepository.fetchUsersWithMine(userIds: userIds)
-                    .withUnretained(self) { owner, users in
-                        return owner.mapChatWithUser(chats: chats, users: users)
-                    }
+                    .map { users in return owner.mapChatWithUser(chats: chats, users: users) }
             }
     }
 }

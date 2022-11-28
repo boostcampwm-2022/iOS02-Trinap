@@ -54,13 +54,7 @@ final class DefaultChatRepository: ChatRepository {
             imageHeight: nil
         )
         
-        guard let values = chatDTO.asDictionary else {
-            return .error(FireStoreError.unknown)
-        }
-        
-        return self.firestoreService
-            .createDocument(documents: ["chatrooms", chatroomId, "chats", chatDTO.chatId], values: values)
-            .asObservable()
+        return self.send(chatroomId: chatroomId, chatDTO: chatDTO)
     }
     
     func send(imageURL: String, chatroomId: String, imageWidth: Double, imageHeight: Double) -> Observable<Void> {
@@ -79,12 +73,39 @@ final class DefaultChatRepository: ChatRepository {
             imageHeight: imageHeight
         )
         
+        return self.send(chatroomId: chatroomId, chatDTO: chatDTO)
+    }
+    
+    func updateIsChecked(chatroomId: String, chatId: String, toState state: Bool = true) -> Observable<Void> {
+        let values = ["isChecked": state]
+        
+        return self.firestoreService
+            .updateDocument(collection: .chatrooms, document: "\(chatroomId)/chats/\(chatId)", values: values)
+            .asObservable()
+    }
+}
+
+// MARK: - Privates
+private extension DefaultChatRepository {
+    
+    func send(chatroomId: String, chatDTO: ChatDTO) -> Observable<Void> {
         guard let values = chatDTO.asDictionary else {
             return .error(FireStoreError.unknown)
         }
         
         return self.firestoreService
             .createDocument(documents: ["chatrooms", chatroomId, "chats", chatDTO.chatId], values: values)
+            .asObservable()
+            .withUnretained(self)
+            .flatMap { owner, _ in owner.updateChatroomTimestamp(chatroomId: chatroomId) }
+    }
+    
+    func updateChatroomTimestamp(chatroomId: String) -> Observable<Void> {
+        let timestamp = Date().toString(type: .timeStamp)
+        let values = ["updatedAt": timestamp]
+        
+        return self.firestoreService
+            .updateDocument(collection: .chatrooms, document: chatroomId, values: values)
             .asObservable()
     }
 }
