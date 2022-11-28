@@ -62,7 +62,7 @@ final class DefaultPhotographerRepository: PhotographerRepository {
             field: "photographerUserId",
             in: [userId]
         )
-        .compactMap { $0[0].toObject(PhotographerDTO.self)?.toModel() }
+        .compactMap { $0.first?.toObject(PhotographerDTO.self)?.toModel() }
         .asObservable()
     }
     
