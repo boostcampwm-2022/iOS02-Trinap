@@ -68,7 +68,6 @@ final class PhotographerPreviewCell: BaseCollectionViewCell {
         }
     }
     
-    //TODO: 그냥 생 preview 줘서 configure 사용?
     func bind(photographerPreview: Driver<PhotographerPreview>) {
         photographerPreview
             .drive { [weak self] preview in

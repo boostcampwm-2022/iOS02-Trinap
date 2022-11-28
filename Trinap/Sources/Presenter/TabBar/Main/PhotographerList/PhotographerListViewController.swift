@@ -108,7 +108,6 @@ final class PhotographerListViewController: BaseViewController {
         
         output.previews
             .compactMap { [weak self] previews in
-                //TODO: 값이 빈 배열이 넘어오면 실행되지 않음,,,,,,,
                 Logger.print("쨔스")
                 Logger.printArray(previews)
                 return self?.generateSnapshot(sources: previews)
