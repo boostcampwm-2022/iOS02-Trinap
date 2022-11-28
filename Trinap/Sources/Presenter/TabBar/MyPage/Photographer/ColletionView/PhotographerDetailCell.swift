@@ -114,7 +114,7 @@ final class PhotographerDetailIntroductionCell: BaseCollectionViewCell {
         }
     }
     
-    func configure(with information: PhotographerDetailIntroduction) {
+    func configure(with information: PhotographerUser) {
         self.introduceLabel.text = information.introduction
         self.priceLabel.text = "\(information.pricePerHalfHour)원"
     }

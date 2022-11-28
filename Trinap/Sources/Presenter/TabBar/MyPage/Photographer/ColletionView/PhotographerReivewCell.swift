@@ -57,7 +57,7 @@ final class PhotographerReivewCell: BaseCollectionViewCell {
         }
     }
     
-    func configure(with review: PhotographerReview) {
+    func configure(with review: UserReview) {
         self.nickNameLabel.text = review.user.nickname
         self.contentsLabel.text = review.contents
         self.ratingView.configureRating(review.rating)

@@ -75,6 +75,7 @@ extension MyPageCoordinator {
                 userRepository: DefaultUserRepository(),
                 photographerRepository: DefaultPhotographerRepository()
             ),
+            editPortfolioPictureUseCase: DefaultEditPortfolioPictureUseCase(photographerRepository: DefaultPhotographerRepository()),
             mapRepository: DefaultMapRepository()
         )
         let viewController = EditPhotographerViewController(viewModel: viewModel)

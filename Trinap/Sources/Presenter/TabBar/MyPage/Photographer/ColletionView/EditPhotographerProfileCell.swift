@@ -27,10 +27,12 @@ final class EditPhotographerProfileCell: BaseCollectionViewCell {
         $0.font = TrinapFontFamily.Pretendard.regular.font(size: 14)
     }
     
-    private lazy var editButton = TrinapButton(style: .black, fillType: .border, isCircle: true).than {
+    lazy var editButton = TrinapButton(style: .black, fillType: .border, isCircle: true).than {
         $0.setTitle("작가정보 수정", for: .normal)
         $0.titleLabel?.font = TrinapFontFamily.Pretendard.regular.font(size: 12)
     }
+    
+    private lazy var stackView = UIStackView()
     
     override func configureHierarchy() {
         self.addSubviews([profileImage, nickNameLabel, locationLabel, editButton, filterView])
@@ -67,17 +69,9 @@ final class EditPhotographerProfileCell: BaseCollectionViewCell {
         }
     }
     
-    func configure(with profile: PhotographerProfile) {
+    func configure(with profile: PhotographerUser) {
         nickNameLabel.text = profile.nickname
         locationLabel.text = profile.location
-        profileImage.setImage(at: profile.profielImage)
-    }
-    
-    override func bind() {
-        editButton.rx.tap
-            .subscribe { [weak self] _ in
-                self?.delegate?.didTapButton?()
-            }
-            .disposed(by: disposeBag)
+        profileImage.setImage(at: profile.profileImage)
     }
 }

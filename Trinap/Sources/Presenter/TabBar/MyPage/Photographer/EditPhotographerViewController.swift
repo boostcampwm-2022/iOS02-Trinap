@@ -24,7 +24,8 @@ final class EditPhotographerViewController: BaseViewController {
     
     private let tabState = BehaviorRelay<Int>(value: 0)
     private let isEditable = BehaviorRelay<Bool>(value: false)
-    private let selectedCell = BehaviorRelay<[Int]>(value: [])
+    private let selectedPicture = BehaviorRelay<[Int?]>(value: [])
+    private let deleteTrigger = PublishSubject<Void>()
     
     // MARK: - Properties
     weak var coordinator: MyPageCoordinator?
@@ -65,7 +66,12 @@ final class EditPhotographerViewController: BaseViewController {
         let input = EditPhotographerViewModel.Input(
             viewWillAppear: self.rx.viewWillAppear.asObservable(),
             tabState: self.tabState.asObservable(),
-            isEditable: self.isEditable.asObservable()
+            isEditable: self.isEditable.asObservable().distinctUntilChanged(),
+            selectedPicture: self.selectedPicture
+                .map { $0.compactMap { $0 }.map { $0 - 1 } }
+                .filter { !$0.isEmpty }
+                .asObservable(),
+            deleteTrigger: self.deleteTrigger.asObservable()
         )
         
         let output = viewModel.transform(input: input)
@@ -75,13 +81,12 @@ final class EditPhotographerViewController: BaseViewController {
             .withUnretained(self)
             .subscribe(onNext: { owner, section in
                 owner.collectionView.setCollectionViewLayout(owner.configureCollectionViewLayout(section), animated: false)
-                
-                if section != .picture {
+                if section != .picture && self.isEditable.value {
                     self.isEditable.accept(false)
                 }
             })
             .disposed(by: disposeBag)
-
+        
         output.dataSource
             .compactMap { dataSource in
                 self.generateSnapShot(dataSource)
@@ -91,10 +96,44 @@ final class EditPhotographerViewController: BaseViewController {
             }
             .disposed(by: disposeBag)
         
-        isEditable.subscribe { value in
-            print(value)
-        }
-        .disposed(by: disposeBag)
+        collectionView.rx.itemSelected
+            .withUnretained(self)
+            .compactMap { owner, indexPath -> Int? in
+                if case let .photo(picture) = owner.dataSource.itemIdentifier(for: indexPath) {
+                    
+                    if picture?.picture == nil {
+                        owner.coordinator?.showUpdatePhotographerViewController()
+                    } else {
+                        return indexPath.row
+                    }
+                }
+                return nil
+            }
+            .withUnretained(self)
+            .subscribe(onNext: { owner, i in
+                owner.selectedPicture.accept(owner.selectedPicture.value + [i])
+            })
+            .disposed(by: disposeBag)
+
+        collectionView.rx.itemDeselected
+            .withUnretained(self)
+            .compactMap { owner, indexPath in
+                if case let .photo = owner.dataSource.itemIdentifier(for: indexPath) {
+                    return indexPath.row
+                }
+                return nil
+            }
+            .withUnretained(self)
+            .subscribe(onNext: { owner, pictureURL in
+                let removedValue = owner.selectedPicture.value.filter { $0 != pictureURL }
+                self.selectedPicture.accept(removedValue)
+            })
+            .disposed(by: self.disposeBag)
+        
+        deleteTrigger
+            .map { _ in false }
+            .bind(to: isEditable)
+            .disposed(by: disposeBag)
     }
     
     override func configureAttributes() {
@@ -119,6 +158,8 @@ extension EditPhotographerViewController {
         collectionView.register(PhotoCell.self)
         collectionView.register(PhotographerSummaryReviewcell.self)
         collectionView.register(PhotographerReivewCell.self)
+        collectionView.registerReusableView(EditPhotographerPhotoDeleteHeaderView.self)
+        collectionView.allowsMultipleSelection = true
     }
     
     private func generateSnapShot(_ data: [EditPhotographerDataSource]) -> Snapshot {
@@ -149,7 +190,8 @@ extension EditPhotographerViewController {
                     .bind(to: self.tabState)
                     .disposed(by: self.disposeBag)
                 
-                cell.rx.rxTap
+                cell.editButton.rx.tap
+                    .throttle(.seconds(1), scheduler: MainScheduler.instance)
                     .subscribe(onNext: {
                         self.coordinator?.showUpdatePhotographerViewController()
                     })
@@ -168,18 +210,21 @@ extension EditPhotographerViewController {
                     return UICollectionViewCell()
                 }
                 cell.configure(with: information)
+                cell.isUserInteractionEnabled = false
                 return cell
             case .review(let review):
                 guard let cell = collectionView.dequeueCell(PhotographerReivewCell.self, for: indexPath) else {
                     return UICollectionViewCell()
                 }
                 cell.configure(with: review)
+                cell.isUserInteractionEnabled = false
                 return cell
             case .summaryReview(let review):
                 guard let cell = collectionView.dequeueCell(PhotographerSummaryReviewcell.self, for: indexPath) else {
                     return UICollectionViewCell()
                 }
                 cell.configure(with: review)
+                cell.isUserInteractionEnabled = false
                 return cell
             }
         }
@@ -190,15 +235,37 @@ extension EditPhotographerViewController {
             
             switch kind {
             case EditPhotographerPhotoHeaderView.reuseIdentifier:
+                
                 guard let header = collectionView.dequeResuableView(EditPhotographerPhotoHeaderView.self, for: indexPath) else {
                     return UICollectionReusableView()
                 }
-                header.rx.rxTap
+                
+                header.editButton.rx.tap
                     .subscribe(onNext: {
                         self.isEditable.accept(!self.isEditable.value)
                     })
-                    .disposed(by: self.disposeBag)
+                    .disposed(by: header.disposeBag)
                 return header
+                
+            case EditPhotographerPhotoDeleteHeaderView.reuseIdentifier:
+                
+                guard let header = collectionView.dequeResuableView(EditPhotographerPhotoDeleteHeaderView.self, for: indexPath) else {
+                    return UICollectionReusableView()
+                }
+                header.containerView.rx.tapGesture()
+                    .when(.recognized)
+                    .asObservable()
+                    .map { _ in }
+                    .bind(to: self.deleteTrigger)
+                    .disposed(by: header.disposeBag)
+                
+                self.selectedPicture
+                    .map { $0.count }
+                    .bind(to: header.rx.setCount)
+                    .disposed(by: self.disposeBag)
+                
+                return header
+                
             default:
                 return UICollectionReusableView()
             }
@@ -275,17 +342,19 @@ extension EditPhotographerViewController {
         
         let section = NSCollectionLayoutSection(group: group)
         
+        let isEditable = self.isEditable.value
         
         let header = NSCollectionLayoutBoundarySupplementaryItem(
             layoutSize: NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .estimated(trinapOffset * 6)
+                heightDimension: .absolute(trinapOffset * 8)
             ),
-            elementKind: EditPhotographerPhotoHeaderView.reuseIdentifier,
+            elementKind: isEditable ? EditPhotographerPhotoDeleteHeaderView.reuseIdentifier : EditPhotographerPhotoHeaderView.reuseIdentifier,
             alignment: .top
         )
         
         section.boundarySupplementaryItems = [header]
+        
         section.contentInsets = NSDirectionalEdgeInsets(top: inset, leading: 0, bottom: 0, trailing: inset)
         return section
     }

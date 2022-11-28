@@ -12,7 +12,13 @@ import RxSwift
 import RxCocoa
 
 final class EditPhotographerPhotoHeaderView: BaseCollectionReusableView {
-    private lazy var editButton = TrinapButton(style: .black, fillType: .border, isCircle: true)
+    lazy var editButton = TrinapButton(style: .black, fillType: .border, isCircle: true)
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        self.disposeBag = DisposeBag()
+    }
     
     override func configureHierarchy() {
         self.addSubview(editButton)
@@ -26,14 +32,5 @@ final class EditPhotographerPhotoHeaderView: BaseCollectionReusableView {
     
     override func configureAttributes() {
         editButton.setTitle("포트폴리오 편집", for: .normal)
-    }
-    
-    override func bind() {
-        editButton.rx.tap
-            .throttle(.seconds(1), scheduler: MainScheduler.instance)
-            .subscribe { [weak self] _ in
-                self?.delegate?.didTapButton?()
-            }
-            .disposed(by: disposeBag)
     }
 }

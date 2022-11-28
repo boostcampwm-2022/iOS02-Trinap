@@ -8,6 +8,8 @@
 
 import UIKit
 
+import Queenfisher
+
 final class PhotoCell: BaseCollectionViewCell {
     
     private lazy var imageView = UIImageView().than {
@@ -18,12 +20,24 @@ final class PhotoCell: BaseCollectionViewCell {
         $0.layer.masksToBounds = true
     }
 
-    private lazy var editButton = UIView().than {
+    private lazy var editButton = UIImageView().than {
         $0.layer.borderColor = TrinapAsset.gray40.color.cgColor
         $0.layer.cornerRadius = 4
         $0.layer.borderWidth = 1
+        $0.layer.masksToBounds = true
         $0.backgroundColor = TrinapAsset.white.color
+        $0.tintColor = TrinapAsset.white.color
+        $0.contentMode = .scaleAspectFill
         $0.alpha = 0.5
+    }
+    
+    override var isSelected: Bool {
+        didSet { setSelected() }
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        self.imageView.image = nil
     }
     
     override func configureHierarchy() {
@@ -42,8 +56,20 @@ final class PhotoCell: BaseCollectionViewCell {
     }
     
     func configure(picture: Picture?) {
-        guard let picture else { return }
+        guard let picture, let url = picture.picture else {
+            self.editButton.isHidden = true
+            self.isUserInteractionEnabled = false
+            return
+        }
+        
         self.editButton.isHidden = !picture.isEditable
-        imageView.qf.setImage(at: picture.profileImage, placeholder: UIImage(systemName: "plus"))
+        self.isUserInteractionEnabled = picture.isEditable
+        imageView.qf.setImage(at: URL(string: url))
+    }
+    
+    func setSelected() {
+        self.editButton.alpha = isSelected ? 1.0 : 0.5
+        self.editButton.image = isSelected ? TrinapAsset.selectedMark.image : nil
+        self.editButton.layer.borderColor = isSelected ? nil : TrinapAsset.background.color.cgColor
     }
 }
