@@ -71,7 +71,9 @@ final class ChatDetailViewModel: ViewModelType {
                 }
                 
                 self.chats = chats
-                self.updateChatToRead(lastChatId: lastChat.chatId)
+                if lastChat.senderType != .mine {
+                    self.updateChatToRead(lastChatId: lastChat.chatId)
+                }
                 
                 return chats
             }

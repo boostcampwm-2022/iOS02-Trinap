@@ -56,7 +56,6 @@ final class ChatPreviewsViewController: BaseViewController {
         let output = viewModel.transform(input: ChatPreviewsViewModel.Input())
         
         output.chatPreviews
-            .map { $0.sorted(by: >) }
             .compactMap { [weak self] chatPreviews in
                 return self?.generateSnapshot(chatPreviews)
             }
@@ -87,11 +86,11 @@ private extension ChatPreviewsViewController {
         case main
     }
     
-    func generateSnapshot(_ sources: [ChatPreview]) -> NSDiffableDataSourceSnapshot<Section, ChatPreview> {
+    func generateSnapshot(_ after: [ChatPreview]) -> NSDiffableDataSourceSnapshot<Section, ChatPreview> {
         var snapshot = NSDiffableDataSourceSnapshot<Section, ChatPreview>()
         
         snapshot.appendSections([.main])
-        snapshot.appendItems(sources)
+        snapshot.appendItems(after)
         return snapshot
     }
     
@@ -111,5 +110,9 @@ private extension ChatPreviewsViewController {
             
             return cell
         }
+    }
+    
+    func chatroomIds(of chatPreviews: [ChatPreview]) -> [String] {
+        return chatPreviews.map { $0.chatroomId }
     }
 }
