@@ -22,15 +22,7 @@ final class TimeCell: BaseCollectionViewCell {
     
     override var isSelected: Bool {
         didSet {
-            if isSelected {
-                self.contentView.backgroundColor = TrinapAsset.primary.color
-                self.timeLabel.textColor = TrinapAsset.white.color
-                self.timeLabel.font = TrinapFontFamily.Pretendard.semiBold.font(size: 14)
-            } else {
-                self.contentView.backgroundColor = TrinapAsset.background.color
-                self.timeLabel.textColor = TrinapAsset.black.color
-                self.timeLabel.font = TrinapFontFamily.Pretendard.regular.font(size: 14)
-            }
+            self.updateSelectionAttributes(isSelected)
         }
     }
     
@@ -52,5 +44,17 @@ final class TimeCell: BaseCollectionViewCell {
     
     func configureCell(with reservationDate: ReservationDate) {
         self.timeLabel.text = reservationDate.date.toString(type: .hourAndMinute)
+    }
+    
+    private func updateSelectionAttributes(_ isSelected: Bool) {
+        if isSelected {
+            self.contentView.backgroundColor = TrinapAsset.primary.color
+            self.timeLabel.textColor = TrinapAsset.white.color
+            self.timeLabel.font = TrinapFontFamily.Pretendard.semiBold.font(size: 14)
+        } else {
+            self.contentView.backgroundColor = TrinapAsset.background.color
+            self.timeLabel.textColor = TrinapAsset.black.color
+            self.timeLabel.font = TrinapFontFamily.Pretendard.regular.font(size: 14)
+        }
     }
 }

@@ -46,18 +46,17 @@ final class SelectReservationDateViewController: BaseViewController {
     private var viewModel: SelectReservationDateViewModel
     
     // MARK: - Initializers
-    init(viewModel: SelectReservationDateViewModel) {
+    init(
+        viewModel: SelectReservationDateViewModel
+    ) {
         self.viewModel = viewModel
         super.init()
+        self.createDataSource()
     }
     
     // MARK: - Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        createDataSource()
-        
-        // TODO: test code 제거
-        self.trinapCalenderView.configurePossibleDate(possibleDate: factoryDate())
     }
     
     override func bind() {
@@ -66,43 +65,8 @@ final class SelectReservationDateViewController: BaseViewController {
                 .asObservable()
                 .compactMap { $0 },
             selectDoneButtonTap: self.selectDoneButton.rx.tap.asObservable(),
-            selectedDate: self.collectionView.rx.itemSelected
-                .asObservable()
-                .compactMap { [weak self] indexPath -> ReservationDate? in
-                    guard
-                        let self,
-                        let selectedDate = self.dataSource?.itemIdentifier(for: indexPath)
-                    else {
-                        return nil
-                    }
-                    
-                    switch indexPath.section {
-                    case 0:
-                        return ReservationDate(
-                            date: selectedDate.date,
-                            type: .startDate
-                        )
-                    case 1:
-                        return ReservationDate(
-                            date: selectedDate.date,
-                            type: .endDate
-                        )
-                    default:
-                        return nil
-                    }
-                },
-            deselectedDate: self.collectionView.rx.itemDeselected
-                .asObservable()
-                .compactMap { indexPath -> ReservationTimeSection? in
-                    switch indexPath.section {
-                    case 0:
-                        return ReservationTimeSection.startDate
-                    case 1:
-                        return ReservationTimeSection.endDate
-                    default:
-                        return nil
-                    }
-                }
+            selectedDate: self.transformSelectedItemToInput(),
+            deselectedDate: self.transformDeselectedItemToInput()
         )
         
         let output = viewModel.transform(input: input)
@@ -110,11 +74,7 @@ final class SelectReservationDateViewController: BaseViewController {
             .compactMap { $0 }
             .withUnretained(self)
             .subscribe(onNext: { owner, reservationDate in
-                guard let indexPath = owner.dataSource?.indexPath(for: reservationDate) else {
-                    return
-                }
-                owner.deselectSectionItem(owner.collectionView, indexPath: indexPath)
-                owner.collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .centeredHorizontally)
+                owner.updateNewSelectDate(reservationDate)
             })
             .disposed(by: disposeBag)
         
@@ -122,16 +82,20 @@ final class SelectReservationDateViewController: BaseViewController {
             .asObservable()
             .withUnretained(self)
             .subscribe(onNext: { owner, date in
-                let (startDate, endDate) = date
-                owner.loadData(
-                    startDate.map { ReservationDate(date: $0, type: .startDate) },
-                    endDate.map { ReservationDate(date: $0, type: .endDate) }
-                )
+                owner.updateReservationTime(date: date)
             })
             .disposed(by: disposeBag)
         
         output.selectDoneButtonEnable
             .bind(to: self.selectDoneButton.rx.enabled)
+            .disposed(by: disposeBag)
+        
+        output.fetchPossibleDate
+            .asObservable()
+            .withUnretained(self)
+            .subscribe(onNext: { owner, possibleDate in
+                owner.trinapCalenderView.configurePossibleDate(possibleDate: possibleDate)
+            })
             .disposed(by: disposeBag)
     }
     
@@ -172,13 +136,75 @@ final class SelectReservationDateViewController: BaseViewController {
     }
 }
 
+private extension SelectReservationDateViewController {
+    
+    func transformSelectedItemToInput() -> Observable<ReservationDate> {
+        return self.collectionView.rx.itemSelected
+            .asObservable()
+            .compactMap { [weak self] indexPath -> ReservationDate? in
+                guard
+                    let self,
+                    let selectedDate = self.dataSource?.itemIdentifier(for: indexPath)
+                else {
+                    return nil
+                }
+                
+                switch indexPath.section {
+                case 0:
+                    return ReservationDate(
+                        date: selectedDate.date,
+                        type: .startDate
+                    )
+                case 1:
+                    return ReservationDate(
+                        date: selectedDate.date,
+                        type: .endDate
+                    )
+                default:
+                    return nil
+                }
+            }
+    }
+    
+    func transformDeselectedItemToInput() -> Observable<ReservationTimeSection> {
+        return self.collectionView.rx.itemDeselected
+            .asObservable()
+            .compactMap { indexPath -> ReservationTimeSection? in
+                switch indexPath.section {
+                case 0:
+                    return ReservationTimeSection.startDate
+                case 1:
+                    return ReservationTimeSection.endDate
+                default:
+                    return nil
+                }
+            }
+    }
+    
+    func updateNewSelectDate(_ reservationDate: ReservationDate) {
+        guard let indexPath = self.dataSource?.indexPath(for: reservationDate) else {
+            return
+        }
+        self.deselectSectionItem(self.collectionView, indexPath: indexPath)
+        self.collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .centeredHorizontally)
+    }
+    
+    func updateReservationTime(date: ([Date], [Date])) {
+        let (startDate, endDate) = date
+        self.loadData(
+            startDate.map { ReservationDate(date: $0, type: .startDate) },
+            endDate.map { ReservationDate(date: $0, type: .endDate) }
+        )
+    }
+}
+
 extension SelectReservationDateViewController {
     
     typealias ReservationDateDataSource = UICollectionViewDiffableDataSource<ReservationTimeSection, ReservationDate>
     typealias ReservationDateSnapshot = NSDiffableDataSourceSnapshot<ReservationTimeSection, ReservationDate>
     
     func createDataSource() {
-        dataSource = ReservationDateDataSource(
+        self.dataSource = ReservationDateDataSource(
             collectionView: collectionView,
             cellProvider: { collectionView, indexPath, item in
                 let cell = collectionView.dequeueCell(TimeCell.self, for: indexPath)
@@ -187,7 +213,7 @@ extension SelectReservationDateViewController {
             }
         )
         
-        dataSource?.supplementaryViewProvider = { collectionView, kind, indexPath in
+        self.dataSource?.supplementaryViewProvider = { collectionView, kind, indexPath in
             guard
                 kind == UICollectionView.elementKindSectionHeader,
                 let view = collectionView.dequeueReusableSupplementaryView(
@@ -209,7 +235,7 @@ extension SelectReservationDateViewController {
         snapshot.appendSections([.startDate, .endDate])
         snapshot.appendItems(startDate, toSection: .startDate)
         snapshot.appendItems(endDate, toSection: .endDate)
-        dataSource?.apply(snapshot)
+        self.dataSource?.apply(snapshot)
     }
     
     func createLayout() -> UICollectionViewCompositionalLayout {
@@ -260,7 +286,7 @@ extension SelectReservationDateViewController {
 
 extension SelectReservationDateViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
-        deselectSectionItem(collectionView, indexPath: indexPath)
+        self.deselectSectionItem(collectionView, indexPath: indexPath)
         collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
         
         return true
@@ -278,20 +304,5 @@ extension SelectReservationDateViewController: UICollectionViewDelegate {
         if let indexPath = selectedItemIndexPath.last {
             collectionView.deselectItem(at: indexPath, animated: false)
         }
-    }
-    
-    // TODO: Test code 제거
-    func factoryDate() -> [Date] {
-        var calendar = Calendar.current
-        
-        let date = Date()
-        let year = calendar.component(.year, from: date)
-        let month = calendar.component(.month, from: date)
-        let day = calendar.component(.day, from: date)
-        let newDate = calendar.date(from: DateComponents(year: year, month: month, day: day)) ?? Date()
-        let newDate2 = calendar.date(from: DateComponents(year: year, month: month, day: day+2)) ?? Date()
-        let newDate3 = calendar.date(from: DateComponents(year: year, month: month, day: day+3)) ?? Date()
-        
-        return [newDate, newDate2, newDate3]
     }
 }

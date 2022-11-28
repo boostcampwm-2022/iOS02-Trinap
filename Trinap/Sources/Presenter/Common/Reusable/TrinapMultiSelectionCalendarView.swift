@@ -1,5 +1,5 @@
 //
-//  TrinapMutiSelectionCalendarView.swift
+//  TrinapMultiSelectionCalendarView.swift
 //  Trinap
 //
 //  Created by ByeongJu Yu on 2022/11/27.
@@ -11,7 +11,7 @@ import UIKit
 import HorizonCalendar
 import SnapKit
 
-final class TrinapMutiSelectionCalendarView: BaseView {
+final class TrinapMultiSelectionCalendarView: BaseView {
     
     // MARK: - UI
     private lazy var calendarView = CalendarView(initialContent: configureCalendarView()).than {
@@ -56,7 +56,7 @@ final class TrinapMutiSelectionCalendarView: BaseView {
 }
 
 // MARK: - Private Functions
-private extension TrinapMutiSelectionCalendarView {
+private extension TrinapMultiSelectionCalendarView {
     
     func configureSelectionHandler() {
         calendarView.daySelectionHandler = { [weak self] day in
@@ -145,21 +145,21 @@ private extension TrinapMutiSelectionCalendarView {
         )
     }
     
-    func filterPreviousDate(with possibleDate: [Date]) -> [Date] {
+    private func filterPreviousDate(with possibleDate: [Date]) -> [Date] {
         return possibleDate.filter { date in
-            let year = self.calendar.component(.year, from: date)
-            
-            return self.calendar.component(.year, from: Date()) == year
-        }
-        .filter { date in
-            let month = self.calendar.component(.month, from: date)
-            
-            return self.calendar.component(.month, from: Date()) == month
-        }
-        .filter { date in
-            let day = self.calendar.component(.day, from: date)
-            
-            return self.calendar.component(.day, from: Date()) <= day
+            let dateComponents = self.calendar.dateComponents([.year, .month, .day], from: date)
+            guard
+                let year = dateComponents.year,
+                let month = dateComponents.month,
+                let day = dateComponents.day
+            else {
+                return false
+            }
+            return (
+                self.calendar.component(.year, from: Date()) == year &&
+                self.calendar.component(.month, from: Date()) == month &&
+                self.calendar.component(.day, from: Date()) <= day
+            )
         }
     }
     

@@ -13,7 +13,7 @@ import RxRelay
 import SnapKit
 
 final class TrinapSingleSelectionCalendarView: BaseView {
-
+    
     // MARK: - UI
     private lazy var calendarView = CalendarView(initialContent: configureCalendarView()).than {
         $0.backgroundColor = TrinapAsset.background.color
@@ -25,7 +25,7 @@ final class TrinapSingleSelectionCalendarView: BaseView {
     private var selectedDate: Date?
     private var possibleDate: [Date] = []
     let selectedSingleDate = BehaviorRelay<Date?>(value: nil)
-    
+     
     // MARK: - Initializers
     init() {
         super.init(frame: .zero)
@@ -50,7 +50,7 @@ final class TrinapSingleSelectionCalendarView: BaseView {
         self.selectedDate = self.isCurrentDate(date: self.possibleDate.first) ? Date() : self.possibleDate.first
         
         guard let date = self.selectedDate else { return }
-
+        
         self.selectedSingleDate.accept(date)
         self.calendarView.setContent(self.configureCalendarView())
     }
@@ -81,9 +81,9 @@ private extension TrinapSingleSelectionCalendarView {
     
     func configureCalendarView() -> CalendarViewContent {
         calendar.locale = Locale(identifier: "ko_KR")
-
+        
         let (startDate, endDate) = self.calculateCurrentMonth()
-                
+        
         return CalendarViewContent(
             calendar: calendar,
             visibleDateRange: startDate...endDate,
@@ -104,7 +104,7 @@ private extension TrinapSingleSelectionCalendarView {
         
         if self.possibleDate.contains(where: { calendar.component(.day, from: $0) == day.day }) {
             if let selectedDate = self.selectedDate,
-                calendar.component(.day, from: selectedDate) == day.day {
+               calendar.component(.day, from: selectedDate) == day.day {
                 invariantViewProperties.font = TrinapFontFamily.Pretendard.bold.font(size: 16)
                 invariantViewProperties.textColor = TrinapAsset.white.color
                 invariantViewProperties.backgroundShapeDrawingConfig.fillColor = TrinapAsset.primary.color
@@ -148,19 +148,19 @@ private extension TrinapSingleSelectionCalendarView {
     
     private func filterPreviousDate(with possibleDate: [Date]) -> [Date] {
         return possibleDate.filter { date in
-            let year = self.calendar.component(.year, from: date)
-            
-            return self.calendar.component(.year, from: Date()) == year
-        }
-        .filter { date in
-            let month = self.calendar.component(.month, from: date)
-            
-            return self.calendar.component(.month, from: Date()) == month
-        }
-        .filter { date in
-            let day = self.calendar.component(.day, from: date)
-            
-            return self.calendar.component(.day, from: Date()) <= day
+            let dateComponents = self.calendar.dateComponents([.year, .month, .day], from: date)
+            guard
+                let year = dateComponents.year,
+                let month = dateComponents.month,
+                let day = dateComponents.day
+            else {
+                return false
+            }
+            return (
+                self.calendar.component(.year, from: Date()) == year &&
+                self.calendar.component(.month, from: Date()) == month &&
+                self.calendar.component(.day, from: Date()) <= day
+            )
         }
     }
     

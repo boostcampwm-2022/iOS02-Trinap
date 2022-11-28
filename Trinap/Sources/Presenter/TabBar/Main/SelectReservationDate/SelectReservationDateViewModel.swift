@@ -12,6 +12,10 @@ import RxCocoa
 import RxRelay
 import RxSwift
 
+protocol SelectReservationDateViewModelDelegate: AnyObject {
+    func selectedReservationDate(startDate: Date, endDate: Date)
+}
+
 final class SelectReservationDateViewModel: ViewModelType {
     
     struct Input {
@@ -25,6 +29,7 @@ final class SelectReservationDateViewModel: ViewModelType {
         let newSelectDate: Observable<ReservationDate?>
         let reservationTime: Observable<([Date], [Date])>
         let selectDoneButtonEnable: Observable<Bool>
+        let fetchPossibleDate: Driver<[Date]>
     }
     
     // MARK: - Properties
@@ -32,15 +37,20 @@ final class SelectReservationDateViewModel: ViewModelType {
     private var selectedStartDate = BehaviorRelay<ReservationDate?>(value: nil)
     private var selectedEndDate = BehaviorRelay<ReservationDate?>(value: nil)
     weak var coordinator: MainCoordinator?
+    weak var delegate: SelectReservationDateViewModelDelegate?
     private var createReservationDateUseCase: CreateReservationDateUseCase
+    private var possibleDate: BehaviorRelay<[Date]>
     
     // MARK: - Initializers
     init(
         createReservationDateUseCase: CreateReservationDateUseCase,
-        coordinator: MainCoordinator
+        coordinator: MainCoordinator,
+        with possibleDate: [Date]
     ) {
         self.createReservationDateUseCase = createReservationDateUseCase
         self.coordinator = coordinator
+        self.possibleDate = BehaviorRelay<[Date]>(value: possibleDate)
+        self.possibleDate.accept(possibleDate)
     }
     
     // MARK: - Methods
@@ -48,7 +58,13 @@ final class SelectReservationDateViewModel: ViewModelType {
         input.selectDoneButtonTap
             .withUnretained(self)
             .subscribe(onNext: { owner, _ in
-                owner.coordinator?.dismissSelectReservationDateViewController()
+                guard
+                    let startDate = owner.selectedStartDate.value?.date,
+                    let endDate = owner.selectedEndDate.value?.date
+                else {
+                    return
+                }
+                owner.delegate?.selectedReservationDate(startDate: startDate, endDate: endDate)
             })
             .disposed(by: disposeBag)
         
@@ -70,50 +86,9 @@ final class SelectReservationDateViewModel: ViewModelType {
             .map { owner, selectedDate -> ReservationDate? in
                 switch selectedDate.type {
                 case .startDate:
-                    owner.selectedStartDate.accept(selectedDate)
-                    if let endDate = owner.selectedEndDate.value {
-                        let newDate = owner.createReservationDateUseCase.selectedStartDate(
-                            startDate: selectedDate,
-                            endDate: endDate
-                        )
-                        
-                        if newDate != nil {
-                            owner.selectedEndDate.accept(newDate)
-                        }
-                        
-                        return newDate
-                    }
-                    
-                    let newDate = owner.createReservationDateUseCase.createReservationDate(
-                        date: selectedDate.date,
-                        minute: 30,
-                        type: .endDate
-                    )
-                    owner.selectedEndDate.accept(newDate)
-                    
-                    return newDate
+                    return owner.selectedStartDate(selectedDate)
                 case .endDate:
-                    owner.selectedEndDate.accept(selectedDate)
-                    if let startDate = owner.selectedStartDate.value {
-                        let newDate = owner.createReservationDateUseCase.selectedEndDate(
-                            startDate: startDate,
-                            endDate: selectedDate
-                        )
-                        
-                        if newDate != nil {
-                            owner.selectedStartDate.accept(newDate)
-                        }
-                        return newDate
-                    }
-                    
-                    let newDate = owner.createReservationDateUseCase.createReservationDate(
-                        date: selectedDate.date,
-                        minute: -30,
-                        type: .startDate
-                    )
-                    owner.selectedStartDate.accept(newDate)
-                    
-                    return newDate
+                    return owner.selectedEndDate(selectedDate)
                 }
             }
         
@@ -142,10 +117,66 @@ final class SelectReservationDateViewModel: ViewModelType {
                 return false
             }
         
+        let fetchPossibleDate = self.possibleDate
+            .asDriver()
+        
         return Output(
             newSelectDate: newSelectDate,
             reservationTime: reservationTime,
-            selectDoneButtonEnable: selectDoneButtonEnable
+            selectDoneButtonEnable: selectDoneButtonEnable,
+            fetchPossibleDate: fetchPossibleDate
         )
+    }
+}
+
+// MARK: - Private Functions
+private extension SelectReservationDateViewModel {
+    func selectedStartDate(_ selectedDate: ReservationDate) -> ReservationDate? {
+        self.selectedStartDate.accept(selectedDate)
+        if let endDate = self.selectedEndDate.value {
+            let newDate = self.createReservationDateUseCase.selectedStartDate(
+                startDate: selectedDate,
+                endDate: endDate
+            )
+            
+            if newDate != nil {
+                self.selectedEndDate.accept(newDate)
+            }
+            
+            return newDate
+        }
+        
+        let newDate = self.createReservationDateUseCase.createReservationDate(
+            date: selectedDate.date,
+            minute: 30,
+            type: .endDate
+        )
+        self.selectedEndDate.accept(newDate)
+        
+        return newDate
+    }
+    
+    func selectedEndDate(_ selectedDate: ReservationDate) -> ReservationDate? {
+        self.selectedEndDate.accept(selectedDate)
+        if let startDate = self.selectedStartDate.value {
+            let newDate = self.createReservationDateUseCase.selectedEndDate(
+                startDate: startDate,
+                endDate: selectedDate
+            )
+            
+            if newDate != nil {
+                self.selectedStartDate.accept(newDate)
+            }
+            return newDate
+        }
+        
+        let newDate = self.createReservationDateUseCase.createReservationDate(
+            date: selectedDate.date,
+            minute: -30,
+            type: .startDate
+        )
+        self.selectedStartDate.accept(newDate)
+        
+        return newDate
     }
 }
