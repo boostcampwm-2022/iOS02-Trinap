@@ -41,7 +41,7 @@ extension MainCoordinator {
                     reviewRepository: DefaultReviewRepository()),
                 coordinator: self
             ))
-        self.navigationController.setNavigationBarHidden(false, animated: false)
+        self.navigationController.setNavigationBarHidden(true, animated: false)
         self.navigationController.pushViewController(viewController, animated: true)
     }
     
@@ -52,6 +52,9 @@ extension MainCoordinator {
         let viewModel = SearchViewModel(
             searchLocationUseCase: DefaultSearchLocationUseCase(
                 mapService: DefaultMapRepository()
+            ),
+            fetchCurrentLocationUseCase: DefaultFetchCurrentLocationUseCase(
+                mapRepository: DefaultMapRepository()
             ),
             coordinator: self,
             searchText: searchText,
@@ -70,6 +73,11 @@ extension MainCoordinator {
     
     func popViewController() {
         navigationController.popViewController(animated: true)
+        
+    }
+    
+    func showDetailPhotographerViewController(userId: String) {
+        Logger.print(userId)
     }
     
 }
