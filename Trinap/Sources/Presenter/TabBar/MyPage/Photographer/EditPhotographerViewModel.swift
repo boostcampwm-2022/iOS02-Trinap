@@ -117,6 +117,16 @@ extension EditPhotographerViewModel {
         let reviews = self.fetchReviewUseCase.fetchReviews(photographerUserId: nil)
         return Observable.zip(summary, reviews)
             .map { summary, reviews in
+                guard !summary.rating.isNaN
+                else {
+                    return ReviewInformation(
+                        summary: ReviewSummary(
+                            rating: 0.0,
+                            count: summary.count
+                        ),
+                        reviews: reviews
+                    )
+                }
                 return ReviewInformation(summary: summary, reviews: reviews)
             }
     }
