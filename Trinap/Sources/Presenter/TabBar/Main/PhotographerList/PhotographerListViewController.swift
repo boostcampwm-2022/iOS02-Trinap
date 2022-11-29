@@ -153,7 +153,7 @@ extension PhotographerListViewController {
                 .subscribe(onNext: { [weak self] _ in
                     self?.viewModel.showDetailPhotographer(userId: itemIdentifier.photographerUserId)
                 })
-                .disposed(by: cell.db)
+                .disposed(by: cell.disposeBag)
             
             return cell
         }
