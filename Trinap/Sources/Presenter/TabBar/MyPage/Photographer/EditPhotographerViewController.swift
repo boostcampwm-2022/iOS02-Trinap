@@ -162,7 +162,7 @@ extension EditPhotographerViewController {
         collectionView.allowsMultipleSelection = true
     }
     
-    private func generateSnapShot(_ data: [EditPhotographerDataSource]) -> Snapshot {
+    private func generateSnapShot(_ data: [PhotographerDataSource]) -> Snapshot {
         var snapshot = Snapshot()
         
         data.forEach { items in

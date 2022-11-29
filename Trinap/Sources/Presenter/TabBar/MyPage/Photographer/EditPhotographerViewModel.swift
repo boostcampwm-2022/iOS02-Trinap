@@ -11,7 +11,7 @@ import Foundation
 import RxCocoa
 import RxSwift
 
-typealias EditPhotographerDataSource = [PhotographerSection: [PhotographerSection.Item]]
+typealias PhotographerDataSource = [PhotographerSection: [PhotographerSection.Item]]
 
 final class EditPhotographerViewModel: ViewModelType {
     
@@ -24,7 +24,7 @@ final class EditPhotographerViewModel: ViewModelType {
     }
     
     struct Output {
-        let dataSource: Driver<[EditPhotographerDataSource]>
+        let dataSource: Driver<[PhotographerDataSource]>
     }
     
     // MARK: - Properties
@@ -75,7 +75,7 @@ final class EditPhotographerViewModel: ViewModelType {
             .share()
         
         let dataSource = Observable.combineLatest(input.isEditable, input.tabState, photographer, reviewInformation)
-            .map { [weak self] editable, section, photographer, review -> [EditPhotographerDataSource] in
+            .map { [weak self] editable, section, photographer, review -> [PhotographerDataSource] in
                 guard let self else { return [] }
                 
                 return self.mappingDataSource(isEditable: editable, state: section, photographer: photographer, review: review)
@@ -100,7 +100,7 @@ extension EditPhotographerViewModel {
     private func fetchPhotographer() -> Observable<PhotographerUser> {
         return self.fetchUserUseCase.fetchUserInfo()
             .flatMap { user in
-                self.fetchPhotographerUseCase.fetch(photographerId: user.userId)
+                self.fetchPhotographerUseCase.fetch(photographerUserId: user.userId)
                     .flatMap { photographer in
                         return self.mapRepository.fetchLocationName(
                             using: Coordinate(lat: photographer.latitude, lng: photographer.latitude)
@@ -121,7 +121,7 @@ extension EditPhotographerViewModel {
             }
     }
     
-    private func mappingDataSource(isEditable: Bool, state: Int, photographer: PhotographerUser, review: ReviewInformation) -> [EditPhotographerDataSource] {
+    private func mappingDataSource(isEditable: Bool, state: Int, photographer: PhotographerUser, review: ReviewInformation) -> [PhotographerDataSource] {
         
         switch state {
         case 0:
@@ -145,19 +145,19 @@ extension EditPhotographerViewModel {
 // MARK: - MappingDataSource
 extension EditPhotographerViewModel {
     
-    private func mappingProfileDataSource(photographer: PhotographerUser) -> EditPhotographerDataSource {
+    private func mappingProfileDataSource(photographer: PhotographerUser) -> PhotographerDataSource {
         return [PhotographerSection.profile: [PhotographerSection.Item.profile(photographer)]]
     }
     
-    private func mappingPictureDataSource(isEditable: Bool, photographer: PhotographerUser) -> EditPhotographerDataSource {
+    private func mappingPictureDataSource(isEditable: Bool, photographer: PhotographerUser) -> PhotographerDataSource {
         return [PhotographerSection.photo: updatePictureState(isEditable: isEditable, pictures: photographer.pictures).map { PhotographerSection.Item.photo($0) } ]
     }
     
-    private func mappingDetailDataSource(photographer: PhotographerUser) -> EditPhotographerDataSource {
+    private func mappingDetailDataSource(photographer: PhotographerUser) -> PhotographerDataSource {
         return [PhotographerSection.detail: [PhotographerSection.Item.detail(photographer)]]
     }
     
-    private func mappingReviewDataSource(review: ReviewInformation) -> [EditPhotographerDataSource] {
+    private func mappingReviewDataSource(review: ReviewInformation) -> [PhotographerDataSource] {
         return [ [.detail: [.summaryReview(review.summary)]] ] +
             [ [.review: review.reviews.map { PhotographerSection.Item.review($0) } ] ]
     }
