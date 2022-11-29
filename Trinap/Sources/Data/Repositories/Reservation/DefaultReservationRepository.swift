@@ -34,21 +34,21 @@ final class DefaultReservationRepository: ReservationRepository {
         return fireStore.getDocument(
             collection: .reservations,
             field: "photographerUserId",
-            condition: [userId]
+            in: [userId]
         )
         .map { $0.compactMap { $0.toObject(ReservationDTO.self)?.toMapper() } }
         .asObservable()
     }
     
     func fetchSentReservations() -> Observable<[Reservation.Mapper]> {
-        guard let token = keychainManager.getToken(with: .userId) else {
+        guard let userId = keychainManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
         }
         
         return fireStore.getDocument(
             collection: .reservations,
             field: "customerUserId",
-            condition: [token]
+            in: [userId]
         )
         .map { $0.compactMap { $0.toObject(ReservationDTO.self)?.toMapper() } }
         .asObservable()
