@@ -62,13 +62,14 @@ final class DefaultMapRepository: NSObject, MapRepository {
             geocoder.reverseGeocodeLocation(location) { placemarks, error in
                 
                 guard let address: [CLPlacemark] = placemarks,
-                      let name = address.first?.name
+                      let locality = address.first?.locality,
+                      let subLocality = address.first?.subLocality
                 else {
                     observable.onError(LocalError.addressError)
                     return
                 }
                 
-                observable.onNext(name)
+                observable.onNext("\(locality) \(subLocality)")
             }
             return Disposables.create()
         }

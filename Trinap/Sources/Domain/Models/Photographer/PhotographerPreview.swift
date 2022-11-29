@@ -42,3 +42,10 @@ struct PhotographerPreview {
         self.rating = rating
     }
 }
+
+extension PhotographerPreview: Hashable {
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(photographerId)
+    }
+}
