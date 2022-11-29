@@ -72,3 +72,11 @@ final class PhotographerListViewModel: ViewModelType {
         return Output(previews: previews)
     }
 }
+
+extension PhotographerListViewModel {
+    
+    func showDetailPhotographer(userId: String) {
+        //TODO: 여기서 userId만 넘겨줘도 괜찮을까요?
+        coordinator?.showDetailPhotographerViewController(userId: userId)
+    }
+}
