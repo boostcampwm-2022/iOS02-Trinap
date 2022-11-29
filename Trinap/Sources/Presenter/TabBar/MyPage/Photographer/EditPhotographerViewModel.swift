@@ -100,7 +100,7 @@ extension EditPhotographerViewModel {
     private func fetchPhotographer() -> Observable<PhotographerUser> {
         return self.fetchUserUseCase.fetchUserInfo()
             .flatMap { user in
-                self.fetchPhotographerUseCase.fetch(photographerId: user.userId)
+                self.fetchPhotographerUseCase.fetch(photographerUserId: user.userId)
                     .flatMap { photographer in
                         return self.mapRepository.fetchLocationName(
                             using: Coordinate(lat: photographer.latitude, lng: photographer.latitude)
