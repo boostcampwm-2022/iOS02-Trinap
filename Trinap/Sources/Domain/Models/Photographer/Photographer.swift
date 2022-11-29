@@ -16,7 +16,7 @@ struct Photographer {
     let tags: [TagType]
     let pictures: [String]
     let pricePerHalfHour: Int
-    let possibleDate: [Date]
+    var possibleDate: [Date]
     
     // MARK: - Methods
     static func createDefaultPhotographer() -> Photographer {
