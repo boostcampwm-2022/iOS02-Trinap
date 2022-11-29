@@ -91,7 +91,7 @@ extension MainCoordinator {
         
     }
     
-    func showDetailPhotographerViewController(userId: String) {
+    func showDetailPhotographerViewController(userId: String, searchCoordinate: Coordinate) {
         Logger.print(userId)
     }
 }
