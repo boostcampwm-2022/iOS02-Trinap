@@ -29,28 +29,42 @@ final class DefaultFetchReviewUseCase: FetchReviewUseCase {
     
     // MARK: - Methods
     /// 리뷰 평균 별점
-    func fetchAverageReview(photographerId: String) -> Observable<Double> {
+    func fetchAverageReview(photographerId: String?) -> Observable<ReviewSummary> {
+        guard let photographerId else {
+            return reviewRepository.fetchReview(target: .photographer)
+                .withUnretained(self)
+                .map { owner, reviews in
+                    owner.mappingReviewSummary(reviews)
+                }
+                .asObservable()
+        }
         return reviewRepository.fetchReviews(id: photographerId, target: .photographer)
-            .map {
-                let reviewRatings = $0.map { $0.rating }
-                let averageRating = Double(reviewRatings.reduce(0, +)) / Double(reviewRatings.count)
-                return round(averageRating * 10) / 10
+            .withUnretained(self)
+            .map { owner, reviews in
+                owner.mappingReviewSummary(reviews)
             }
             .asObservable()
     }
     
     /// 유저가 작성한 리뷰 확인
-    func fetchReviews(userId: String) -> Observable<[UserReview]> {
-        return reviewRepository.fetchReviews(id: userId, target: .customer)
-            .withUnretained(self)
-            .flatMap { owner, reviews in
-                return owner.mappingReviewWithUser(reviews: reviews)
-            }
-    }
+//    func fetchReviews(userId: String) -> Observable<[UserReview]> {
+//        return reviewRepository.fetchReviews(id: userId, target: .customer)
+//            .withUnretained(self)
+//            .flatMap { owner, reviews in
+//                return owner.mappingReviewWithUser(reviews: reviews)
+//            }
+//    }
     
     /// 작가에게 작성된 리뷰 확인
-    func fetchReviews(photographerId: String) -> Observable<[PhotographerReview]> {        
-        return reviewRepository.fetchReviews(id: photographerId, target: .photographer)
+    func fetchReviews(photographerUserId: String?) -> Observable<[UserReview]> {
+        guard let photographerUserId else {
+            return reviewRepository.fetchReview(target: .photographer)
+                .flatMap { reviews in
+                    return self.mappingReviewOfPhotographer(reviews: reviews)
+                }
+        }
+        
+        return reviewRepository.fetchReviews(id: photographerUserId, target: .photographer)
             .flatMap { reviews in
                 return self.mappingReviewOfPhotographer(reviews: reviews)
             }
@@ -59,24 +73,47 @@ final class DefaultFetchReviewUseCase: FetchReviewUseCase {
 
 extension DefaultFetchReviewUseCase {
 
-    private func mappingReviewWithUser(reviews: [Review]) -> Observable<[UserReview]> {
-        
+//    private func mappingReviewWithUser(reviews: [Review]) -> Observable<[UserReview]> {
+//
+//        /// 중복된 id제거
+//        let photographerIds = reviews.map { $0.photographerUserId }.removingDuplicates()
+//
+//        return photographerIds.isEmpty ? .just([]) : photographerRepository.fetchPhotographers(ids: photographerIds)
+//            .map { photographers in
+//                var userReviews: [UserReview] = []
+//
+//                for photographer in photographers {
+//                    for review in reviews where review.photographerUserId == photographer.photographerUserId {
+//
+//                        let userReview = UserReview(
+//                            photorgrapher: photographer,
+//                            contents: review.contents,
+//                            rating: review.rating
+//                        )
+//                        userReviews.append(userReview)
+//                    }
+//                }
+//
+//                return userReviews
+//            }
+//    }
+    
+    private func mappingReviewOfPhotographer(reviews: [Review]) -> Observable<[UserReview]> {
         /// 중복된 id제거
-        let photographerIds = reviews.map { $0.photographerUserId }.removingDuplicates()
-
-        return photographerIds.isEmpty ? .just([]) : photographerRepository.fetchPhotographers(ids: photographerIds)
-            .map { photographers in
+        let userIds = reviews.map { $0.creatorUserId }.removingDuplicates()
+        
+        return userIds.isEmpty ? .just([]) : userRepository.fetchUsers(userIds: userIds)
+            .map { users in
+                
                 var userReviews: [UserReview] = []
                 
-                for photographer in photographers {
-                    print(photographer)
-                    for review in reviews where review.photographerUserId == photographer.photographerUserId {
-                        
+                for user in users {
+                    for review in reviews where review.creatorUserId == user.userId {
                         let userReview = UserReview(
-                            photorgrapher: photographer,
+                            user: user,
                             contents: review.contents,
-                            rating: review.rating
-                        )
+                            rating: review.rating)
+                        
                         userReviews.append(userReview)
                     }
                 }
@@ -85,28 +122,10 @@ extension DefaultFetchReviewUseCase {
             }
     }
     
-    private func mappingReviewOfPhotographer(reviews: [Review]) -> Observable<[PhotographerReview]> {
+    private func mappingReviewSummary(_ reivew: [Review]) -> ReviewSummary {
+        let reviewRatings = reivew.map { $0.rating }
+        let averageRating = Double(reviewRatings.reduce(0, +)) / Double(reviewRatings.count)
         
-        /// 중복된 id제거
-        let userIds = reviews.map { $0.creatorUserId }.removingDuplicates()
-
-        return userIds.isEmpty ? .just([]) : userRepository.fetchUsers(userIds: userIds)
-            .map { users in
-                
-                var photographerReviews: [PhotographerReview] = []
-                
-                for user in users {
-                    for review in reviews where review.creatorUserId == user.userId {
-                        let photographerReview = PhotographerReview(
-                            user: user,
-                            contents: review.contents,
-                            rating: review.rating)
-                        
-                        photographerReviews.append(photographerReview)
-                    }
-                }
-                
-                return photographerReviews
-            }
+        return ReviewSummary(rating: round(averageRating * 10) / 10, count: reviewRatings.count)
     }
 }

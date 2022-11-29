@@ -13,7 +13,7 @@ enum ReviewTarget: String {
     case photographer = "photographerUserId"
 }
 
-struct Review: Equatable {
+struct Review: Equatable, Hashable {
     let reviewId, photographerUserId, creatorUserId, contents, status: String
     let rating: Int
 }

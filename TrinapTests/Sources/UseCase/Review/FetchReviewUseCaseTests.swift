@@ -8,6 +8,7 @@
 
 import XCTest
 
+import RxBlocking
 import RxSwift
 import RxTest
 
@@ -15,6 +16,7 @@ import RxTest
 
 final class FetchReviewUseCaseTests: XCTestCase {
     
+    // MARK: - Properteis
     private var fetchReviewUseCase: FetchReviewUseCase!
     
     private var scheduler: TestScheduler!
@@ -42,15 +44,19 @@ final class FetchReviewUseCaseTests: XCTestCase {
     }
     
     func test_fetch_reviews() {
+        
         let reviews = scheduler.createObserver(Bool.self)
         
         self.scheduler
-            .createColdObservable([
-                .next(10, ""),
-                .next(20, "363B9925-06AC-495E-9DE4-41D34F72BBEE")
+            .createHotObservable([
+                .next(210, ""),
+                .next(300, "363B9925-06AC-495E-9DE4-41D34F72BBEE")
             ])
-            .flatMap {
-                return self.fetchReviewUseCase.fetchReviews(photographerId: $0).map { _ in true }.catchAndReturn(false)
+            .withUnretained(self)
+            .flatMap { onwer, id in
+                return onwer.fetchReviewUseCase.fetchReviews(photographerId: id)
+                    .map { _ in true }
+                    .catchAndReturn(false)
             }
             .bind(to: reviews)
             .disposed(by: disposeBag)
@@ -58,8 +64,8 @@ final class FetchReviewUseCaseTests: XCTestCase {
         self.scheduler.start()
         
         XCTAssertEqual(reviews.events, [
-            .next(10, false),
-            .next(20, true)
+            .next(210, false),
+            .next(300, true)
         ])
     }
 }

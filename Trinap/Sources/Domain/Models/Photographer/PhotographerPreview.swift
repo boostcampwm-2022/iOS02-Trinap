@@ -28,15 +28,24 @@ struct PhotographerPreview {
         self.rating = rating
     }
     
-    init(photographer: Photographer,
-         location: String,
-         name: String,
-         rating: Double) {
+    init(
+        photographer: Photographer,
+        location: String,
+        name: String,
+        rating: Double
+    ) {
         self.photographerId = photographer.photographerId
         self.photographerUserId = photographer.photographerUserId
         self.name = name
         self.pictures = photographer.pictures
         self.location = location
         self.rating = rating
+    }
+}
+
+extension PhotographerPreview: Hashable {
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(photographerId)
     }
 }

@@ -14,10 +14,7 @@ final class PhotographerListViewModel: ViewModelType {
     
     struct Input {
         let searchTrigger: Observable<Void>
-//        var coordinate: Observable<Coordinate?>
-//        var tagType: Observable<TagType>
         var tagType: Observable<TagType>
-//        var searchText: BehaviorRelay<String>
     }
 
     struct Output {
@@ -42,15 +39,7 @@ final class PhotographerListViewModel: ViewModelType {
     }
 
     // MARK: - Methods
-    func transform(input: Input) -> Output {
-//        coordinate
-//            .subscribe(onNext: { print("야!@#!@#!@#!@!#\($0)")})
-//            .disposed(by: disposeBag)
-//        input.tagType.do(onNext: {})
-//        input.tagType
-//            .drive(onNext: { print($0)})
-//            .disposed(by: disposeBag)
-        
+    func transform(input: Input) -> Output {        
         input.searchTrigger
             .subscribe(onNext: { [weak self] _ in
                 guard let self else { return }
@@ -61,7 +50,6 @@ final class PhotographerListViewModel: ViewModelType {
             })
             .disposed(by: disposeBag)
         
-        //TODO: tagtype 초기 값이 .all로 설정이 안돼서 coordinate가 들어와도 실행이 되지 않는 상황
         let previews = Observable.combineLatest(
             self.coordinate,
             input.tagType.startWith(.all)
@@ -70,15 +58,8 @@ final class PhotographerListViewModel: ViewModelType {
             .withUnretained(self)
             .flatMap { (owner, val) -> Observable<[PhotographerPreview]> in
                 let (coordinate, type) = val
-                print("와 여기까지 들어와? \(val)")
                 return owner.previewsUseCase.fetch(coordinate: coordinate, type: type)
             }
-            .debug()
-            .map { i -> [PhotographerPreview] in
-                print("패치됨. \(i)")
-                return i
-            }
-            .debug()
             .asDriver(onErrorJustReturn: [])
         
         return Output(previews: previews)

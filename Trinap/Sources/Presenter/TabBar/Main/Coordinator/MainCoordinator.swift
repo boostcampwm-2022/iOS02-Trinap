@@ -77,9 +77,9 @@ extension MainCoordinator {
         )
         
         self.navigationController.setNavigationBarHidden(false, animated: false)
-//        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
-        self.navigationController.pushViewController(viewController, animated: false)
-//        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
+        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(viewController, animated: true)
+        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
 
     }
     
