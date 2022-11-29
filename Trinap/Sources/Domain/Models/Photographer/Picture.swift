@@ -12,4 +12,3 @@ struct Picture: Hashable {
     let isEditable: Bool
     let picture: String?
 }
-
