@@ -56,7 +56,7 @@ private extension DefaultFetchReservationPreviewsUseCase {
         let photographerUserIds = reservations.map { $0.photographerUserId }
         let userIds = (customerUserIds + photographerUserIds).removingDuplicates()
         
-        return userRepository.fetchUsers(userIds: userIds)
+        return userRepository.fetchUsersWithMine(userIds: userIds)
     }
     
     func mapToReservationPreview(mappers: [Reservation.Mapper], users: [User]) -> [Reservation.Preview] {
