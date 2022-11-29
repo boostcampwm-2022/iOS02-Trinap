@@ -23,20 +23,34 @@ final class RatingView: BaseView {
     
     private var buttons: [UIButton] = []
     
+    private lazy var starFillImage: UIImage? = {
+        return TrinapAsset.starFillReview.image
+    }()
+    
     private lazy var starImage: UIImage? = {
-        return UIImage(systemName: "star.fill")
+        return TrinapAsset.starReview.image
     }()
     
     private lazy var stackView = UIStackView().than {
         $0.axis = .horizontal
         $0.distribution = .fillEqually
-        $0.backgroundColor = .clear
+        $0.backgroundColor = .white
     }
     
     init(style: RatingStyle) {
         self.style = style
         
         super.init(frame: .zero)
+    }
+    
+    override func layoutIfNeeded() {
+        super.layoutIfNeeded()
+        
+        let inset = frame.width / 10
+        stackView.snp.updateConstraints { make in
+            make.top.bottom.equalToSuperview()
+            make.leading.trailing.equalToSuperview().inset(inset)
+        }
     }
     
     override func configureHierarchy() {
@@ -50,11 +64,11 @@ final class RatingView: BaseView {
         self.addSubview(stackView)
     }
     
-    override func configureConstraints() {        
+    override func configureConstraints() {
+        let inset = frame.width / 10
         stackView.snp.makeConstraints { make in
             make.top.bottom.equalToSuperview()
-            make.leading.equalToSuperview().offset(30)
-            make.trailing.equalToSuperview().offset(-30)
+            make.leading.trailing.equalToSuperview().inset(inset)
         }
     }
     
@@ -64,7 +78,6 @@ final class RatingView: BaseView {
     }
     
     override func bind() {
-        
         self.buttons.enumerated().forEach { index, button in
             button.rx.tap
                 .map { index + 1 }
@@ -74,21 +87,21 @@ final class RatingView: BaseView {
         
         self.currentRate
             .subscribe { [weak self] rate in
-                self?.updateRating(rate: rate)
+                self?.configureRating(rate)
             }
             .disposed(by: disposeBag)
     }
     
-    private func updateRating(rate: Int) {
+    func configureRating(_ rate: Int) {
         
         let starCount = 5
         
         (0..<rate).forEach { i in
-            buttons[i].imageView?.tintColor = TrinapAsset.secondary.color
+            buttons[i].setImage(starFillImage, for: .normal)
         }
         
         (rate..<starCount).forEach { i in
-            buttons[i].imageView?.tintColor = .lightGray
+            buttons[i].setImage(starImage, for: .normal)
         }
     }
     
@@ -99,9 +112,9 @@ final class RatingView: BaseView {
         
         let button = UIButton()
         button.imageView?.contentMode = .scaleAspectFill
-        button.imageView?.tintColor = .lightGray
         button.setPreferredSymbolConfiguration(imageConfiguration, forImageIn: .normal)
         button.setImage(starImage, for: .normal)
+        button.imageView?.tintColor = TrinapAsset.secondary.color
         button.contentMode = .scaleAspectFit
         button.layer.masksToBounds = true
         return button

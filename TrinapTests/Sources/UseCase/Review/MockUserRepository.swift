@@ -14,6 +14,19 @@ import RxSwift
 
 final class MockUserRepository: UserRepository {
     
+    func fetchUsersWithMine(userIds: [String]) -> RxSwift.Observable<[Trinap.User]> {
+        return .just([])
+    }
+    
+    func update(profileImage: String?, nickname: String?, isPhotographer: Bool?) -> RxSwift.Observable<Void> {
+        return .just(())
+    }
+    
+    func createRandomNickname() -> RxSwift.Observable<String> {
+        return .just("")
+    }
+    
+    
     private let mockUser = User(userId: "", nickname: "", profileImage: nil, isPhotographer: false, fcmToken: "", status: .deactivate)
     
     func fetch() -> Observable<User> {

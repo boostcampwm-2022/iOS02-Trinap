@@ -52,7 +52,7 @@ enum MyPageCellType: Hashable {
         case .photographerExposure:
             return "작가 프로필 노출"
         case .nofiticationAuthorization:
-            return "알람 설정"
+            return "알림 설정"
         case .photoAuthorization:
             return "이미지 권한 설정"
         case .locationAuthorization:
