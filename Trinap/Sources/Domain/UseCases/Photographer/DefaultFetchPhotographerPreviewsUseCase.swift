@@ -46,9 +46,6 @@ final class DefaultFetchPhotographerPreviewsUseCase: FetchPhotographerPreviewsUs
                 $0.filter {
                     $0.tags.contains(type)
                 }
-            }.map {
-                Logger.printArray($0)
-                return $0
             }
         return toPreviews(photographers: previews)
     }

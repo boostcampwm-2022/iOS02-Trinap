@@ -48,10 +48,6 @@ final class StarView: BaseView {
         }
     }
     
-    override func configureAttributes() {}
-    
-    override func bind() {}
-    
     func configure(rating: Double) {
         ratingLabel.text = "\(rating)"
     }
