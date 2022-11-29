@@ -14,6 +14,7 @@ final class SearchViewModel: ViewModelType {
     struct Input {
         var searchText: Observable<String>
         var selectedSpace: Observable<Space>
+        var currentLocationTrigger: Observable<Void>
     }
     
     struct Output {
@@ -24,17 +25,20 @@ final class SearchViewModel: ViewModelType {
     let disposeBag = DisposeBag()
     private weak var coordinator: MainCoordinator?
     private let searchLocationUseCase: SearchLocationUseCase
+    private let currentLocationUseCase: FetchCurrentLocationUseCase
     
     weak var searchText: BehaviorRelay<String>?
     weak var coordinate: BehaviorRelay<Coordinate?>?
     // MARK: - Initializer
     init(
         searchLocationUseCase: SearchLocationUseCase,
+        fetchCurrentLocationUseCase: FetchCurrentLocationUseCase,
         coordinator: MainCoordinator,
         searchText: BehaviorRelay<String>,
         coordinate: BehaviorRelay<Coordinate?>
     ) {
         self.searchLocationUseCase = searchLocationUseCase
+        self.currentLocationUseCase = fetchCurrentLocationUseCase
         self.coordinator = coordinator
         self.searchText = searchText
         self.coordinate = coordinate
@@ -61,9 +65,33 @@ final class SearchViewModel: ViewModelType {
             .disposed(by: disposeBag)
         
         guard let coordinate else { return Output(spaces: spaces) }
+        
+        input.currentLocationTrigger
+            .withUnretained(self)
+            .do(onNext: { owner, _ in
+                owner.searchText?.accept("현위치")
+                owner.coordinator?.popViewController()
+            })
+            .flatMap { owner, _ -> Observable<(Coordinate, String)> in
+                owner.currentLocationUseCase.fetchCurrentLocation()
+            }
+            .bind(onNext: { [weak self] coor, text in
+                guard let self else { return }
+                self.searchText?.accept(text)
+                self.coordinate?.accept(coor)
+            })
+            .disposed(by: disposeBag)
+        
         input.selectedSpace
-            .map { Coordinate(lat: $0.lat, lng: $0.lng) }
+            .withUnretained(self)
+            .do(onNext: { owner, _ in
+                owner.coordinator?.popViewController()
+            })
+            .map { _, space -> Coordinate in
+                Coordinate(lat: space.lat, lng: space.lng)
+            }
             .bind(to: coordinate)
+            .disposed(by: disposeBag)
         
         return Output(spaces: spaces)
     }
