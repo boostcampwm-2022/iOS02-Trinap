@@ -16,17 +16,21 @@ struct ReservationDTO: Codable {
     let photographerUserId: String
     let reservationStartDate: Date
     let reservationEndDate: Date
-    let status: String
+    let latitude: Double
+    let longitude: Double
+    let status: Reservation.Status
     
-    // TODO: Date 되어 있는 부분 String으로 변환하는 작업 처리
     // MARK: Methods
-    func toModel() -> Reservation {
-        return Reservation(
-            reservationId: self.reservationId,
-            customerUserId: self.customerUserId,
-            photographerUserId: self.photographerUserId,
-            reservationStartDate: self.reservationStartDate,
-            reservationEndDate: self.reservationEndDate
+    func toMapper() -> Reservation.Mapper {
+        return Reservation.Mapper(
+            reservationId: reservationId,
+            customerUserId: customerUserId,
+            photographerUserId: photographerUserId,
+            reservationStartDate: reservationStartDate,
+            reservationEndDate: reservationEndDate,
+            latitude: latitude,
+            longitude: longitude,
+            status: status
         )
     }
 }
