@@ -17,8 +17,16 @@ final class SearchViewController: BaseViewController {
     
     // MARK: - UI
     private lazy var searchBar = UISearchBar().than {
+        $0.searchTextField.layer.cornerRadius = 20
+        $0.searchTextField.layer.masksToBounds = true
         $0.setImage(UIImage(named: "icSearchNonW"), for: UISearchBar.Icon.search, state: .normal)
         $0.placeholder = "장소를 입력해주세요"
+    }
+    
+    private lazy var currentLocationButton = TrinapButton(style: .secondary).than {
+        $0.setTitle("현재 위치", for: .normal)
+        $0.setTitleColor(TrinapAsset.white.color, for: .normal)
+        $0.titleLabel?.font = TrinapFontFamily.Pretendard.bold.font(size: 16)
     }
     
     private lazy var searchTableView: UITableView = {
@@ -46,6 +54,8 @@ final class SearchViewController: BaseViewController {
     // MARK: - Methods
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        configureBackButton()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -53,15 +63,28 @@ final class SearchViewController: BaseViewController {
     }
     
     override func configureHierarchy() {
-        self.view.addSubviews([searchBar, searchTableView])
+        self.view.addSubviews([
+            searchBar,
+            currentLocationButton,
+            searchTableView
+        ])
     }
     
     override func configureConstraints() {
         searchBar.snp.makeConstraints { make in
             make.top.equalToSuperview()
         }
+        
+        currentLocationButton.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide)
+            make.leading.equalToSuperview().offset(trinapOffset)
+            make.trailing.equalToSuperview().offset(-trinapOffset)
+            make.height.equalTo(36)
+        }
+        
         searchTableView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.horizontalEdges.bottom.equalToSuperview()
+            make.top.equalTo(currentLocationButton.snp.bottom)
         }
     }
     
@@ -89,7 +112,8 @@ final class SearchViewController: BaseViewController {
         
         let input = SearchViewModel.Input(
             searchText: searchBar.rx.text.orEmpty.asObservable(),
-            selectedSpace: selectedSpace
+            selectedSpace: selectedSpace,
+            currentLocationTrigger: currentLocationButton.rx.tap.asObservable()
         )
         
         let output = viewModel.transform(input: input)
@@ -102,6 +126,13 @@ final class SearchViewController: BaseViewController {
                 self?.dataSource?.apply(snapshot, animatingDifferences: true)
             }
             .disposed(by: disposeBag)
+    }
+    
+    private func configureBackButton() {
+        navigationController?.navigationBar.backIndicatorImage = UIImage(systemName: "arrow.backward")
+        navigationController?.navigationBar.backIndicatorTransitionMaskImage = UIImage(systemName: "arrow.backward")
+        navigationController?.navigationBar.tintColor = .black
+        self.navigationController?.navigationBar.topItem?.title = ""
     }
 }
 
