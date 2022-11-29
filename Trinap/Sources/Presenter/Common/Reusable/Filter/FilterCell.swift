@@ -14,6 +14,7 @@ final class FilterCell: BaseCollectionViewCell {
         
     private lazy var titleLabel = UILabel().than {
         $0.font = TrinapFontFamily.Pretendard.regular.font(size: 16)
+        $0.lineBreakMode = .byWordWrapping
         $0.text = "테스트"
     }
     
