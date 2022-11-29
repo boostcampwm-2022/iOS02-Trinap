@@ -82,9 +82,29 @@ final class ReservationCell: BaseTableViewCell {
 private extension ReservationCell {
     
     func configureCell(_ item: Reservation.Preview, byUser user: User) {
+        let reservationStatusContent = item.status.content
+        
         self.profileImageView.setImage(at: user.profileImage)
         self.nicknameLabel.text = user.nickname
         self.dateLabel.text = item.reservationStartDate.toString(type: .yearAndMonth)
-        self.reservationStatusButton.setTitle("예약 확인", for: .normal)
+        self.reservationStatusButton.setTitle(reservationStatusContent.text, for: .normal)
+        self.reservationStatusButton.style = reservationStatusContent.style
+    }
+}
+
+// MARK: - Reservation.Status
+extension Reservation.Status {
+    
+    var content: (text: String, style: TrinapButton.ColorType) {
+        switch self {
+        case .request:
+            return ("예약 요청", .secondary)
+        case .confirm:
+            return ("예약 확정", .primary)
+        case .done:
+            return ("촬영 완료", .black)
+        case .cancel:
+            return ("예약 취소", .error)
+        }
     }
 }
