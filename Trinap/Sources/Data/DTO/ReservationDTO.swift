@@ -14,8 +14,8 @@ struct ReservationDTO: Codable {
     let reservationId: String
     let customerUserId: String
     let photographerUserId: String
-    let reservationStartDate: Date
-    let reservationEndDate: Date
+    let reservationStartDate: String
+    let reservationEndDate: String
     let latitude: Double
     let longitude: Double
     let status: Reservation.Status
@@ -26,8 +26,8 @@ struct ReservationDTO: Codable {
             reservationId: reservationId,
             customerUserId: customerUserId,
             photographerUserId: photographerUserId,
-            reservationStartDate: reservationStartDate,
-            reservationEndDate: reservationEndDate,
+            reservationStartDate: Date.fromStringOrNow(reservationStartDate),
+            reservationEndDate: Date.fromStringOrNow(reservationEndDate),
             latitude: latitude,
             longitude: longitude,
             status: status
