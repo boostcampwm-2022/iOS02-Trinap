@@ -26,7 +26,10 @@ final class ReservationCell: BaseTableViewCell {
         $0.textColor = TrinapAsset.subtext2.color
     }
     
-    private lazy var reservationStatusButton = TrinapButton(style: .primary)
+    private lazy var reservationStatusButton = TrinapButton(style: .primary).than {
+        $0.setTitle("예약 완료", for: .normal)
+        $0.contentEdgeInsets = UIEdgeInsets(top: 4, left: 8, bottom: 4, right: 8)
+    }
     
     // MARK: - Initializers
     
@@ -54,6 +57,7 @@ final class ReservationCell: BaseTableViewCell {
         
         nicknameLabel.snp.makeConstraints { make in
             make.leading.equalTo(self.profileImageView.snp.trailing).offset(padding)
+            make.trailing.lessThanOrEqualTo(self.reservationStatusButton.snp.leading).offset(-padding)
             make.top.equalToSuperview().offset(padding + 2)
         }
         
@@ -71,9 +75,9 @@ final class ReservationCell: BaseTableViewCell {
     func configureCell(_ item: Reservation.Preview, reservationFilter: ReservationFilter) {
         switch reservationFilter {
         case .receive:
-            configureCell(item, byUser: item.customerUser)
+            configureCell(item, byUser: item.customerUser, nicknamePostfix: "고객님")
         case .send:
-            configureCell(item, byUser: item.photographerUser)
+            configureCell(item, byUser: item.photographerUser, nicknamePostfix: "작가님")
         }
     }
 }
@@ -81,12 +85,12 @@ final class ReservationCell: BaseTableViewCell {
 // MARK: - Privates
 private extension ReservationCell {
     
-    func configureCell(_ item: Reservation.Preview, byUser user: User) {
+    func configureCell(_ item: Reservation.Preview, byUser user: User, nicknamePostfix: String) {
         let reservationStatusContent = item.status.content
         
         self.profileImageView.setImage(at: user.profileImage)
-        self.nicknameLabel.text = user.nickname
-        self.dateLabel.text = item.reservationStartDate.toString(type: .yearAndMonth)
+        self.nicknameLabel.text = "\(user.nickname) \(nicknamePostfix)"
+        self.dateLabel.text = item.reservationStartDate.toString(type: .monthAndDate)
         self.reservationStatusButton.setTitle(reservationStatusContent.text, for: .normal)
         self.reservationStatusButton.style = reservationStatusContent.style
     }
