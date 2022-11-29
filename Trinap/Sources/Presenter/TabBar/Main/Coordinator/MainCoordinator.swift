@@ -45,6 +45,21 @@ extension MainCoordinator {
         self.navigationController.pushViewController(viewController, animated: true)
     }
     
+    // TODO: - ViewModel Delegate Setting
+    func showSelectReservationDateViewController(with possibleDate: [Date]) {
+        let viewModel = SelectReservationDateViewModel(
+            createReservationDateUseCase: DefaultCreateReservationDateUseCase(),
+            coordinator: self,
+            with: possibleDate
+        )
+        
+        let viewController = SelectReservationDateViewController(
+            viewModel: viewModel
+        )
+                
+        self.navigationController.present(viewController, animated: true)
+    }
+    
     func showSearchViewController(
         searchText: BehaviorRelay<String>,
         coordinate: BehaviorRelay<Coordinate?>
@@ -79,5 +94,4 @@ extension MainCoordinator {
     func showDetailPhotographerViewController(userId: String) {
         Logger.print(userId)
     }
-    
 }

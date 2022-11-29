@@ -26,7 +26,7 @@ final class DefaultObserveChatPreviewsUseCase: ObserveChatPreviewsUseCase {
     }
     
     func execute() -> Observable<[ChatPreview]> {
-        return chatroomRepository.fetch()
+        return chatroomRepository.observe()
             .withUnretained(self)
             .flatMap { owner, chatrooms -> Observable<[ChatPreview]> in
                 let customerUserIds = chatrooms.map { $0.customerUserId }

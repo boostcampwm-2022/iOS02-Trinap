@@ -17,6 +17,7 @@ extension Date {
         case hourAndMinute = "HH:mm"
         case monthAndDate = "M월 d일"
         case yearAndMonthAndDate = "YYYY년 M월 d일"
+        case yearAndMonth = "YYYY년 M월"
     }
     
     // MARK: Methods

@@ -42,7 +42,7 @@ class BaseTableViewCell: UITableViewCell {
     }
 }
 
-final class RxBaseTableViewCellProxy: DelegateProxy<BaseTableViewCell,BaseTableViewCellDelegate>, DelegateProxyType, BaseTableViewCellDelegate {
+final class RxBaseTableViewCellProxy: DelegateProxy<BaseTableViewCell, BaseTableViewCellDelegate>, DelegateProxyType, BaseTableViewCellDelegate {
     
     static func registerKnownImplementations() {
         self.register { tableViewCell -> RxBaseTableViewCellProxy in

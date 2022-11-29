@@ -57,6 +57,7 @@ extension ChatPreviewsViewModel {
     
     private func observeChatPreviews() -> Driver<[ChatPreview]> {
         return observeChatPreviewsUseCase.execute()
+            .map { $0.sorted(by: >) }
             .asDriver(onErrorJustReturn: [.onError])
     }
     
@@ -64,9 +65,12 @@ extension ChatPreviewsViewModel {
         var chatPreview = baseChatPreview
         
         chatPreview.content = chat.content
-        chatPreview.isChecked = chat.isChecked
+        if chat.senderType == .mine {
+            chatPreview.isChecked = true
+        } else {
+            chatPreview.isChecked = chat.isChecked
+        }
         chatPreview.chatType = chat.chatType
-        chatPreview.date = chat.createdAt
         
         switch chatPreview.chatType {
         case .text:
