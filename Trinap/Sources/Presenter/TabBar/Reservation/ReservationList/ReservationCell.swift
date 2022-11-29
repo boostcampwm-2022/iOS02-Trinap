@@ -18,6 +18,7 @@ final class ReservationCell: BaseTableViewCell {
     private lazy var nicknameLabel = UILabel().than {
         $0.font = TrinapFontFamily.Pretendard.regular.font(size: 16)
         $0.textColor = TrinapAsset.black.color
+        $0.setContentCompressionResistancePriority(.required, for: .horizontal)
     }
     
     private lazy var dateLabel = UILabel().than {
@@ -53,13 +54,12 @@ final class ReservationCell: BaseTableViewCell {
         
         nicknameLabel.snp.makeConstraints { make in
             make.leading.equalTo(self.profileImageView.snp.trailing).offset(padding)
-            make.trailing.equalTo(self.reservationStatusButton.snp.leading).offset(padding)
             make.top.equalToSuperview().offset(padding + 2)
         }
         
         dateLabel.snp.makeConstraints { make in
             make.leading.trailing.equalTo(self.nicknameLabel)
-            make.bottom.equalToSuperview().offset(padding - 2)
+            make.bottom.equalToSuperview().offset(-(padding + 2))
         }
         
         reservationStatusButton.snp.makeConstraints { make in
@@ -68,7 +68,23 @@ final class ReservationCell: BaseTableViewCell {
         }
     }
     
-    func configureCell(_ item: Reservation) {
-        
+    func configureCell(_ item: Reservation.Preview, reservationFilter: ReservationFilter) {
+        switch reservationFilter {
+        case .receive:
+            configureCell(item, byUser: item.customerUser)
+        case .send:
+            configureCell(item, byUser: item.photographerUser)
+        }
+    }
+}
+
+// MARK: - Privates
+private extension ReservationCell {
+    
+    func configureCell(_ item: Reservation.Preview, byUser user: User) {
+        self.profileImageView.setImage(at: user.profileImage)
+        self.nicknameLabel.text = user.nickname
+        self.dateLabel.text = item.reservationStartDate.toString(type: .yearAndMonth)
+        self.reservationStatusButton.setTitle("예약 확인", for: .normal)
     }
 }
