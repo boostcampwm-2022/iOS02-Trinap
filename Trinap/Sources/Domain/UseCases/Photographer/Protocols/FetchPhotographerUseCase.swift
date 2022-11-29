@@ -13,5 +13,5 @@ import RxSwift
 protocol FetchPhotographerUseCase {
     
     // MARK: Methods
-    func fetch(photographerId: String) -> Observable<Photographer>
+    func fetch(photographerUserId: String) -> Observable<Photographer>
 }
