@@ -24,3 +24,10 @@ struct Reservation: Codable {
     let reservationStartDate: Date
     let reservationEndDate: Date
 }
+
+extension Reservation: Hashable {
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(reservationId)
+    }
+}
