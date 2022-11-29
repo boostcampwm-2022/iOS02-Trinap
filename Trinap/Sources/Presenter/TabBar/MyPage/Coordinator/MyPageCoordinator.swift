@@ -49,6 +49,8 @@ extension MyPageCoordinator {
             showAuthorizationSetting(state: state)
         case .profile(user: let user):
             showEditViewController(user: user)
+        case .photographerDate:
+            showEditPossibleDateViewController()
         default:
             return
         }
@@ -88,6 +90,25 @@ extension MyPageCoordinator {
     func showUpdatePhotographerViewController() {
         let viewController = UpdateDetailPhotographerViewController(viewModel: UpdateDetailPhotographerViewModel())
         navigationController.present(viewController, animated: true)
+    }
+
+    private func showEditPossibleDateViewController() {
+        let photographerRepository = DefaultPhotographerRepository()
+        let viewModel = EditPossibleDateViewModel(
+            editPhotographerUseCase: DefaultEditPhotographerUseCase(
+                photographerRepository: photographerRepository
+            ),
+            fetchPhotographerUseCase: DefaultFetchPhotographerUseCase(
+                photographerRespository: photographerRepository
+            )
+        )
+        
+        let viewController = EditPossibleDateViewController(viewModel: viewModel)
+        
+        self.navigationController.setNavigationBarHidden(false, animated: false)
+        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(viewController, animated: true)
+        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
     }
 }
 
