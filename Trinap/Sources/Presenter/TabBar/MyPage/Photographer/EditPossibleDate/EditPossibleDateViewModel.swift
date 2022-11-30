@@ -16,7 +16,7 @@ final class EditPossibleDateViewModel: ViewModelType {
     
     struct Input {
         let calendarDateTap: Observable<[Date]>
-        let editDoneButtonTap: Observable<[Date]>
+        let possibleDateEditDone: Observable<[Date]>
     }
     
     struct Output {
@@ -37,15 +37,17 @@ final class EditPossibleDateViewModel: ViewModelType {
     // MARK: - Initializer
     init(
         editPhotographerUseCase: EditPhotographerUseCase,
-        fetchPhotographerUseCase: FetchPhotographerUseCase
+        fetchPhotographerUseCase: FetchPhotographerUseCase,
+        coordinator: MyPageCoordinator
     ) {
         self.editPhotographerUseCase = editPhotographerUseCase
         self.fetchPhotographerUseCase = fetchPhotographerUseCase
+        self.coordinator = coordinator
     }
     
     // MARK: - Methods
     func transform(input: Input) -> Output {
-        let editResult = input.editDoneButtonTap
+        let editResult = input.possibleDateEditDone
             .withUnretained(self)
             .flatMap { owner, possibleDate -> Observable<Void> in
                 owner.photographer?.possibleDate = possibleDate

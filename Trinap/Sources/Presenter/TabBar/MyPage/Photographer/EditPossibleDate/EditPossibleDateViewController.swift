@@ -40,10 +40,6 @@ final class EditPossibleDateViewController: BaseViewController {
     }
     
     // MARK: - Methods
-    override func viewDidLoad() {
-        super.viewDidLoad()
-    }
-    
     override func configureHierarchy() {
         self.view.addSubviews([
             titleLabel,
@@ -71,10 +67,11 @@ final class EditPossibleDateViewController: BaseViewController {
     override func bind() {
         let input = EditPossibleDateViewModel.Input(
             calendarDateTap: self.trinapCalenderView.possibleDate.asObservable(),
-            editDoneButtonTap: self.editDoneButton.rx.tap
+            possibleDateEditDone: self.editDoneButton.rx.tap
                 .asObservable()
-                .map {
-                    return self.trinapCalenderView.possibleDate.value
+                .withUnretained(self)
+                .map { owner, _ in
+                    return owner.trinapCalenderView.possibleDate.value
                 }
         )
         
@@ -109,7 +106,7 @@ final class EditPossibleDateViewController: BaseViewController {
         if isEnabled {
             self.editDoneButton.setTitleColor(TrinapAsset.primary.color, for: .normal)
         } else {
-            self.editDoneButton.setTitleColor(TrinapAsset.disabled.color, for: .normal)
+            self.editDoneButton.setTitleColor(TrinapAsset.disabled.color, for: .disabled)
         }
     }
 }
