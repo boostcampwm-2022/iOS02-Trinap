@@ -19,7 +19,7 @@ final class SearchViewController: BaseViewController {
     private lazy var searchBar = UISearchBar().than {
         $0.searchTextField.layer.cornerRadius = 20
         $0.searchTextField.layer.masksToBounds = true
-        $0.setImage(UIImage(named: "icSearchNonW"), for: UISearchBar.Icon.search, state: .normal)
+        $0.setImage(nil, for: UISearchBar.Icon.search, state: .normal)
         $0.placeholder = "장소를 입력해주세요"
     }
     
@@ -103,7 +103,7 @@ final class SearchViewController: BaseViewController {
             .map { [weak self] index -> Space? in
                 self?.dataSource?.itemIdentifier(for: index)
             }
-            .compactMap{ $0 }
+            .compactMap { $0 }
 
         selectedSpace
             .map { $0.name }
