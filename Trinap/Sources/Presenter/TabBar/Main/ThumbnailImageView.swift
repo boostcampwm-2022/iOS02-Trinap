@@ -34,11 +34,9 @@ final class ThumbnailImageView: BaseView {
     
     private lazy var thumbnailPageControl = UIPageControl().than {
         $0.translatesAutoresizingMaskIntoConstraints = false
-        $0.addTarget(self, action: #selector(tappedThumbnailPageControl), for: .valueChanged)
     }
     
     // MARK: Properties
-    private var timer: Timer?
     
     // MARK: Initializers
     
@@ -70,63 +68,16 @@ final class ThumbnailImageView: BaseView {
     }
     
     override func configureAttributes() {
-        thumbnailScrollView.delegate = self
-
-        timerInitialize()
+//        thumbnailScrollView.delegate = self
+        
     }
 }
 
-// MARK: 스크롤 관련
 extension ThumbnailImageView {
-    
-    func timerInitialize() {
-        timer = Timer.scheduledTimer(
-            timeInterval: 1,
-            target: self,
-            selector: #selector(timerThumbnailPageControl),
-            userInfo: nil,
-            repeats: true
-        )
-    }
-
-    @objc func tappedThumbnailPageControl(_ sender: UIPageControl) {
-        let current = sender.currentPage
-        let width = thumbnailScrollView.frame.width
-        thumbnailScrollView.setContentOffset(
-            CGPoint(x: CGFloat(current) * width, y: 0),
-            animated: true
-        )
-    }
-    
-    @objc func timerThumbnailPageControl() {
-        let numberOfPage = thumbnailPageControl.numberOfPages
-        var current = thumbnailPageControl.currentPage
-        if current + 1 == numberOfPage {
-            current = 0
-        } else {
-            current += 1
-        }
-        let width = thumbnailScrollView.frame.width
-        thumbnailScrollView.setContentOffset(
-            CGPoint(x: CGFloat(current) * width, y: 0),
-            animated: true
-        )
-    }
-}
-
-extension ThumbnailImageView: UIScrollViewDelegate {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let page = scrollView.contentOffset.x / scrollView.frame.size.width
         thumbnailPageControl.currentPage = Int(round(page))
-    }
-    
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        timer?.invalidate()
-    }
-    
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        timerInitialize()
     }
 }
 
@@ -156,14 +107,5 @@ extension ThumbnailImageView {
                 self?.thumbnailScrollView.addSubview(imageView)
             }
         }
-    }
-}
-
-private extension UIView {
-    func roundCorners(corners: UIRectCorner, radius: CGFloat) {
-        let path = UIBezierPath(roundedRect: bounds, byRoundingCorners: corners, cornerRadii: CGSize(width: radius, height: radius))
-        let mask = CAShapeLayer()
-        mask.path = path.cgPath
-        layer.mask = mask
     }
 }

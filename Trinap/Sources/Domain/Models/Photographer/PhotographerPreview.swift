@@ -19,7 +19,14 @@ struct PhotographerPreview {
     let rating: Double
 
     // MARK: Initializers
-    init(photographerId: String, photographerUserId: String, name: String, imageStrings: [String], location: String, rating: Double) {
+    init(
+        photographerId: String,
+        photographerUserId: String,
+        name: String,
+        imageStrings: [String],
+        location: String,
+        rating: Double
+    ) {
         self.photographerId = photographerId
         self.photographerUserId = photographerUserId
         self.name = name
