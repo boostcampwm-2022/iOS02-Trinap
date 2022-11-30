@@ -22,12 +22,14 @@ final class DefaultSignOutUseCase: SignOutUseCase {
     
     // MARK: - Methods
     func signOut() -> Observable<Bool> {
-        return self.authRepository.signOut()
-            .asObservable()
-            .flatMap { _ -> Observable<Void> in
-                return self.authRepository.deleteFcmToken()
+        return self.authRepository.deleteFcmToken()
+            .withUnretained(self)
+            .flatMap { owner, _ -> Single<Void> in
+                return owner.authRepository.signOut()
             }
+            .asObservable()
             .map { true }
             .catchAndReturn(false)
     }
 }
+
