@@ -32,10 +32,10 @@ final class ReservationDetailViewController: BaseViewController {
     }
     
     private lazy var reservationInformationView = InformationStackView(descriptionAlignment: .trailing)
-    
     private lazy var photographerUserView = ReservationUserView(userType: .photographer)
     private lazy var divider = Divider()
     private lazy var customerUserView = ReservationUserView(userType: .customer)
+    private lazy var reservationButtonView = ReservationButtonView()
     
     // MARK: - Properties
     private let viewModel: ReservationDetailViewModel
@@ -48,14 +48,6 @@ final class ReservationDetailViewController: BaseViewController {
     }
     
     // MARK: - Methods
-    override func viewDidLoad() {
-        super.viewDidLoad()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-    }
-    
     override func configureHierarchy() {
         super.configureHierarchy()
         
@@ -66,7 +58,8 @@ final class ReservationDetailViewController: BaseViewController {
             reservationInformationView,
             photographerUserView,
             divider,
-            customerUserView
+            customerUserView,
+            reservationButtonView
         ])
     }
     
@@ -107,6 +100,11 @@ final class ReservationDetailViewController: BaseViewController {
             make.top.equalTo(divider.snp.bottom).offset(24)
             make.leading.trailing.equalToSuperview().inset(16)
         }
+        
+        reservationButtonView.snp.makeConstraints { make in
+            make.leading.trailing.bottom.equalTo(self.view.safeAreaLayoutGuide)
+            make.height.equalTo(64)
+        }
     }
     
     override func configureAttributes() {
@@ -141,5 +139,11 @@ private extension ReservationDetailViewController {
         
         photographerUserView.setUser(reservation.photographerUser)
         customerUserView.setUser(reservation.customerUser)
+        
+        
+    }
+    
+    func configureStatus(_ status: Reservation.Status) {
+        
     }
 }
