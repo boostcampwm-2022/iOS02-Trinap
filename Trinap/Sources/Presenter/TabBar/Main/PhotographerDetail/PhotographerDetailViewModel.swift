@@ -70,10 +70,10 @@ final class PhotographerDetailViewModel: ViewModelType {
             }
             .share()
         
-        let photographer = self.reloadTrigger
+        let reviewInformation = Observable.combineLatest(reloadTrigger, photographer)
             .withUnretained(self)
-            .flatMap { owner, _ in
-                owner.fetchPhotographer()
+            .flatMap { owner, value in
+                return owner.fetchReviews(photographerId: value.1.photographerId)
             }
             .share()
         
@@ -108,11 +108,13 @@ extension PhotographerDetailViewModel {
             }
     }
     
-    private func fetchReviews() -> Observable<ReviewInformation> {
-        let summary = self.fetchReviewUseCase.fetchAverageReview(photographerId: nil)
-        let reviews = self.fetchReviewUseCase.fetchReviews(photographerUserId: nil)
+    private func fetchReviews(photographerId: String) -> Observable<ReviewInformation> {
+        let summary = self.fetchReviewUseCase.fetchAverageReview(photographerUserId: userId)
+        let reviews = self.fetchReviewUseCase.fetchReviews(photographerUserId: userId)
         return Observable.zip(summary, reviews)
             .map { summary, reviews in
+                Logger.print(summary)
+                Logger.printArray(reviews)
                 guard !summary.rating.isNaN
                 else {
                     return ReviewInformation(
