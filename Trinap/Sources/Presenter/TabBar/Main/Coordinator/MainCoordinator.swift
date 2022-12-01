@@ -39,6 +39,9 @@ extension MainCoordinator {
                     mapRepository: DefaultMapRepository(),
                     userRepository: DefaultUserRepository(),
                     reviewRepository: DefaultReviewRepository()),
+                fetchCurrentLocationUseCase: DefaultFetchCurrentLocationUseCase(
+                    mapRepository: DefaultMapRepository()
+                ),
                 coordinator: self
             ))
         self.navigationController.setNavigationBarHidden(true, animated: false)
