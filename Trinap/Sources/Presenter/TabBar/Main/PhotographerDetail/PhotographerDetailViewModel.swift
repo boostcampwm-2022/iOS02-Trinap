@@ -30,7 +30,6 @@ final class PhotographerDetailViewModel: ViewModelType {
     private let fetchUserUseCase: FetchUserUseCase
     private let fetchPhotographerUseCase: FetchPhotographerUseCase
     private let fetchReviewUseCase: FetchReviewUseCase
-    private let editPortfolioPictureUseCase: EditPortfolioPictureUseCase
     private let mapRepository: MapRepository
     
     private let reloadTrigger = BehaviorSubject<Void>(value: ())
@@ -40,14 +39,18 @@ final class PhotographerDetailViewModel: ViewModelType {
         fetchUserUseCase: FetchUserUseCase,
         fetchPhotographerUseCase: FetchPhotographerUseCase,
         fetchReviewUseCase: FetchReviewUseCase,
-        editPortfolioPictureUseCase: EditPortfolioPictureUseCase,
-        mapRepository: MapRepository
+        mapRepository: MapRepository,
+        userId: String,
+        searchCoordinate: Coordinate,
+        coordinator: MainCoordinator
     ) {
         self.fetchUserUseCase = fetchUserUseCase
         self.fetchPhotographerUseCase = fetchPhotographerUseCase
         self.fetchReviewUseCase = fetchReviewUseCase
-        self.editPortfolioPictureUseCase = editPortfolioPictureUseCase
         self.mapRepository = mapRepository
+        self.coordiantor = coordinator
+        self.searchCoordinate = searchCoordinate
+        self.userId = userId
     }
 
     // MARK: - Initializer
