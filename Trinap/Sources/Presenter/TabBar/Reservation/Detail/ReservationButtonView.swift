@@ -19,6 +19,7 @@ final class ReservationButtonView: BaseView {
     }
     
     private lazy var primaryButton = TrinapButton(style: .black)
+    private lazy var primaryButton = TrinapButton(style: .disabled)
     private lazy var secondaryButton = TrinapButton(style: .disabled)
     
     // MARK: - Properties
