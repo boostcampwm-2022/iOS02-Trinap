@@ -63,10 +63,10 @@ final class PhotographerDetailViewModel: ViewModelType {
             .bind(to: reloadTrigger)
             .disposed(by: disposeBag)
         
-        let reviewInformation = self.reloadTrigger
+        let photographer = self.reloadTrigger
             .withUnretained(self)
             .flatMap { owner, _ in
-                owner.fetchReviews()
+                owner.fetchPhotographer()
             }
             .share()
         
@@ -92,8 +92,7 @@ final class PhotographerDetailViewModel: ViewModelType {
 extension PhotographerDetailViewModel {
     
     private func fetchPhotographer() -> Observable<PhotographerUser> {
-        //TODO: 내꺼 아니라 다른 사람 userInfo 받아오도록 변경
-        return self.fetchUserUseCase.fetchUserInfo()
+        return self.fetchUserUseCase.fetchUserInfo(userId: userId)
             .flatMap { user in
                 self.fetchPhotographerUseCase.fetch(photographerUserId: user.userId)
                     .flatMap { photographer in
