@@ -97,10 +97,25 @@ final class PhotographerDetailViewModel: ViewModelType {
             }
 
         input.confirmTrigger
-            .subscribe(onNext: {
+            .withUnretained(self)
+            .flatMap { owner, _ -> Observable<Void> in
                 //TODO: reservation 객체 만들어서 reservation 던져주고 화면 채팅으로 전환.
-                // 근데 reservation 통신은 여기서? 
-            })
+                // 근데 reservation 통신은 여기서?
+                guard
+                    let start = owner.reservationDate.value[safe: 0],
+                    let end = owner.reservationDate.value[safe: 1]
+                else { return Observable.just(()) }
+                
+                return owner.createReservationUseCase.create(
+                    photographerUserId: owner.userId,
+                    startDate: start,
+                    endDate: end,
+                    coordinate: owner.searchCoordinate
+                )
+            }
+        //TODO: 채팅 전달
+            .subscribe()
+            .disposed(by: disposeBag)
         
         Observable.combineLatest(input.calendarTrigger, photographer)
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
