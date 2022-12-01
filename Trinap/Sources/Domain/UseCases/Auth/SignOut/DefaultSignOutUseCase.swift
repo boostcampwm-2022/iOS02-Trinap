@@ -32,4 +32,3 @@ final class DefaultSignOutUseCase: SignOutUseCase {
             .catchAndReturn(false)
     }
 }
-

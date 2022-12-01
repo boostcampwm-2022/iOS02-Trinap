@@ -73,11 +73,18 @@ final class DefaultAuthRepository: AuthRepository {
         guard let userId = tokenManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
         }
-        self.tokenManager.deleteToken(with: .userId)
-        self.tokenManager.deleteToken(with: .fcmToken)
+        
         return firebaseStoreService.deleteDocument(
             collection: .users,
             document: userId
+        )
+        .asObservable()
+    }
+    
+    func removePhotographerInfo(with photographerId: String) -> Observable<Void> {
+        return firebaseStoreService.deleteDocument(
+            collection: .photographers,
+            document: photographerId
         )
         .asObservable()
     }
@@ -158,8 +165,10 @@ final class DefaultAuthRepository: AuthRepository {
         guard let user = Auth.auth().currentUser else {
             return .error(FireStoreError.unknown)
         }
+        self.tokenManager.deleteToken(with: .userId)
+        self.tokenManager.deleteToken(with: .fcmToken)
         
-        return Single.create { [weak self] single in
+        return Single.create { single in
             user.delete { error in
                 if let error = error {
                     single(.failure(error))
