@@ -118,7 +118,7 @@ final class EditPhotographerViewController: BaseViewController {
         collectionView.rx.itemDeselected
             .withUnretained(self)
             .compactMap { owner, indexPath in
-                if case let .photo = owner.dataSource.itemIdentifier(for: indexPath) {
+                if case .photo = owner.dataSource.itemIdentifier(for: indexPath) {
                     return indexPath.row
                 }
                 return nil
