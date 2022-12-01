@@ -23,6 +23,7 @@ protocol Coordinator: AnyObject {
 
     func start()
     func finish()
+    func pop()
 }
 
 extension Coordinator {

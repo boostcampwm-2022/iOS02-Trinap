@@ -54,15 +54,14 @@ final class DefaultReservationRepository: ReservationRepository {
         .asObservable()
     }
     
-    // document가 reservationId라고 가정하고 진행함
-//    func fetchDetail(reservationId: String) -> Observable<Reservation> {
-//        return fireStore.getDocument(
-//            collection: .reservations,
-//            document: reservationId
-//        )
-//        .compactMap { $0.toObject(ReservationDTO.self)?.toModel() }
-//        .asObservable()
-//    }
+    func fetchReservation(reservationId: String) -> Observable<Reservation.Mapper> {
+        return fireStore.getDocument(
+            collection: .reservations,
+            document: reservationId
+        )
+        .compactMap { $0.toObject(ReservationDTO.self)?.toMapper() }
+        .asObservable()
+    }
 //
 //    func addReservation(reservation: Reservation) -> Observable<Bool> {
 //        guard let data = reservation.asDictionary else { return Observable.just(false) }
