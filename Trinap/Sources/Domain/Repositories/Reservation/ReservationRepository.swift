@@ -13,6 +13,7 @@ import RxSwift
 protocol ReservationRepository {
     
     // MARK: Methods
+    func fetchUserType(customerId: String, photographerId: String) -> Reservation.UserType?
     func fetchReceivedReservations() -> Observable<[Reservation.Mapper]>
     func fetchSentReservations() -> Observable<[Reservation.Mapper]>
     func fetchReservation(reservationId: String) -> Observable<Reservation.Mapper>
