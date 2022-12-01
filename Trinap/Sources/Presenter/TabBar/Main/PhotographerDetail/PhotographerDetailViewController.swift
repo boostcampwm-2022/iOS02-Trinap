@@ -123,6 +123,16 @@ class PhotographerDetailViewController: BaseViewController {
             }
             .disposed(by: disposeBag)
 
+        output.resevationDates
+            .drive { [weak self] dates in
+                guard
+                    let start = dates[safe: 0],
+                    let end = dates[safe: 1]
+                else { return }
+                      
+                self?.configureCalendarButton(startDate: start, endDate: end)
+            }
+            .disposed(by: disposeBag)
     }
 }
 
@@ -373,3 +383,74 @@ extension PhotographerDetailViewController {
         return section
     }
 }
+
+extension PhotographerDetailViewController {
+    
+    private func configureCalendarButton(startDate: Date, endDate: Date) {
+        guard let dateInfo = formattingCalendarButtonText(
+            startDate: startDate,
+            endDate: endDate
+        )
+        else { return }
+        
+        calendarButton.titleLabel?.numberOfLines = 0
+        calendarButton.titleLabel?.textAlignment = .left
+        calendarButton.setTitle(nil, for: .normal)
+        let buttonText = NSMutableAttributedString()
+            .bold(string: dateInfo)
+            .regular(string: "날짜 변경하기")
+        calendarButton.setAttributedTitle(buttonText, for: .normal)
+    }
+    
+    private func formattingCalendarButtonText(startDate: Date, endDate: Date) -> String? {
+        let startSeperated = startDate.toString(type: .yearToSecond).components(separatedBy: " ")
+        let endSeperated = endDate.toString(type: .yearToSecond).components(separatedBy: " ")
+        
+        guard let date = startSeperated[safe: 0] else { return nil }
+        let dateSeperated = date.components(separatedBy: "-")
+        guard
+            let month = dateSeperated[safe: 1],
+            let day = dateSeperated[safe: 2]
+        else { return nil }
+        
+        guard
+            let startTime = startSeperated.last,
+            let endTime = endSeperated.last
+        else { return nil }
+        let startHourToSec = startTime.components(separatedBy: ":")
+        let endHourToSec = endTime.components(separatedBy: ":")
+        guard
+            let startHour = startHourToSec[safe: 0],
+            let startMin = startHourToSec[safe: 1],
+            let endHour = endHourToSec[safe: 0],
+            let endMin = endHourToSec[safe: 1]
+        else { return nil }
+
+        let reservationDate = "\(month)/\(day)"
+        let reservationStart = "\(startHour):\(startMin)"
+        let reservationEnd = "\(endHour):\(endMin)"
+        let dateInfo = "\(reservationDate) \(reservationStart)-\(reservationEnd)\n"
+        return dateInfo
+    }
+}
+
+private extension NSMutableAttributedString {
+
+    func bold(string: String) -> NSMutableAttributedString {
+        let font = TrinapFontFamily.Pretendard.bold.font(size: 16)
+        let attributes: [NSAttributedString.Key: Any] = [.font: font]
+        self.append(NSAttributedString(string: string, attributes: attributes))
+        return self
+    }
+
+    func regular(string: String) -> NSMutableAttributedString {
+        let font = TrinapFontFamily.Pretendard.regular.font(size: 12)
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: font,
+            .foregroundColor: TrinapAsset.subtext.color
+        ]
+        self.append(NSAttributedString(string: string, attributes: attributes))
+        return self
+    }
+}
+
