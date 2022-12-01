@@ -49,4 +49,13 @@ final class ReservationDependencyContainer {
     }
     
     // MARK: - Detail
+    func makeReservationDetailViewController(reservationId: String) -> ReservationDetailViewController {
+        let viewModel = makeReservationDetailViewModel(reservationId: reservationId)
+        
+        return ReservationDetailViewController(viewModel: viewModel)
+    }
+    
+    private func makeReservationDetailViewModel(reservationId: String) -> ReservationDetailViewModel {
+        return ReservationDetailViewModel(reservationCoordinator: reservationCoordinator)
+    }
 }
