@@ -18,6 +18,7 @@ protocol PhotographerRepository {
     func fetchPhotographers(coordinate: Coordinate) -> Observable<[Photographer]>
     func fetchDetailPhotographer(of photograhperId: String) -> Observable<Photographer>
     func fetchDetailPhotographer(userId: String) -> Observable<Photographer>
+    func fetchDetailPhotographer() -> Observable<Photographer>
     
     func create(photographer: Photographer) -> Observable<Void>
     func updatePhotograhperInformation(with information: Photographer) -> Observable<Void>

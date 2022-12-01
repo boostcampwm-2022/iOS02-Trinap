@@ -9,17 +9,14 @@
 import UIKit
 
 import RxCocoa
+import RxGesture
 import RxSwift
 import SnapKit
 
 final class PhotographerListViewController: BaseViewController {
 
     // MARK: - UI
-    //TODO: 디자인이 다르고 입력받을 일이 없어서 uiview로 변경하기
-    private lazy var searchBar = UISearchBar().than {
-        $0.setImage(UIImage(named: "icSearchNonW"), for: UISearchBar.Icon.search, state: .normal)
-        $0.placeholder = "추억을 만들 장소를 선택해주세요."
-    }
+    private lazy var searchBarView = SearchBarView()
     
     private lazy var filterView = FilterView(filterMode: .main)
     
@@ -32,10 +29,11 @@ final class PhotographerListViewController: BaseViewController {
     }
         
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout).than {
+        $0.allowsSelection = false
         $0.register(PhotographerPreviewCell.self)
     }
     
-    private var datasource: UICollectionViewDiffableDataSource<Section, PhotographerPreview>?
+    private var dataSource: UICollectionViewDiffableDataSource<Section, PhotographerPreview>?
     
     // MARK: - Properties
     private let viewModel: PhotographerListViewModel
@@ -50,26 +48,33 @@ final class PhotographerListViewController: BaseViewController {
     // MARK: - Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationController?.navigationBar.topItem?.titleView = searchBar
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(false)
+        self.navigationController?.setNavigationBarHidden(true, animated: false)
+    }
+    
     override func configureHierarchy() {
         self.view.addSubviews([
-            searchBar,
+            searchBarView,
             filterView,
             collectionView
         ])
     }
 
     override func configureConstraints() {
-        searchBar.snp.makeConstraints { make in
-            make.top.equalToSuperview()
+        searchBarView.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide)
+            make.leading.equalToSuperview().offset(trinapOffset)
+            make.trailing.equalToSuperview().offset(-trinapOffset)
+            make.height.equalTo(48)
         }
         
         filterView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(trinapOffset)
-            make.trailing.equalToSuperview().offset(-trinapOffset)
-            make.top.equalTo(view.safeAreaLayoutGuide)
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
+            make.top.equalTo(searchBarView.snp.bottom)
             make.height.equalTo(trinapOffset * 6)
         }
         
@@ -82,23 +87,29 @@ final class PhotographerListViewController: BaseViewController {
     }
 
     override func configureAttributes() {
-        searchBar.isUserInteractionEnabled = false
-        datasource = configureDataSource()
+        dataSource = configureDataSource()
     }
 
     override func bind() {
-        
-        viewModel.searchText.bind(to: searchBar.searchTextField.rx.text)
+        viewModel.searchText
+            .map { [weak self] text in
+                if text.isEmpty {
+                    self?.searchBarView.searchLabel.textColor = TrinapAsset.gray40.color
+                    return self?.viewModel.defaultString
+                }
+                self?.searchBarView.searchLabel.textColor = .black
+                return text
+            }
+            .bind(to: searchBarView.searchLabel.rx.text)
             .disposed(by: disposeBag)
         
         let type = self.filterView.rx.itemSelected
             .map { TagType(index: $0.row) }
-        let searchTrigger = searchBar.rx.tapGesture()
+        
+        let searchTrigger = searchBarView.rx.tapGesture()
             .when(.recognized).asObservable()
             .map { _ in return () }
-        
-        //TODO: 선택된 셀 인덱스로 넘겨주기
-        
+                
         let input = PhotographerListViewModel.Input(
             searchTrigger: searchTrigger,
             tagType: type
@@ -108,12 +119,10 @@ final class PhotographerListViewController: BaseViewController {
         
         output.previews
             .compactMap { [weak self] previews in
-                Logger.print("쨔스")
-                Logger.printArray(previews)
-                return self?.generateSnapshot(sources: previews)
+                self?.generateSnapshot(sources: previews)
             }
             .drive(onNext: { [weak self] snapshot in
-                self?.datasource?.apply(snapshot, animatingDifferences: true)
+                self?.dataSource?.apply(snapshot, animatingDifferences: true)
             })
             .disposed(by: disposeBag)
     }
@@ -138,6 +147,13 @@ extension PhotographerListViewController {
             guard let cell = collectionView.dequeueCell(PhotographerPreviewCell.self, for: indexPath)
             else { return UICollectionViewCell() }
             cell.configureCell(itemIdentifier)
+            
+            cell.rx.tapGesture()
+                .subscribe(onNext: { [weak self] _ in
+                    self?.viewModel.showDetailPhotographer(userId: itemIdentifier.photographerUserId)
+                })
+                .disposed(by: cell.disposeBag)
+            
             return cell
         }
     }

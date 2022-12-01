@@ -46,6 +46,7 @@ final class MyPageViewController: BaseViewController {
     
     override func configureAttributes() {
         self.configureTableView()
+        self.dataSource = generateDataSource()
     }
     
     override func bind() {

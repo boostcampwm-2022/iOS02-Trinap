@@ -8,6 +8,8 @@
 
 import UIKit
 
+import FirestoreService
+
 final class ReservationCoordinator: Coordinator {
     
     // MARK: - Properties
@@ -15,10 +17,14 @@ final class ReservationCoordinator: Coordinator {
     var navigationController: UINavigationController
     var childCoordinators: [Coordinator]
     
+    private let firestoreService: FireStoreService
+    
     // MARK: - Initializers
     init(_ navigationController: UINavigationController) {
         self.navigationController = navigationController
         self.childCoordinators = []
+        
+        self.firestoreService = DefaultFireStoreService()
     }
     
     // MARK: - Methods
@@ -28,10 +34,27 @@ final class ReservationCoordinator: Coordinator {
 }
 
 extension ReservationCoordinator {
+    
     func showReservationListViewController() {
-        // TODO: 추후 UI를 구현한 ViewController로 교체
-        let viewController = MockReservationListViewController()
+        let viewModel = ReservationPreviewListViewModel(
+            coordinator: self,
+            fetchReservationPreviewsUseCase: makeFetchReservationPreviewsUseCase()
+        )
+        let viewController = ReservationPreviewListViewController(viewModel: viewModel)
+        
         self.navigationController.setNavigationBarHidden(true, animated: false)
         self.navigationController.pushViewController(viewController, animated: true)
+    }
+    
+    private func makeFetchReservationPreviewsUseCase() -> FetchReservationPreviewsUseCase {
+        let reservationRepository = DefaultReservationRepository(firebaseStoreService: firestoreService)
+        let userRepository = DefaultUserRepository()
+        let mapRepository = DefaultMapRepository()
+        
+        return DefaultFetchReservationPreviewsUseCase(
+            reservationRepository: reservationRepository,
+            userRepository: userRepository,
+            mapRepository: mapRepository
+        )
     }
 }

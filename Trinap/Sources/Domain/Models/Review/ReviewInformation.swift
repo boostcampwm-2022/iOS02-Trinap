@@ -12,7 +12,7 @@ struct ReviewInformation {
     let summary: ReviewSummary
     let reviews: [UserReview]
     
-    func toDataSource() -> [EditPhotographerDataSource] {
+    func toDataSource() -> [PhotographerDataSource] {
         return [
             [.detail: [.summaryReview(self.summary)]],
             [.review: self.reviews.map { PhotographerSection.Item.review($0) } ]

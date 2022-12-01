@@ -10,8 +10,8 @@ import UIKit
 
 import RxCocoa
 import RxSwift
+import RxGesture
 import Than
-import Queenfisher
 
 final class PhotographerPreviewCell: BaseCollectionViewCell {
     
@@ -30,9 +30,15 @@ final class PhotographerPreviewCell: BaseCollectionViewCell {
     private lazy var ratingLabel = StarView()
     
     // MARK: Properties
-    private let disposebag = DisposeBag()
+    var cellDisposeBag = DisposeBag()
     
     // MARK: Methods
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        cellDisposeBag = DisposeBag()
+    }
+    
     override func configureHierarchy() {
         contentView.addSubviews(
             [
@@ -50,7 +56,6 @@ final class PhotographerPreviewCell: BaseCollectionViewCell {
             make.horizontalEdges.top.equalToSuperview()
             make.bottom.equalToSuperview().offset(-60)
         }
-        
         
         locationLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview()
@@ -74,18 +79,15 @@ final class PhotographerPreviewCell: BaseCollectionViewCell {
                 guard let self else { return }
                 self.configureCell(preview)
             }
-            .disposed(by: disposebag)
+            .disposed(by: self.cellDisposeBag)
     }
     
-    override func configureAttributes() {
-//        self.backgroundColor = .blue
-    }
 }
 
 extension PhotographerPreviewCell {
     
     func configureCell(_ preview: PhotographerPreview) {
-        nicknameLabel.text = preview.name
+        nicknameLabel.text = "\(preview.name) 작가"
         locationLabel.text = preview.location
         ratingLabel.configure(rating: preview.rating)
         thumbnailImageView.configure(imageStrings: preview.pictures)

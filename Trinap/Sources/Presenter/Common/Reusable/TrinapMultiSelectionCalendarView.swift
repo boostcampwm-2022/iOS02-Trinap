@@ -10,6 +10,7 @@ import UIKit
 
 import HorizonCalendar
 import SnapKit
+import RxRelay
 
 final class TrinapMultiSelectionCalendarView: BaseView {
     
@@ -22,6 +23,7 @@ final class TrinapMultiSelectionCalendarView: BaseView {
     // MARK: - Properties
     private lazy var calendar = Calendar.current
     private var selectedDate: [Date] = []
+    let possibleDate = BehaviorRelay<[Date]>(value: [])
     
     // MARK: - Initializers
     init() {
@@ -45,13 +47,8 @@ final class TrinapMultiSelectionCalendarView: BaseView {
     func configurePossibleDate(possibleDate: [Date]) {
         self.selectedDate = filterPreviousDate(with: possibleDate)
         
+        self.possibleDate.accept(self.selectedDate)
         self.calendarView.setContent(self.configureCalendarView())
-    }
-    
-    ///  선택된 작가 영업일을 반환하는 함수
-    /// - Returns: 선택된 영업일
-    func getSeletedDate() -> [Date] {
-        return self.selectedDate
     }
 }
 
@@ -75,6 +72,7 @@ private extension TrinapMultiSelectionCalendarView {
             } else {
                 self.selectedDate.append(date)
             }
+            self.possibleDate.accept(self.selectedDate)
             self.calendarView.setContent(self.configureCalendarView())
         }
     }
@@ -91,6 +89,14 @@ private extension TrinapMultiSelectionCalendarView {
         )
         .verticalDayMargin(trinapOffset)
         .horizontalDayMargin(trinapOffset)
+        .monthDayInsets(
+            UIEdgeInsets(
+                top: trinapOffset * 2,
+                left: 0,
+                bottom: 0,
+                right: 0
+            )
+        )
         .dayItemProvider { [calendar] day in
             return self.configureDayItemProvider(day: day, calendar: calendar)
         }
