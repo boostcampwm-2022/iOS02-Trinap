@@ -27,7 +27,7 @@ final class ReservationPreviewListViewModel: ViewModelType {
     
     // MARK: - Initializer
     init(
-        coordinator: ReservationCoordinator,
+        coordinator: ReservationCoordinator?,
         fetchReservationPreviewsUseCase: FetchReservationPreviewsUseCase
     ) {
         self.coordinator = coordinator
