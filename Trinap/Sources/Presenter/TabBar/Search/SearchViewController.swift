@@ -59,6 +59,7 @@ final class SearchViewController: BaseViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         navigationController?.navigationBar.topItem?.titleView = searchBar
     }
     
@@ -103,7 +104,7 @@ final class SearchViewController: BaseViewController {
             .map { [weak self] index -> Space? in
                 self?.dataSource?.itemIdentifier(for: index)
             }
-            .compactMap{ $0 }
+            .compactMap { $0 }
 
         selectedSpace
             .map { $0.name }
