@@ -51,6 +51,8 @@ extension MyPageCoordinator {
             showEditViewController(user: user)
         case .photographerDate:
             showEditPossibleDateViewController()
+        case .dropout:
+            showDropOutViewController()
         default:
             return
         }
@@ -91,7 +93,7 @@ extension MyPageCoordinator {
         let viewController = UpdateDetailPhotographerViewController(viewModel: UpdateDetailPhotographerViewModel())
         navigationController.present(viewController, animated: true)
     }
-
+    
     private func showEditPossibleDateViewController() {
         let photographerRepository = DefaultPhotographerRepository()
         let viewModel = EditPossibleDateViewModel(
@@ -105,11 +107,31 @@ extension MyPageCoordinator {
         )
         
         let viewController = EditPossibleDateViewController(viewModel: viewModel)
+        self.navigationController.setNavigationBarHidden(false, animated: false)
+        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(viewController, animated: true)
+        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
+    }
+    
+    func showDropOutViewController() {
+        let viewModel = DropOutViewModel(
+            coordinator: self,
+            dropOutUseCase: DefaultDropOutUseCase(
+                authRepository: DefaultAuthRepository(),
+                photographerRepository: DefaultPhotographerRepository()
+            )
+        )
+        
+        let viewController = DropOutViewController(viewModel: viewModel)
         
         self.navigationController.setNavigationBarHidden(false, animated: false)
         self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
         self.navigationController.pushViewController(viewController, animated: true)
         self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
+    }
+    
+    func popViewController() {
+        self.navigationController.popViewController(animated: true)
     }
 }
 
