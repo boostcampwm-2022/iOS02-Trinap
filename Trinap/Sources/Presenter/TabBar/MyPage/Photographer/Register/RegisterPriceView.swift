@@ -57,6 +57,7 @@ extension Reactive where Base: RegisterPriceView {
     var setValue: Binder<Int> {
         return Binder(self.base) { registerPriceView, price in
             registerPriceView.textField.text = String(price)
+            registerPriceView.textField.sendActions(for: .valueChanged)
         }
     }
 }

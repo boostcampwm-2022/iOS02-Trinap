@@ -8,6 +8,9 @@
 
 import UIKit
 
+import RxRelay
+import RxCocoa
+
 final class RegisterTagCell: BaseCollectionViewCell {
     
     private lazy var tagLabel = UILabel().than {
@@ -21,6 +24,7 @@ final class RegisterTagCell: BaseCollectionViewCell {
     override var isSelected: Bool {
         didSet { setSelected() }
     }
+    
     override func configureHierarchy() {
         self.addSubview(tagLabel)
     }
@@ -33,6 +37,7 @@ final class RegisterTagCell: BaseCollectionViewCell {
     
     override func configureAttributes() {
         self.layer.masksToBounds = true
+        self.isUserInteractionEnabled = true
     }
     
     override func layoutSubviews() {
@@ -66,10 +71,11 @@ final class TagCollectionViewLeftAlignFlowLayout: UICollectionViewFlowLayout {
     }
     
     override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
-        self.minimumLineSpacing = self.offset
         
         let attributes = super.layoutAttributesForElements(in: rect)
- 
+        
+        self.minimumLineSpacing = self.offset
+        
         var leftMargin = sectionInset.left
         var maxY: CGFloat = -1.0
         attributes?.forEach { layoutAttribute in

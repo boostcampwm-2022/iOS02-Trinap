@@ -13,8 +13,7 @@ import RxSwift
 
 final class RegisterLocationView: BaseView {
     
-    var location: Space?
-    private lazy var locationLabel = UILabel().than {
+    lazy var locationLabel = UILabel().than {
         $0.font = TrinapFontFamily.Pretendard.regular.font(size: 16)
         $0.textColor = TrinapAsset.subtext2.color
         $0.text = "지역을 선택해주세요"
@@ -48,20 +47,8 @@ final class RegisterLocationView: BaseView {
         self.layer.cornerRadius = 8
     }
     
-    func configure(space: Space?) {
-        guard let space else {
-            return
-        }
-        self.location = space
-        self.locationLabel.text = space.name
-        self.locationLabel.textColor = space.name.isEmpty ? TrinapAsset.subtext2.color : TrinapAsset.black.color
-    }
-}
-
-extension Reactive where Base: RegisterLocationView {
-    var applyLocation: Binder<Space> {
-        return Binder(self.base) { registerLocationView, space in
-            registerLocationView.configure(space: space)
-        }
+    func configure(text: String) {
+        self.locationLabel.text = text
+        self.locationLabel.textColor = text.isEmpty ? TrinapAsset.subtext2.color : TrinapAsset.black.color
     }
 }

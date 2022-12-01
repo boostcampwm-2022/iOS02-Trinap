@@ -15,17 +15,16 @@ import RxSwift
 final class RegisterPhotographerInfoViewModel: ViewModelType {
     
     struct Input {
-        let location: Observable<Space?>
         let locationTrigger: Observable<Void>
         let tags: Observable<[TagType]>
-        let price: Observable<Int>
+        let priceText: Observable<String>
         let introduction: Observable<String>
         let applyTrigger: Observable<Void>
     }
     
     struct Output {
         let isValid: Observable<Bool>
-        let location: Observable<Space>
+        let location: Observable<String>
         let tagItems: Observable<[TagItem]>
         let price: Observable<Int>
         let introduction: Observable<String>
@@ -34,19 +33,20 @@ final class RegisterPhotographerInfoViewModel: ViewModelType {
     // MARK: - Properties
     var disposeBag = DisposeBag()
     
-    weak var coordinator: RegisterPhotographerInfoCoordinator?
+    weak var coordinator: MyPageCoordinator?
     
     private let fetchPhotographerUseCase: FetchPhotographerUseCase
     private let editPhotographerUseCase: EditPhotographerUseCase
     private let mapRepository: MapRepository
     
-    lazy var searchText = BehaviorRelay<String>(value: placeholder)
+    lazy var locationText = BehaviorRelay<String>(value: placeholder)
+    
     let coordinate = BehaviorRelay<Coordinate?>(value: nil)
     let placeholder = "지역을 선택해주세요."
     
     // MARK: - Initializer
     init(
-        coordinator: RegisterPhotographerInfoCoordinator,
+        coordinator: MyPageCoordinator,
         fetchPhotographerUseCase: FetchPhotographerUseCase,
         editPhotographerUseCase: EditPhotographerUseCase,
         mapRepository: MapRepository
@@ -64,7 +64,9 @@ final class RegisterPhotographerInfoViewModel: ViewModelType {
             .fetch(photographerUserId: nil)
             .share()
         
-        let location = photographer
+        let price = input.priceText.compactMap { Int($0) }
+        
+        photographer
             .withUnretained(self)
             .flatMap { owner, photographer in
                 owner.mapRepository
@@ -75,8 +77,11 @@ final class RegisterPhotographerInfoViewModel: ViewModelType {
                     )
                     .map { Space(name: $0, address: $0, lat: photographer.latitude, lng: photographer.longitude) }
             }
-            .share()
-        
+            .subscribe(onNext: { space in
+                self.locationText.accept(space.name)
+                self.coordinate.accept(Coordinate(lat: space.lat, lng: space.lng))
+            })
+            .disposed(by: disposeBag)
         
         let tagItems = photographer
             .map { $0.tags }
@@ -86,11 +91,9 @@ final class RegisterPhotographerInfoViewModel: ViewModelType {
                 }
             }
         
-        let price = photographer.map { $0.pricePerHalfHour }
         let introduction = photographer.map { $0.introduction }
         
-        let paramters = Observable.combineLatest(input.location, input.tags, input.price, input.introduction)
-            .share()
+        let paramters = Observable.combineLatest(self.coordinate, input.tags, price, input.introduction)
         
         input.applyTrigger.withLatestFrom(paramters)
             .flatMap { location, tags, price, introduction in
@@ -101,7 +104,7 @@ final class RegisterPhotographerInfoViewModel: ViewModelType {
                         introduction: introduction,
                         latitude: location?.lat ?? photographer.latitude,
                         longitude: location?.lng ?? photographer.longitude,
-                        tags: tags.isEmpty ? [.all] : tags,
+                        tags: tags,
                         pictures: photographer.pictures,
                         pricePerHalfHour: price,
                         possibleDate: photographer.possibleDate)
@@ -109,7 +112,7 @@ final class RegisterPhotographerInfoViewModel: ViewModelType {
             }
             .flatMap { self.editPhotographerUseCase.updatePhotographer(photographer: $0) }
             .subscribe(onNext: {
-                self.coordinator?.dismissViewController()
+                self.coordinator?.popViewController()
             })
             .disposed(by: disposeBag)
         
@@ -117,7 +120,7 @@ final class RegisterPhotographerInfoViewModel: ViewModelType {
             .withUnretained(self)
             .subscribe(onNext: { owner, _ in
                 owner.coordinator?.showSearchViewController(
-                    searchText: owner.searchText,
+                    searchText: owner.locationText,
                     coordinate: owner.coordinate
                 )
             })
@@ -129,9 +132,9 @@ final class RegisterPhotographerInfoViewModel: ViewModelType {
         
         return Output(
             isValid: isValid,
-            location: location,
+            location: locationText.asObservable(),
             tagItems: tagItems,
-            price: price,
+            price: photographer.map { $0.pricePerHalfHour },
             introduction: introduction
         )
     }

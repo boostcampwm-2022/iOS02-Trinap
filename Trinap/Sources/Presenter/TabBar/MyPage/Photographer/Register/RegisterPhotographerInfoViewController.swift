@@ -20,6 +20,7 @@ struct TagItem: Hashable {
 
 // TODO: - 키보드 나오면 y좌표 움직이기.
 final class RegisterPhotographerInfoViewController: BaseViewController {
+    
     // MARK: - Properties
     private let selectedTags = BehaviorRelay<[TagType]>(value: [])
     private lazy var scrollView = UIScrollView()
@@ -190,6 +191,7 @@ final class RegisterPhotographerInfoViewController: BaseViewController {
     override func configureAttributes() {
         self.hideKeyboardWhenTapped()
         contentView.backgroundColor = TrinapAsset.white.color
+        self.navigationController?.navigationBar.topItem?.title = ""
         configureCollectionView()
     }
     
@@ -198,14 +200,12 @@ final class RegisterPhotographerInfoViewController: BaseViewController {
         self.textViewBinding()
         self.collectionViewBinding()
         
-        let price = registerPriceView.textField.rx.text.orEmpty.compactMap { Int($0) }
-            .share()
+        let price = registerPriceView.textField.rx.text.orEmpty.asObservable()
         
         let input = RegisterPhotographerInfoViewModel.Input(
-            location: .just(nil),
             locationTrigger: registerLocationView.rx.tapGesture().when(.recognized).map { _ in },
             tags: self.selectedTags.asObservable(),
-            price: price,
+            priceText: price,
             introduction: introducingTextView.rx.text.orEmpty.asObservable(),
             applyTrigger: applyButton.rx.tap.asObservable()
         )
@@ -217,7 +217,9 @@ final class RegisterPhotographerInfoViewController: BaseViewController {
             .disposed(by: disposeBag)
         
         output.location
-            .bind(to: registerLocationView.rx.applyLocation)
+            .subscribe(onNext: {
+                self.registerLocationView.configure(text: $0)
+            })
             .disposed(by: disposeBag)
         
         output.introduction
@@ -233,7 +235,8 @@ final class RegisterPhotographerInfoViewController: BaseViewController {
         output.tagItems
             .withUnretained(self)
             .subscribe(onNext: { owner, tagItem in
-                owner.selectedTags.accept(tagItem.map { $0.tag })
+                let selectedTag = tagItem.filter { $0.isSelected }.map { $0.tag }
+                owner.selectedTags.accept(selectedTag)
                 
                 let snapshot = owner.generateSnapshot(tagItem)
                 owner.dataSource?.apply(snapshot)
@@ -272,19 +275,23 @@ extension RegisterPhotographerInfoViewController {
     }
     
     private func collectionViewBinding() {
-        tagCollectionView.rx.willDisplayCell
-            .subscribe(onNext: { cell, indexPath in
-                guard let item = self.dataSource?.itemIdentifier(for: indexPath) else {
-                    return
-                }
-                cell.isSelected = item.isSelected
-            })
-            .disposed(by: disposeBag)
+//        tagCollectionView.rx.willDisplayCell
+//            .subscribe(onNext: { cell, indexPath in
+//                guard let item = self.dataSource?.itemIdentifier(for: indexPath) else {
+//                    return
+//                }
+                
+//                if item.isSelected {
+//                    self.tagCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: .top)
+//                }
+//                cell.isSelected = item.isSelected
+//            })
+//            .disposed(by: disposeBag)
         
         tagCollectionView.rx.itemSelected
             .withUnretained(self)
             .compactMap { owner, indexPath in
-                owner.dataSource?.itemIdentifier(for: indexPath)?.tag
+                return owner.dataSource?.itemIdentifier(for: indexPath)?.tag
             }
             .withUnretained(self)
             .subscribe(onNext: { owner, tag in
@@ -295,7 +302,7 @@ extension RegisterPhotographerInfoViewController {
         tagCollectionView.rx.itemDeselected
             .withUnretained(self)
             .compactMap { owner, indexPath in
-                owner.dataSource?.itemIdentifier(for: indexPath)?.tag
+                return owner.dataSource?.itemIdentifier(for: indexPath)?.tag
             }
             .withUnretained(self)
             .subscribe(onNext: { owner, tag in
@@ -307,13 +314,6 @@ extension RegisterPhotographerInfoViewController {
 }
 // MARK: - CollectionView
 extension RegisterPhotographerInfoViewController: UICollectionViewDelegateFlowLayout {
-    
-    private func configureCollectionViewLayout() -> UICollectionViewFlowLayout {
-        let layout = UICollectionViewFlowLayout()
-        layout.minimumInteritemSpacing = trinapOffset
-        layout.minimumLineSpacing = trinapOffset
-        return layout
-    }
     
     private func configureCollectionView() {
         self.tagCollectionView.register(RegisterTagCell.self)
@@ -339,6 +339,9 @@ extension RegisterPhotographerInfoViewController: UICollectionViewDelegateFlowLa
                 return UICollectionViewCell()
             }
             cell.configure(tag: itemIdentifier)
+            if itemIdentifier.isSelected {
+                collectionView.selectItem(at: indexPath, animated: false, scrollPosition: .left)
+            }
             return cell
         }
     }
