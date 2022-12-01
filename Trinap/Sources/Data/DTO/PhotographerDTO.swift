@@ -33,7 +33,7 @@ struct PhotographerDTO: Codable {
         self.tags = photographer.tags.map { $0.rawValue }
         self.pictures = photographer.pictures
         self.pricePerHalfHour = photographer.pricePerHalfHour
-        self.possibleDate = photographer.possibleDate.map { $0.toString(type: .yearToDay)}
+        self.possibleDate = photographer.possibleDate.map { $0.toString(type: .yearToDay) }
         self.status = status
     }
     

@@ -55,15 +55,6 @@ final class SearchViewModel: ViewModelType {
             }
             .asDriver(onErrorJustReturn: [])
         
-        input.selectedSpace
-            .withUnretained(self)
-            .subscribe(onNext: { owner, space in
-                Logger.print("쨔스! \(space) 선택됨")
-                // searchText를 space.address로 바꿔주고 popviewcontroller
-                owner.coordinator?.popViewController()
-            })
-            .disposed(by: disposeBag)
-        
         guard let coordinate else { return Output(spaces: spaces) }
         
         input.currentLocationTrigger

@@ -176,6 +176,7 @@ extension EditPhotographerViewController {
     }
     
     private func configureDataSource() -> DataSource {
+        
         let dataSource = DataSource(collectionView: self.collectionView) { [weak self] collectionView, indexPath, item in
             guard let self else { return UICollectionViewCell() }
             

@@ -86,19 +86,15 @@ extension MyPageCoordinator {
     }
     
     func showUpdatePhotographerViewController() {
-        let coordinator = RegisterPhotographerInfoCoordinator(UINavigationController())
-        coordinator.delegate = self
-        coordinator.start()
-        self.childCoordinators.append(coordinator)
-//        let viewModel = RegisterPhotographerInfoViewModel(
-//            coordinator: self,
-//            fetchPhotographerUseCase: DefaultFetchPhotographerUseCase(photographerRespository: DefaultPhotographerRepository()),
-//            editPhotographerUseCase: DefaultEditPhotographerUseCase(photographerRepository: DefaultPhotographerRepository()),
-//            mapRepository: DefaultMapRepository()
-//        )
-//
-//        let viewController = RegisterPhotographerInfoViewController(viewModel: viewModel)
-//        self.navigationController.pushViewController(viewController, animated: true)
+        let viewModel = RegisterPhotographerInfoViewModel(
+            coordinator: self,
+            fetchPhotographerUseCase: DefaultFetchPhotographerUseCase(photographerRespository: DefaultPhotographerRepository()),
+            editPhotographerUseCase: DefaultEditPhotographerUseCase(photographerRepository: DefaultPhotographerRepository()),
+            mapRepository: DefaultMapRepository()
+        )
+
+        let viewController = RegisterPhotographerInfoViewController(viewModel: viewModel)
+        self.navigationController.pushViewController(viewController, animated: true)
     }
     
     func showSearchViewController(
@@ -116,18 +112,13 @@ extension MyPageCoordinator {
             searchText: searchText,
             coordinate: coordinate
         )
-        let viewController = SearchViewController(
-            viewModel: viewModel
-        )
-        
-        self.navigationController.present(viewController, animated: true)
+        let viewController = SearchViewController(viewModel: viewModel)
+        self.navigationController.pushViewController(viewController, animated: true)
     }
 }
 
 extension MyPageCoordinator: CoordinatorDelegate {
-    func didFinish(childCoordinator: Coordinator) {
-        
-    }
+    func didFinish(childCoordinator: Coordinator) { }
 }
 
 private extension MyPageCoordinator {
