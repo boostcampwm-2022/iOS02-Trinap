@@ -1,10 +1,11 @@
-
 //  PhotographerDetailViewModel.swift
 //  Trinap
 //
 //  Created by kimchansoo on 2022/11/29.
 //  Copyright © 2022 Trinap. All rights reserved.
 //
+
+import Foundation
 
 import RxCocoa
 import RxRelay
@@ -15,11 +16,13 @@ final class PhotographerDetailViewModel: ViewModelType {
     struct Input {
         let viewWillAppear: Observable<Bool>
         let tabState: Observable<Int>
-//        let calendarTrigger: Observable<Void>
-//        let confirmTrigger: Observable<Void>
+        let calendarTrigger: Observable<Void>
+        let confirmTrigger: Observable<Void>
     }
 
     struct Output {
+        let confirmButtonEnabled: Driver<Bool>
+        let resevationDates: Driver<[Date]>
         let dataSource: Driver<[PhotographerDataSource]>
     }
 
@@ -33,6 +36,13 @@ final class PhotographerDetailViewModel: ViewModelType {
     private let mapRepository: MapRepository
     
     private let reloadTrigger = BehaviorSubject<Void>(value: ())
+    
+    private let searchCoordinate: Coordinate
+    private let userId: String
+    //TODO: 델리게이트로 넘어오는 값 여기에 넣기
+    private var reservationDate = BehaviorRelay<[Date]>(value: [])
+    
+    private weak var coordiantor: MainCoordinator?
     
     // MARK: - Initializer
     init(
@@ -77,14 +87,43 @@ final class PhotographerDetailViewModel: ViewModelType {
             }
             .share()
         
+        let buttonAvailable = self.reservationDate
+            .map { date -> Bool in
+                if date.count == 2 { return true }
+                return false
+            }
+
+        input.confirmTrigger
+            .subscribe(onNext: {
+                //TODO: reservation 객체 만들어서 reservation 던져주고 화면 채팅으로 전환.
+                // 근데 reservation 통신은 여기서? 
+            })
+        
+        Observable.combineLatest(input.calendarTrigger, photographer)
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .withUnretained(self)
+            .subscribe(onNext: { owner, value in
+                let photographerUser = value.1
+//                owner.coordiantor?.showSelectReservationDateViewController(with: photographerUser.possibleDate, detailViewModel: self)
+                owner.coordiantor?.showSelectReservationDateViewController(with: [Date()], detailViewModel: self)
+            })
+            .disposed(by: disposeBag)
+        
         let dataSource = Observable.combineLatest(input.tabState, photographer, reviewInformation)
             .map { [weak self] section, photographer, review -> [PhotographerDataSource] in
                 guard let self else { return [] }
                 
                 return self.mappingDataSource(isEditable: false, state: section, photographer: photographer, review: review)
             }
+        
+        let reservationDates = self.reservationDate.asDriver(onErrorJustReturn: [])
+            
 
-        return Output(dataSource: dataSource.asDriver(onErrorJustReturn: []))
+        return Output(
+            confirmButtonEnabled: buttonAvailable.asDriver(onErrorJustReturn: false),
+            resevationDates: reservationDates,
+            dataSource: dataSource.asDriver(onErrorJustReturn: [])
+        )
     }
 }
 
@@ -168,5 +207,12 @@ extension PhotographerDetailViewModel {
     private func mappingReviewDataSource(review: ReviewInformation) -> [PhotographerDataSource] {
         return [ [.detail: [.summaryReview(review.summary)]] ] +
             [ [.review: review.reviews.map { PhotographerSection.Item.review($0) } ] ]
+    }
+}
+
+extension PhotographerDetailViewModel: SelectReservationDateViewModelDelegate {
+    
+    func selectedReservationDate(startDate: Date, endDate: Date) {
+        self.reservationDate.accept([startDate, endDate])
     }
 }
