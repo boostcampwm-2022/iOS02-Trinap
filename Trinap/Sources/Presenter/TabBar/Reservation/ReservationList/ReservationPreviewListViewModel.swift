@@ -42,6 +42,10 @@ final class ReservationPreviewListViewModel: ViewModelType {
         
         return Output(reservationPreviews: reservationPreviews.asDriver(onErrorJustReturn: []))
     }
+    
+    func presentReservationDetail(reservationId: String) {
+        coordinator?.showReservationDetailViewController(reservationId: reservationId)
+    }
 }
 
 // MARK: - Privates
