@@ -8,9 +8,9 @@
 
 import Foundation
 
-struct Reservation: Codable {
+struct Reservation {
 
-    enum State: String {
+    enum Status: String, Codable {
         case request
         case confirm
         case done
@@ -19,8 +19,48 @@ struct Reservation: Codable {
 
     // MARK: Properties
     let reservationId: String
-    let customerUserId: String
-    let photographerUserId: String
+    let customerUser: User
+    let photographerUser: User
     let reservationStartDate: Date
     let reservationEndDate: Date
+    let location: String
+    let status: Status
+}
+
+extension Reservation: Hashable {
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(reservationId)
+    }
+}
+
+// MARK: - Mapper struct
+extension Reservation {
+    
+    struct Preview: Hashable {
+        
+        // MARK: - Properties
+        let reservationId: String
+        let customerUser: User
+        let photographerUser: User
+        let reservationStartDate: Date
+        let status: Status
+        
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(reservationId)
+        }
+    }
+    
+    struct Mapper {
+        
+        // MARK: - Properties
+        let reservationId: String
+        let customerUserId: String
+        let photographerUserId: String
+        let reservationStartDate: Date
+        let reservationEndDate: Date
+        let latitude: Double
+        let longitude: Double
+        let status: Status
+    }
 }

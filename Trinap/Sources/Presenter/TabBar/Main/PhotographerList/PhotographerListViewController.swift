@@ -64,7 +64,6 @@ final class PhotographerListViewController: BaseViewController {
     }
 
     override func configureConstraints() {
-        
         searchBarView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide)
             make.leading.equalToSuperview().offset(trinapOffset)
