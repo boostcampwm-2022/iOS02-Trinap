@@ -36,7 +36,7 @@ final class EditPhotographerViewModel: ViewModelType {
     
     var disposeBag = DisposeBag()
     
-    private let reloadTrigger = BehaviorSubject<Void>(value: ())
+    private let reloadTrigger = PublishSubject<Void>()
     // MARK: - Initializer
     init(
         fetchUserUseCase: FetchUserUseCase,
@@ -103,7 +103,7 @@ extension EditPhotographerViewModel {
                 self.fetchPhotographerUseCase.fetch(photographerUserId: user.userId)
                     .flatMap { photographer in
                         return self.mapRepository.fetchLocationName(
-                            using: Coordinate(lat: photographer.latitude, lng: photographer.latitude)
+                            using: Coordinate(lat: photographer.latitude, lng: photographer.longitude)
                         )
                         .map { location in
                             return PhotographerUser(user: user, photographer: photographer, location: location)
