@@ -8,7 +8,6 @@
 import Foundation
 
 import RxCocoa
-import RxRelay
 import RxSwift
 
 final class PhotographerDetailViewModel: ViewModelType {
@@ -92,20 +91,23 @@ final class PhotographerDetailViewModel: ViewModelType {
         
         let buttonAvailable = self.reservationDate
             .map { date -> Bool in
-                if date.count == 2 { return true }
-                return false
+                return date.count == 2
             }
-
-        input.confirmTrigger
+        
+        //TODO: 같은 일자면 못 보내도록 서버에서 받아와서 확인하고 처리
+        Observable
+            .combineLatest(input.confirmTrigger, self.reservationDate.asObservable())
+            .map { _, dates -> [Date] in
+                dates
+            }
+            .distinctUntilChanged()
             .withUnretained(self)
-            .flatMap { owner, _ -> Observable<Void> in
-                //TODO: reservation 객체 만들어서 reservation 던져주고 화면 채팅으로 전환.
-                // 근데 reservation 통신은 여기서?
+            .flatMap { owner, dates -> Observable<Void> in
                 guard
-                    let start = owner.reservationDate.value[safe: 0],
-                    let end = owner.reservationDate.value[safe: 1]
+                    let start = dates[safe: 0],
+                    let end = dates[safe: 1]
                 else { return Observable.just(()) }
-                
+              
                 return owner.createReservationUseCase.create(
                     photographerUserId: owner.userId,
                     startDate: start,
@@ -113,10 +115,10 @@ final class PhotographerDetailViewModel: ViewModelType {
                     coordinate: owner.searchCoordinate
                 )
             }
-        //TODO: 채팅 전달
+            //TODO: 채팅 전달
             .subscribe()
             .disposed(by: disposeBag)
-        
+                
         Observable.combineLatest(input.calendarTrigger, photographer)
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .withUnretained(self)
