@@ -112,6 +112,7 @@ final class PhotographerListViewController: BaseViewController {
             .map { _ in return () }
                 
         let input = PhotographerListViewModel.Input(
+            viewWillAppear: self.rx.viewWillAppear.asObservable(),
             searchTrigger: searchTrigger,
             tagType: type
         )
@@ -150,6 +151,9 @@ extension PhotographerListViewController {
             cell.configureCell(itemIdentifier)
             
             cell.rx.tapGesture()
+                .asObservable()
+                .when(.recognized)
+                .throttle(.seconds(1), scheduler: MainScheduler.instance)
                 .subscribe(onNext: { [weak self] _ in
                     self?.viewModel.showDetailPhotographer(userId: itemIdentifier.photographerUserId)
                 })
@@ -158,5 +162,4 @@ extension PhotographerListViewController {
             return cell
         }
     }
-
 }
