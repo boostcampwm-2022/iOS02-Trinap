@@ -58,5 +58,4 @@ final class SearchBarView: BaseView {
     func configure(searchText: String) {
         self.searchLabel.text = searchText
     }
-
 }

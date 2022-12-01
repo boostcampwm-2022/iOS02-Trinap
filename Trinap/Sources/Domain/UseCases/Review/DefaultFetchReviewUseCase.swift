@@ -29,8 +29,8 @@ final class DefaultFetchReviewUseCase: FetchReviewUseCase {
     
     // MARK: - Methods
     /// 리뷰 평균 별점
-    func fetchAverageReview(photographerId: String?) -> Observable<ReviewSummary> {
-        guard let photographerId else {
+    func fetchAverageReview(photographerUserId: String?) -> Observable<ReviewSummary> {
+        guard let photographerUserId else {
             return reviewRepository.fetchReview(target: .photographer)
                 .withUnretained(self)
                 .map { owner, reviews in
@@ -38,7 +38,7 @@ final class DefaultFetchReviewUseCase: FetchReviewUseCase {
                 }
                 .asObservable()
         }
-        return reviewRepository.fetchReviews(id: photographerId, target: .photographer)
+        return reviewRepository.fetchReviews(id: photographerUserId, target: .photographer)
             .withUnretained(self)
             .map { owner, reviews in
                 owner.mappingReviewSummary(reviews)

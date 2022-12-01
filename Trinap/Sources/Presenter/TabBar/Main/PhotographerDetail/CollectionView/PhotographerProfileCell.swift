@@ -32,7 +32,7 @@ final class PhotographerProfileCell: BaseCollectionViewCell {
     
     // MARK: Methods
     override func configureHierarchy() {
-        self.addSubviews([profileImage, nickNameLabel, locationLabel, filterView])
+        self.contentView.addSubviews([profileImage, nickNameLabel, locationLabel, filterView])
     }
     
     override func configureConstraints() {

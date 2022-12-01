@@ -66,6 +66,48 @@ final class DefaultReservationRepository: ReservationRepository {
         .asObservable()
     }
     
+    func create(reservation: Reservation, coordinate: Coordinate) -> Observable<Void> {
+        let dto = ReservationDTO(reservation: reservation, coordinate: coordinate)
+        return fireStore.createDocument(
+            collection: .reservations,
+            document: dto.reservationId,
+            values: dto.asDictionary ?? [:]
+        )
+        .asObservable()
+    }
+    
+    func create(
+        photographerUserId: String,
+        startDate: Date,
+        endDate: Date,
+        coordinate: Coordinate
+    ) -> Observable<Void> {
+        guard let userId = keychainManager.getToken(with: .userId) else {
+            return .error(LocalError.tokenError)
+        }
+        
+        let dto = ReservationDTO(
+            reservationId: UUID().uuidString,
+            customerUserId: userId,
+            photographerUserId: photographerUserId,
+            reservationStartDate: startDate.toString(type: .timeStamp),
+            reservationEndDate: startDate.toString(type: .timeStamp),
+            latitude: coordinate.lat,
+            longitude: coordinate.lng,
+            status: .request
+        )
+        guard let values = dto.asDictionary else {
+            return .error(LocalError.structToDictionaryError)
+            
+        }
+        
+        return fireStore.createDocument(
+            collection: .reservations,
+            document: dto.reservationId,
+            values: values
+        ).asObservable()
+    }
+    
     func fetchReservation(reservationId: String) -> Observable<Reservation.Mapper> {
         return fireStore.getDocument(
             collection: .reservations,
@@ -74,6 +116,7 @@ final class DefaultReservationRepository: ReservationRepository {
         .compactMap { $0.toObject(ReservationDTO.self)?.toMapper() }
         .asObservable()
     }
+    
 //
 //    func addReservation(reservation: Reservation) -> Observable<Bool> {
 //        guard let data = reservation.asDictionary else { return Observable.just(false) }
