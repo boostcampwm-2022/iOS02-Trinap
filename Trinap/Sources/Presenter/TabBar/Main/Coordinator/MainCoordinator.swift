@@ -9,6 +9,7 @@
 import UIKit
 
 import RxRelay
+import FirestoreService
 
 final class MainCoordinator: Coordinator {
     
@@ -108,6 +109,11 @@ extension MainCoordinator {
                 reviewRepositry: DefaultReviewRepository(),
                 userRepository: DefaultUserRepository(),
                 photographerRepository: DefaultPhotographerRepository()
+            ),
+            createReservationUseCase: DefaultCreateReservationUseCase(
+                reservationRepository: DefaultReservationRepository(
+                    firebaseStoreService: DefaultFireStoreService()
+                )
             ),
             mapRepository: DefaultMapRepository(),
             userId: userId,

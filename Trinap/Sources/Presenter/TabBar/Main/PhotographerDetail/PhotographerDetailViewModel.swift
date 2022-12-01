@@ -25,7 +25,7 @@ final class PhotographerDetailViewModel: ViewModelType {
         let resevationDates: Driver<[Date]>
         let dataSource: Driver<[PhotographerDataSource]>
     }
-
+    
     // MARK: - Properties
     let disposeBag = DisposeBag()
 
@@ -33,6 +33,7 @@ final class PhotographerDetailViewModel: ViewModelType {
     private let fetchUserUseCase: FetchUserUseCase
     private let fetchPhotographerUseCase: FetchPhotographerUseCase
     private let fetchReviewUseCase: FetchReviewUseCase
+    private let createReservationUseCase: CreateReservationUseCase
     private let mapRepository: MapRepository
     
     private let reloadTrigger = BehaviorSubject<Void>(value: ())
@@ -49,6 +50,7 @@ final class PhotographerDetailViewModel: ViewModelType {
         fetchUserUseCase: FetchUserUseCase,
         fetchPhotographerUseCase: FetchPhotographerUseCase,
         fetchReviewUseCase: FetchReviewUseCase,
+        createReservationUseCase: CreateReservationUseCase,
         mapRepository: MapRepository,
         userId: String,
         searchCoordinate: Coordinate,
@@ -57,6 +59,7 @@ final class PhotographerDetailViewModel: ViewModelType {
         self.fetchUserUseCase = fetchUserUseCase
         self.fetchPhotographerUseCase = fetchPhotographerUseCase
         self.fetchReviewUseCase = fetchReviewUseCase
+        self.createReservationUseCase = createReservationUseCase
         self.mapRepository = mapRepository
         self.coordiantor = coordinator
         self.searchCoordinate = searchCoordinate
