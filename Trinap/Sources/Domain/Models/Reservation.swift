@@ -9,6 +9,11 @@
 import Foundation
 
 struct Reservation {
+    
+    enum UserType: String {
+        case photographer = "작가님"
+        case customer = "고객님"
+    }
 
     enum Status: String, Codable {
         case request
