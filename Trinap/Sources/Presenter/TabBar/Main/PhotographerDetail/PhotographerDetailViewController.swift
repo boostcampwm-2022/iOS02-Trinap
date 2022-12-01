@@ -58,8 +58,6 @@ class PhotographerDetailViewController: BaseViewController {
     // MARK: - Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-//        collectionView.backgroundColor = .blue
     }
     
     override func configureHierarchy() {
@@ -124,16 +122,7 @@ class PhotographerDetailViewController: BaseViewController {
             .disposed(by: disposeBag)
         
         output.confirmButtonEnabled
-            .drive { [weak self] flag in
-                if flag {
-                    self?.confirmButton.isEnabled = true
-                    self?.confirmButton.style = .primary
-                }
-                else {
-                    self?.confirmButton.isEnabled = false
-                    self?.confirmButton.style = .disabled
-                }
-            }
+            .drive(confirmButton.rx.enabled)
             .disposed(by: disposeBag)
         
         output.resevationDates
