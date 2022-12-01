@@ -11,7 +11,6 @@ import UIKit
 import SnapKit
 import Than
 
-
 final class TimeCell: BaseCollectionViewCell {
     private lazy var timeLabel = UILabel().than {
         $0.text = "00:00"

@@ -66,6 +66,20 @@ final class DefaultPhotographerRepository: PhotographerRepository {
         .asObservable()
     }
     
+    func fetchDetailPhotographer() -> Observable<Photographer> {
+        guard let userId = tokenManager.getToken(with: .userId) else {
+            return .error(TokenManagerError.notFound)
+        }
+        
+        return fireStoreService.getDocument(
+            collection: .photographers,
+            field: "photographerUserId",
+            in: [userId]
+        )
+        .compactMap { $0.first?.toObject(PhotographerDTO.self)?.toModel() }
+        .asObservable()
+    }
+    
     func create(photographer: Photographer) -> Observable<Void> {
         guard let token = tokenManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
