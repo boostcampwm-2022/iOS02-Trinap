@@ -23,6 +23,15 @@ final class TrinapButton: UIButton {
     var style: ColorType = .primary {
         didSet { configureColorSet() }
     }
+    
+    var fill: FillType {
+        get { return fillType }
+        set {
+            self.fillType = newValue
+            configureColorSet()
+        }
+    }
+    
     var originalStyle: ColorType
     private var fillType: FillType
     private var isCircle: Bool
