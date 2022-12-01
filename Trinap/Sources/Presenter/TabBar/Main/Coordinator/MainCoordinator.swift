@@ -46,12 +46,14 @@ extension MainCoordinator {
     }
     
     // TODO: - ViewModel Delegate Setting
-    func showSelectReservationDateViewController(with possibleDate: [Date]) {
+    func showSelectReservationDateViewController(with possibleDate: [Date], detailViewModel: PhotographerDetailViewModel) {
         let viewModel = SelectReservationDateViewModel(
             createReservationDateUseCase: DefaultCreateReservationDateUseCase(),
             coordinator: self,
             with: possibleDate
         )
+        
+        viewModel.delegate = detailViewModel
         
         let viewController = SelectReservationDateViewController(
             viewModel: viewModel
