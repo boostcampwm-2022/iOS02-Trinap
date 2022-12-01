@@ -8,8 +8,6 @@
 
 import UIKit
 
-import FirestoreService
-
 final class ReservationCoordinator: Coordinator {
     
     // MARK: - Properties
@@ -17,44 +15,36 @@ final class ReservationCoordinator: Coordinator {
     var navigationController: UINavigationController
     var childCoordinators: [Coordinator]
     
-    private let firestoreService: FireStoreService
+    private lazy var dependencies = ReservationDependencyContainer(reservationCoordinator: self)
     
     // MARK: - Initializers
     init(_ navigationController: UINavigationController) {
         self.navigationController = navigationController
         self.childCoordinators = []
-        
-        self.firestoreService = DefaultFireStoreService()
     }
     
     // MARK: - Methods
     func start() {
-        self.showReservationListViewController()
+        self.showReservationPreviewListViewController()
     }
 }
 
 extension ReservationCoordinator {
     
-    func showReservationListViewController() {
-        let viewModel = ReservationPreviewListViewModel(
-            coordinator: self,
-            fetchReservationPreviewsUseCase: makeFetchReservationPreviewsUseCase()
-        )
-        let viewController = ReservationPreviewListViewController(viewModel: viewModel)
+    func showReservationPreviewListViewController() {
+        let reservationPreviewListViewController = dependencies.makeReservationPreviewListViewController()
         
-        self.navigationController.setNavigationBarHidden(true, animated: false)
-        self.navigationController.pushViewController(viewController, animated: true)
+        self.navigationController.navigationBar.isHidden = true
+        self.navigationController.pushViewController(reservationPreviewListViewController, animated: true)
     }
     
-    private func makeFetchReservationPreviewsUseCase() -> FetchReservationPreviewsUseCase {
-        let reservationRepository = DefaultReservationRepository(firebaseStoreService: firestoreService)
-        let userRepository = DefaultUserRepository()
-        let mapRepository = DefaultMapRepository()
-        
-        return DefaultFetchReservationPreviewsUseCase(
-            reservationRepository: reservationRepository,
-            userRepository: userRepository,
-            mapRepository: mapRepository
+    func showReservationDetailViewController(reservationId: String) {
+        let reservationDetailViewController = dependencies.makeReservationDetailViewController(
+            reservationId: reservationId
         )
+        
+        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(reservationDetailViewController, animated: true)
+        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
     }
 }

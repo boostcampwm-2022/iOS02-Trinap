@@ -21,8 +21,8 @@ final class DefaultUserRepository: UserRepository {
     // MARK: - Methods
     init(
         tokenManager: TokenManager = KeychainTokenManager(),
-        firestoreService: DefaultFireStoreService = DefaultFireStoreService(),
-        networkService: DefaultNetworkService = DefaultNetworkService()
+        firestoreService: FireStoreService = DefaultFireStoreService(),
+        networkService: NetworkService = DefaultNetworkService()
     ) {
         self.firestoreService = firestoreService
         self.networkService = networkService

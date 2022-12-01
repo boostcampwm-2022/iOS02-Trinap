@@ -15,17 +15,14 @@ final class DefaultFetchReservationPreviewsUseCase: FetchReservationPreviewsUseC
     // MARK: Properties
     private let reservationRepository: ReservationRepository
     private let userRepository: UserRepository
-    private let mapRepository: MapRepository
     
     // MARK: Initializer
     init(
         reservationRepository: ReservationRepository,
-        userRepository: UserRepository,
-        mapRepository: MapRepository
+        userRepository: UserRepository
     ) {
         self.reservationRepository = reservationRepository
         self.userRepository = userRepository
-        self.mapRepository = mapRepository
     }
     
     // MARK: Methods

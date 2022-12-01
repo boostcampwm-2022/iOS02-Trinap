@@ -21,6 +21,7 @@ final class ThumbnailImageView: BaseView {
         $0.isPagingEnabled = true
         $0.clipsToBounds = true
         $0.alwaysBounceHorizontal = true
+        $0.showsHorizontalScrollIndicator = false
     }
     
     private lazy var imageShadowView = UIView().than {
