@@ -15,6 +15,12 @@ protocol ReservationRepository {
     // MARK: Methods
     func fetchReceivedReservations() -> Observable<[Reservation.Mapper]>
     func fetchSentReservations() -> Observable<[Reservation.Mapper]>
+    func create(
+        photographerUserId: String,
+        startDate: Date,
+        endDate: Date,
+        coordinate: Coordinate
+    ) -> Observable<Void>
 //    func fetchDetail(reservationId: String) -> Observable<Reservation>
 //    func addReservation(reservation: Reservation) -> Observable<Bool>
 //    func deleteReservation(reservationId: String) -> Observable<Void>
