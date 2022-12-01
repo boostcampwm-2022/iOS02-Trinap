@@ -43,6 +43,8 @@ extension ReservationCoordinator {
             reservationId: reservationId
         )
         
+        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
         self.navigationController.pushViewController(reservationDetailViewController, animated: true)
+        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
     }
 }
