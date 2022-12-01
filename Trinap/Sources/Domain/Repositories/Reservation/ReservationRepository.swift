@@ -15,7 +15,7 @@ protocol ReservationRepository {
     // MARK: Methods
     func fetchReceivedReservations() -> Observable<[Reservation.Mapper]>
     func fetchSentReservations() -> Observable<[Reservation.Mapper]>
-//    func fetchDetail(reservationId: String) -> Observable<Reservation>
+    func fetchReservation(reservationId: String) -> Observable<Reservation.Mapper>
 //    func addReservation(reservation: Reservation) -> Observable<Bool>
 //    func deleteReservation(reservationId: String) -> Observable<Void>
 //    func updateState(reservationId: String, state: Reservation.Status) -> Observable<Void>

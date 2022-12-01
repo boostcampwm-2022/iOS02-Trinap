@@ -57,7 +57,7 @@ final class ReservationPreviewListViewController: BaseViewController {
         }
         
         reservationListTableView.snp.makeConstraints { make in
-            make.top.equalTo(self.filterView.snp.bottom)
+            make.top.equalTo(self.filterView.snp.bottom).offset(2)
             make.leading.trailing.bottom.equalTo(self.view.safeAreaLayoutGuide)
         }
     }
@@ -86,6 +86,18 @@ final class ReservationPreviewListViewController: BaseViewController {
                 self?.dataSource?.apply(snapshot)
             })
             .disposed(by: disposeBag)
+        
+        reservationListTableView.rx.itemSelected
+            .bind(onNext: { [weak self] indexPath in
+                self?.showReservationDetailViewController(at: indexPath)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func showReservationDetailViewController(at indexPath: IndexPath) {
+        guard let reservationPreview = self.dataSource?.itemIdentifier(for: indexPath) else { return }
+        
+        viewModel.presentReservationDetail(reservationId: reservationPreview.reservationId)
     }
 }
 

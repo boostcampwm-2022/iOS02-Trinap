@@ -27,7 +27,7 @@ final class ReservationPreviewListViewModel: ViewModelType {
     
     // MARK: - Initializer
     init(
-        coordinator: ReservationCoordinator,
+        coordinator: ReservationCoordinator?,
         fetchReservationPreviewsUseCase: FetchReservationPreviewsUseCase
     ) {
         self.coordinator = coordinator
@@ -41,6 +41,10 @@ final class ReservationPreviewListViewModel: ViewModelType {
             .flatMap { $0.mapFilterToPreviews($1) }
         
         return Output(reservationPreviews: reservationPreviews.asDriver(onErrorJustReturn: []))
+    }
+    
+    func presentReservationDetail(reservationId: String) {
+        coordinator?.showReservationDetailViewController(reservationId: reservationId)
     }
 }
 
