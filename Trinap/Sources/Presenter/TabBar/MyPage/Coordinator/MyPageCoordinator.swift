@@ -100,7 +100,8 @@ extension MyPageCoordinator {
             ),
             fetchPhotographerUseCase: DefaultFetchPhotographerUseCase(
                 photographerRespository: photographerRepository
-            )
+            ),
+            coordinator: self
         )
         
         let viewController = EditPossibleDateViewController(viewModel: viewModel)

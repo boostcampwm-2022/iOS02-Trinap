@@ -23,6 +23,7 @@ final class EditPossibleDateViewController: BaseViewController {
     
     private lazy var editDoneButton = UIButton().than {
         $0.setTitleColor(TrinapAsset.primary.color, for: .normal)
+        $0.setTitleColor(TrinapAsset.disabled.color, for: .disabled)
         $0.setTitle("완료", for: .normal)
         $0.titleLabel?.font = TrinapFontFamily.Pretendard.semiBold.font(size: 16)
     }
@@ -102,12 +103,6 @@ final class EditPossibleDateViewController: BaseViewController {
     
     func updateEditDoneButtonEnabled(_ isEnabled: Bool) {
         self.editDoneButton.isEnabled = isEnabled
-        
-        if isEnabled {
-            self.editDoneButton.setTitleColor(TrinapAsset.primary.color, for: .normal)
-        } else {
-            self.editDoneButton.setTitleColor(TrinapAsset.disabled.color, for: .disabled)
-        }
     }
 }
 
