@@ -56,6 +56,26 @@ final class ReservationDependencyContainer {
     }
     
     private func makeReservationDetailViewModel(reservationId: String) -> ReservationDetailViewModel {
-        return ReservationDetailViewModel(reservationCoordinator: reservationCoordinator)
+        let fetchReservationUseCase = makeFetchReservationUseCase()
+        
+        return ReservationDetailViewModel(
+            reservationCoordinator: reservationCoordinator,
+            fetchReservationUseCase: fetchReservationUseCase,
+            reservationId: reservationId
+        )
+    }
+    
+    private func makeFetchReservationUseCase() -> FetchReservationUseCase {
+        let mapRepository = makeMapRepository()
+        
+        return DefaultFetchReservationUseCase(
+            reservationRepository: reservationRepository,
+            userRepository: userRepository,
+            mapRepository: mapRepository
+        )
+    }
+    
+    private func makeMapRepository() -> MapRepository {
+        return DefaultMapRepository()
     }
 }
