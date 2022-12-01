@@ -45,7 +45,16 @@ final class PhotographerListViewModel: ViewModelType {
     }
 
     // MARK: - Methods
-    func transform(input: Input) -> Output {        
+    func transform(input: Input) -> Output {
+        input.viewWillAppear
+            .withUnretained(self)
+            .flatMap { owner, _ in owner.fetchCurrentLocationUseCase.fetchCurrentLocation()
+            }
+            .bind(onNext: { coor, _ in
+                self.coordinate.accept(coor)
+            })
+            .disposed(by: disposeBag)
+        
         input.searchTrigger
             .subscribe(onNext: { [weak self] _ in
                 guard let self else { return }
@@ -79,7 +88,6 @@ final class PhotographerListViewModel: ViewModelType {
 extension PhotographerListViewModel {
     
     func showDetailPhotographer(userId: String) {
-        //TODO:
         guard let coordinate = coordinate.value else { return }
         coordinator?.showDetailPhotographerViewController(userId: userId, searchCoordinate: coordinate)
     }
