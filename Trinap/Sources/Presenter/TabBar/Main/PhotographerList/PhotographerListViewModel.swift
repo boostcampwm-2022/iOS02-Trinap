@@ -37,7 +37,7 @@ final class PhotographerListViewModel: ViewModelType {
     init(
         previewsUseCase: FetchPhotographerPreviewsUseCase,
         fetchCurrentLocationUseCase: FetchCurrentLocationUseCase,
-        coordinator: MainCoordinator
+        coordinator: MainCoordinator?
     ) {
         self.previewsUseCase = previewsUseCase
         self.fetchCurrentLocationUseCase = fetchCurrentLocationUseCase

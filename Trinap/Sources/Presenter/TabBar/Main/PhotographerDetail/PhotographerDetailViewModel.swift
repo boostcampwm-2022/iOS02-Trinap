@@ -53,7 +53,7 @@ final class PhotographerDetailViewModel: ViewModelType {
         mapRepository: MapRepository,
         userId: String,
         searchCoordinate: Coordinate,
-        coordinator: MainCoordinator
+        coordinator: MainCoordinator?
     ) {
         self.fetchUserUseCase = fetchUserUseCase
         self.fetchPhotographerUseCase = fetchPhotographerUseCase
