@@ -93,13 +93,15 @@ class PhotographerDetailViewController: BaseViewController {
     
     override func configureAttributes() {
         configureCollectionView()
+        self.confirmButton.isEnabled = false
     }
     
     override func bind() {
         let input = PhotographerDetailViewModel.Input(
             viewWillAppear: self.rx.viewWillAppear.asObservable(),
-            tabState: self.tabState.asObservable()
-//            confirmTrigger:
+            tabState: self.tabState.asObservable(),
+            calendarTrigger: calendarButton.rx.tap.asObservable(),
+            confirmTrigger: confirmButton.rx.tap.asObservable()
         )
         
         let output = viewModel.transform(input: input)
@@ -120,7 +122,20 @@ class PhotographerDetailViewController: BaseViewController {
                 self.dataSource.apply(snapshot, animatingDifferences: false)
             }
             .disposed(by: disposeBag)
-
+        
+        output.confirmButtonEnabled
+            .drive { [weak self] flag in
+                if flag {
+                    self?.confirmButton.isEnabled = true
+                    self?.confirmButton.style = .primary
+                }
+                else {
+                    self?.confirmButton.isEnabled = false
+                    self?.confirmButton.style = .disabled
+                }
+            }
+            .disposed(by: disposeBag)
+        
         output.resevationDates
             .drive { [weak self] dates in
                 guard
