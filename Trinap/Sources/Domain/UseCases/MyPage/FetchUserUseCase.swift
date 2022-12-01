@@ -11,5 +11,8 @@ import Foundation
 import RxSwift
 
 protocol FetchUserUseCase {
+
+    // MARK: Methods
     func fetchUserInfo() -> Observable<User>
+    func fetchUserInfo(userId: String) -> Observable<User>
 }

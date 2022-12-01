@@ -16,6 +16,7 @@ import Than
 final class PhotographerPreviewCell: BaseCollectionViewCell {
     
     // MARK: UI
+    // TODO: 이미지 여러개가 겹쳐서 나온다
     private lazy var thumbnailImageView = ThumbnailImageView()
     
     private lazy var locationLabel = UILabel().than {
@@ -30,13 +31,13 @@ final class PhotographerPreviewCell: BaseCollectionViewCell {
     private lazy var ratingLabel = StarView()
     
     // MARK: Properties
-    var cellDisposeBag = DisposeBag()
+//    var disposeBag = DisposeBag()
     
     // MARK: Methods
     override func prepareForReuse() {
         super.prepareForReuse()
         
-        cellDisposeBag = DisposeBag()
+        self.disposeBag = DisposeBag()
     }
     
     override func configureHierarchy() {
@@ -79,9 +80,8 @@ final class PhotographerPreviewCell: BaseCollectionViewCell {
                 guard let self else { return }
                 self.configureCell(preview)
             }
-            .disposed(by: self.cellDisposeBag)
+            .disposed(by: self.disposeBag)
     }
-    
 }
 
 extension PhotographerPreviewCell {

@@ -9,6 +9,7 @@
 import UIKit
 
 import RxRelay
+import FirestoreService
 
 final class MainCoordinator: Coordinator {
     
@@ -39,6 +40,9 @@ extension MainCoordinator {
                     mapRepository: DefaultMapRepository(),
                     userRepository: DefaultUserRepository(),
                     reviewRepository: DefaultReviewRepository()),
+                fetchCurrentLocationUseCase: DefaultFetchCurrentLocationUseCase(
+                    mapRepository: DefaultMapRepository()
+                ),
                 coordinator: self
             ))
         self.navigationController.setNavigationBarHidden(true, animated: false)
@@ -46,12 +50,14 @@ extension MainCoordinator {
     }
     
     // TODO: - ViewModel Delegate Setting
-    func showSelectReservationDateViewController(with possibleDate: [Date]) {
+    func showSelectReservationDateViewController(with possibleDate: [Date], detailViewModel: PhotographerDetailViewModel) {
         let viewModel = SelectReservationDateViewModel(
             createReservationDateUseCase: DefaultCreateReservationDateUseCase(),
             coordinator: self,
             with: possibleDate
         )
+        
+        viewModel.delegate = detailViewModel
         
         let viewController = SelectReservationDateViewController(
             viewModel: viewModel
@@ -92,6 +98,33 @@ extension MainCoordinator {
     }
     
     func showDetailPhotographerViewController(userId: String, searchCoordinate: Coordinate) {
-        Logger.print(userId)
+        let viewModel = PhotographerDetailViewModel(
+            fetchUserUseCase: DefaultFetchUserUseCase(
+                userRepository: DefaultUserRepository()
+            ),
+            fetchPhotographerUseCase: DefaultFetchPhotographerUseCase(
+                photographerRespository: DefaultPhotographerRepository()
+            ),
+            fetchReviewUseCase: DefaultFetchReviewUseCase(
+                reviewRepositry: DefaultReviewRepository(),
+                userRepository: DefaultUserRepository(),
+                photographerRepository: DefaultPhotographerRepository()
+            ),
+            createReservationUseCase: DefaultCreateReservationUseCase(
+                reservationRepository: DefaultReservationRepository(
+                    firebaseStoreService: DefaultFireStoreService()
+                )
+            ),
+            mapRepository: DefaultMapRepository(),
+            userId: userId,
+            searchCoordinate: searchCoordinate,
+            coordinator: self
+        )
+        let viewController = PhotographerDetailViewController(
+            viewModel: viewModel
+        )
+        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(viewController, animated: true)
+        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
     }
 }

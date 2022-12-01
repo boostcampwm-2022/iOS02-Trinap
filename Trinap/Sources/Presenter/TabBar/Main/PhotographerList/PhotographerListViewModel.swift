@@ -13,9 +13,9 @@ import RxSwift
 final class PhotographerListViewModel: ViewModelType {
     
     struct Input {
+        let viewWillAppear: Observable<Bool>
         let searchTrigger: Observable<Void>
         var tagType: Observable<TagType>
-//        var selectedPreview: Observable<PhotographerPreview>
     }
 
     struct Output {
@@ -26,6 +26,7 @@ final class PhotographerListViewModel: ViewModelType {
     let disposeBag = DisposeBag()
     private weak var coordinator: MainCoordinator?
     private let previewsUseCase: FetchPhotographerPreviewsUseCase
+    private let fetchCurrentLocationUseCase: FetchCurrentLocationUseCase
     
     let defaultString = "추억을 만들 장소를 선택해주세요."
     
@@ -35,14 +36,25 @@ final class PhotographerListViewModel: ViewModelType {
     // MARK: - Initializer
     init(
         previewsUseCase: FetchPhotographerPreviewsUseCase,
+        fetchCurrentLocationUseCase: FetchCurrentLocationUseCase,
         coordinator: MainCoordinator
     ) {
         self.previewsUseCase = previewsUseCase
+        self.fetchCurrentLocationUseCase = fetchCurrentLocationUseCase
         self.coordinator = coordinator
     }
 
     // MARK: - Methods
-    func transform(input: Input) -> Output {        
+    func transform(input: Input) -> Output {
+        input.viewWillAppear
+            .withUnretained(self)
+            .flatMap { owner, _ in owner.fetchCurrentLocationUseCase.fetchCurrentLocation()
+            }
+            .bind(onNext: { coor, _ in
+                self.coordinate.accept(coor)
+            })
+            .disposed(by: disposeBag)
+        
         input.searchTrigger
             .subscribe(onNext: { [weak self] _ in
                 guard let self else { return }
@@ -76,7 +88,6 @@ final class PhotographerListViewModel: ViewModelType {
 extension PhotographerListViewModel {
     
     func showDetailPhotographer(userId: String) {
-        //TODO:
         guard let coordinate = coordinate.value else { return }
         coordinator?.showDetailPhotographerViewController(userId: userId, searchCoordinate: coordinate)
     }

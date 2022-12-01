@@ -113,7 +113,7 @@ extension EditPhotographerViewModel {
     }
     
     private func fetchReviews() -> Observable<ReviewInformation> {
-        let summary = self.fetchReviewUseCase.fetchAverageReview(photographerId: nil)
+        let summary = self.fetchReviewUseCase.fetchAverageReview(photographerUserId: nil)
         let reviews = self.fetchReviewUseCase.fetchReviews(photographerUserId: nil)
         return Observable.zip(summary, reviews)
             .map { summary, reviews in

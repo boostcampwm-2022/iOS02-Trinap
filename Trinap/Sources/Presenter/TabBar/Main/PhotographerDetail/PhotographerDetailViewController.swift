@@ -58,8 +58,6 @@ class PhotographerDetailViewController: BaseViewController {
     // MARK: - Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-//        collectionView.backgroundColor = .blue
     }
     
     override func configureHierarchy() {
@@ -73,7 +71,7 @@ class PhotographerDetailViewController: BaseViewController {
     override func configureConstraints() {
         collectionView.snp.makeConstraints { make in
             make.horizontalEdges.top.equalToSuperview()
-            make.bottom.equalToSuperview().offset(-200)
+            make.bottom.equalToSuperview().offset(-88)
         }
         
         calendarButton.snp.makeConstraints { make in
@@ -89,19 +87,19 @@ class PhotographerDetailViewController: BaseViewController {
             make.width.equalTo((view.frame.width - 2 * trinapOffset) / 2)
             make.height.equalTo(48)
         }
-        
-        collectionView.backgroundColor = .red
     }
     
     override func configureAttributes() {
         configureCollectionView()
+        self.confirmButton.isEnabled = false
     }
     
     override func bind() {
         let input = PhotographerDetailViewModel.Input(
             viewWillAppear: self.rx.viewWillAppear.asObservable(),
-            tabState: self.tabState.asObservable()
-//            confirmTrigger:
+            tabState: self.tabState.asObservable(),
+            calendarTrigger: calendarButton.rx.tap.asObservable(),
+            confirmTrigger: confirmButton.rx.tap.asObservable()
         )
         
         let output = viewModel.transform(input: input)
@@ -122,7 +120,21 @@ class PhotographerDetailViewController: BaseViewController {
                 self.dataSource.apply(snapshot, animatingDifferences: false)
             }
             .disposed(by: disposeBag)
-
+        
+        output.confirmButtonEnabled
+            .drive(confirmButton.rx.enabled)
+            .disposed(by: disposeBag)
+        
+        output.resevationDates
+            .drive { [weak self] dates in
+                guard
+                    let start = dates[safe: 0],
+                    let end = dates[safe: 1]
+                else { return }
+                      
+                self?.configureCalendarButton(startDate: start, endDate: end)
+            }
+            .disposed(by: disposeBag)
     }
 }
 
@@ -197,10 +209,6 @@ extension PhotographerDetailViewController {
                 return cell
             }
         }
-        
-        dataSource.supplementaryViewProvider = { [weak self] (collectionView: UICollectionView, kind: String, indexPath: IndexPath) -> UICollectionReusableView? in
-            return nil
-        }
         return dataSource
     }
 }
@@ -274,19 +282,6 @@ extension PhotographerDetailViewController {
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitem: item, count: 3)
         
         let section = NSCollectionLayoutSection(group: group)
-        
-        let isEditable = false
-        
-//        let header = NSCollectionLayoutBoundarySupplementaryItem(
-//            layoutSize: NSCollectionLayoutSize(
-//                widthDimension: .fractionalWidth(1.0),
-//                heightDimension: .absolute(trinapOffset * 8)
-//            ),
-//            elementKind: isEditable ? EditPhotographerPhotoDeleteHeaderView.reuseIdentifier : EditPhotographerPhotoHeaderView.reuseIdentifier,
-//            alignment: .top
-//        )
-//
-//        section.boundarySupplementaryItems = [header]
         
         section.contentInsets = NSDirectionalEdgeInsets(top: inset, leading: 0, bottom: 0, trailing: inset)
         return section
@@ -373,3 +368,74 @@ extension PhotographerDetailViewController {
         return section
     }
 }
+
+extension PhotographerDetailViewController {
+    
+    private func configureCalendarButton(startDate: Date, endDate: Date) {
+        guard let dateInfo = formattingCalendarButtonText(
+            startDate: startDate,
+            endDate: endDate
+        )
+        else { return }
+        
+        calendarButton.titleLabel?.numberOfLines = 0
+        calendarButton.titleLabel?.textAlignment = .left
+        calendarButton.setTitle(nil, for: .normal)
+        let buttonText = NSMutableAttributedString()
+            .bold(string: dateInfo)
+            .regular(string: "날짜 변경하기")
+        calendarButton.setAttributedTitle(buttonText, for: .normal)
+    }
+    
+    private func formattingCalendarButtonText(startDate: Date, endDate: Date) -> String? {
+        let startSeperated = startDate.toString(type: .yearToSecond).components(separatedBy: " ")
+        let endSeperated = endDate.toString(type: .yearToSecond).components(separatedBy: " ")
+        
+        guard let date = startSeperated[safe: 0] else { return nil }
+        let dateSeperated = date.components(separatedBy: "-")
+        guard
+            let month = dateSeperated[safe: 1],
+            let day = dateSeperated[safe: 2]
+        else { return nil }
+        
+        guard
+            let startTime = startSeperated.last,
+            let endTime = endSeperated.last
+        else { return nil }
+        let startHourToSec = startTime.components(separatedBy: ":")
+        let endHourToSec = endTime.components(separatedBy: ":")
+        guard
+            let startHour = startHourToSec[safe: 0],
+            let startMin = startHourToSec[safe: 1],
+            let endHour = endHourToSec[safe: 0],
+            let endMin = endHourToSec[safe: 1]
+        else { return nil }
+
+        let reservationDate = "\(month)/\(day)"
+        let reservationStart = "\(startHour):\(startMin)"
+        let reservationEnd = "\(endHour):\(endMin)"
+        let dateInfo = "\(reservationDate) \(reservationStart)-\(reservationEnd)\n"
+        return dateInfo
+    }
+}
+
+private extension NSMutableAttributedString {
+
+    func bold(string: String) -> NSMutableAttributedString {
+        let font = TrinapFontFamily.Pretendard.bold.font(size: 16)
+        let attributes: [NSAttributedString.Key: Any] = [.font: font]
+        self.append(NSAttributedString(string: string, attributes: attributes))
+        return self
+    }
+
+    func regular(string: String) -> NSMutableAttributedString {
+        let font = TrinapFontFamily.Pretendard.regular.font(size: 12)
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: font,
+            .foregroundColor: TrinapAsset.subtext.color
+        ]
+        self.append(NSAttributedString(string: string, attributes: attributes))
+        return self
+    }
+}
+

@@ -1,4 +1,3 @@
-
 //  PhotographerDetailViewModel.swift
 //  Trinap
 //
@@ -6,8 +5,9 @@
 //  Copyright © 2022 Trinap. All rights reserved.
 //
 
+import Foundation
+
 import RxCocoa
-import RxRelay
 import RxSwift
 
 final class PhotographerDetailViewModel: ViewModelType {
@@ -15,14 +15,16 @@ final class PhotographerDetailViewModel: ViewModelType {
     struct Input {
         let viewWillAppear: Observable<Bool>
         let tabState: Observable<Int>
-//        let calendarTrigger: Observable<Void>
-//        let confirmTrigger: Observable<Void>
+        let calendarTrigger: Observable<Void>
+        let confirmTrigger: Observable<Void>
     }
 
     struct Output {
+        let confirmButtonEnabled: Driver<Bool>
+        let resevationDates: Driver<[Date]>
         let dataSource: Driver<[PhotographerDataSource]>
     }
-
+    
     // MARK: - Properties
     let disposeBag = DisposeBag()
 
@@ -30,24 +32,37 @@ final class PhotographerDetailViewModel: ViewModelType {
     private let fetchUserUseCase: FetchUserUseCase
     private let fetchPhotographerUseCase: FetchPhotographerUseCase
     private let fetchReviewUseCase: FetchReviewUseCase
-    private let editPortfolioPictureUseCase: EditPortfolioPictureUseCase
+    private let createReservationUseCase: CreateReservationUseCase
     private let mapRepository: MapRepository
     
     private let reloadTrigger = BehaviorSubject<Void>(value: ())
+    
+    private let searchCoordinate: Coordinate
+    private let userId: String
+    //TODO: 델리게이트로 넘어오는 값 여기에 넣기
+    private var reservationDate = BehaviorRelay<[Date]>(value: [])
+    
+    private weak var coordiantor: MainCoordinator?
     
     // MARK: - Initializer
     init(
         fetchUserUseCase: FetchUserUseCase,
         fetchPhotographerUseCase: FetchPhotographerUseCase,
         fetchReviewUseCase: FetchReviewUseCase,
-        editPortfolioPictureUseCase: EditPortfolioPictureUseCase,
-        mapRepository: MapRepository
+        createReservationUseCase: CreateReservationUseCase,
+        mapRepository: MapRepository,
+        userId: String,
+        searchCoordinate: Coordinate,
+        coordinator: MainCoordinator
     ) {
         self.fetchUserUseCase = fetchUserUseCase
         self.fetchPhotographerUseCase = fetchPhotographerUseCase
         self.fetchReviewUseCase = fetchReviewUseCase
-        self.editPortfolioPictureUseCase = editPortfolioPictureUseCase
+        self.createReservationUseCase = createReservationUseCase
         self.mapRepository = mapRepository
+        self.coordiantor = coordinator
+        self.searchCoordinate = searchCoordinate
+        self.userId = userId
     }
 
     // MARK: - Initializer
@@ -60,13 +75,6 @@ final class PhotographerDetailViewModel: ViewModelType {
             .bind(to: reloadTrigger)
             .disposed(by: disposeBag)
         
-        let reviewInformation = self.reloadTrigger
-            .withUnretained(self)
-            .flatMap { owner, _ in
-                owner.fetchReviews()
-            }
-            .share()
-        
         let photographer = self.reloadTrigger
             .withUnretained(self)
             .flatMap { owner, _ in
@@ -74,14 +82,68 @@ final class PhotographerDetailViewModel: ViewModelType {
             }
             .share()
         
+        let reviewInformation = Observable.combineLatest(reloadTrigger, photographer)
+            .withUnretained(self)
+            .flatMap { owner, value in
+                return owner.fetchReviews(photographerId: value.1.photographerId)
+            }
+            .share()
+        
+        let buttonAvailable = self.reservationDate
+            .map { date -> Bool in
+                return date.count == 2
+            }
+        
+        //TODO: 같은 일자면 못 보내도록 서버에서 받아와서 확인하고 처리
+        Observable
+            .combineLatest(input.confirmTrigger, self.reservationDate.asObservable())
+            .map { _, dates -> [Date] in
+                dates
+            }
+            .distinctUntilChanged()
+            .withUnretained(self)
+            .flatMap { owner, dates -> Observable<Void> in
+                guard
+                    let start = dates[safe: 0],
+                    let end = dates[safe: 1]
+                else { return Observable.just(()) }
+              
+                return owner.createReservationUseCase.create(
+                    photographerUserId: owner.userId,
+                    startDate: start,
+                    endDate: end,
+                    coordinate: owner.searchCoordinate
+                )
+            }
+            //TODO: 채팅 전달
+            .subscribe()
+            .disposed(by: disposeBag)
+                
+        Observable.combineLatest(input.calendarTrigger, photographer)
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .withUnretained(self)
+            .subscribe(onNext: { owner, value in
+                let photographerUser = value.1
+//                owner.coordiantor?.showSelectReservationDateViewController(with: photographerUser.possibleDate, detailViewModel: self)
+                owner.coordiantor?.showSelectReservationDateViewController(with: [Date()], detailViewModel: self)
+            })
+            .disposed(by: disposeBag)
+        
         let dataSource = Observable.combineLatest(input.tabState, photographer, reviewInformation)
             .map { [weak self] section, photographer, review -> [PhotographerDataSource] in
                 guard let self else { return [] }
                 
                 return self.mappingDataSource(isEditable: false, state: section, photographer: photographer, review: review)
             }
+        
+        let reservationDates = self.reservationDate.asDriver(onErrorJustReturn: [])
+            
 
-        return Output(dataSource: dataSource.asDriver(onErrorJustReturn: []))
+        return Output(
+            confirmButtonEnabled: buttonAvailable.asDriver(onErrorJustReturn: false),
+            resevationDates: reservationDates,
+            dataSource: dataSource.asDriver(onErrorJustReturn: [])
+        )
     }
 }
 
@@ -89,8 +151,7 @@ final class PhotographerDetailViewModel: ViewModelType {
 extension PhotographerDetailViewModel {
     
     private func fetchPhotographer() -> Observable<PhotographerUser> {
-        //TODO: 내꺼 아니라 다른 사람 userInfo 받아오도록 변경
-        return self.fetchUserUseCase.fetchUserInfo()
+        return self.fetchUserUseCase.fetchUserInfo(userId: userId)
             .flatMap { user in
                 self.fetchPhotographerUseCase.fetch(photographerUserId: user.userId)
                     .flatMap { photographer in
@@ -106,11 +167,13 @@ extension PhotographerDetailViewModel {
             }
     }
     
-    private func fetchReviews() -> Observable<ReviewInformation> {
-        let summary = self.fetchReviewUseCase.fetchAverageReview(photographerId: nil)
-        let reviews = self.fetchReviewUseCase.fetchReviews(photographerUserId: nil)
+    private func fetchReviews(photographerId: String) -> Observable<ReviewInformation> {
+        let summary = self.fetchReviewUseCase.fetchAverageReview(photographerUserId: userId)
+        let reviews = self.fetchReviewUseCase.fetchReviews(photographerUserId: userId)
         return Observable.zip(summary, reviews)
             .map { summary, reviews in
+                Logger.print(summary)
+                Logger.printArray(reviews)
                 guard !summary.rating.isNaN
                 else {
                     return ReviewInformation(
@@ -164,5 +227,12 @@ extension PhotographerDetailViewModel {
     private func mappingReviewDataSource(review: ReviewInformation) -> [PhotographerDataSource] {
         return [ [.detail: [.summaryReview(review.summary)]] ] +
             [ [.review: review.reviews.map { PhotographerSection.Item.review($0) } ] ]
+    }
+}
+
+extension PhotographerDetailViewModel: SelectReservationDateViewModelDelegate {
+    
+    func selectedReservationDate(startDate: Date, endDate: Date) {
+        self.reservationDate.accept([startDate, endDate])
     }
 }
