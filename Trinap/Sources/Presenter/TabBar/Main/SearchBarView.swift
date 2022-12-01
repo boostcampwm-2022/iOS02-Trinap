@@ -25,9 +25,6 @@ final class SearchBarView: BaseView {
         $0.textColor = TrinapAsset.gray40.color
     }
     
-//    lazy var qweodin = UITextField().than {
-//        $0.imag
-//    }
     // MARK: Properties
     
     // MARK: Initializers
