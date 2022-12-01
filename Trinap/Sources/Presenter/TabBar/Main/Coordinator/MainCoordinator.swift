@@ -94,6 +94,28 @@ extension MainCoordinator {
     }
     
     func showDetailPhotographerViewController(userId: String, searchCoordinate: Coordinate) {
-        Logger.print(userId)
+        let viewModel = PhotographerDetailViewModel(
+            fetchUserUseCase: DefaultFetchUserUseCase(
+                userRepository: DefaultUserRepository()
+            ),
+            fetchPhotographerUseCase: DefaultFetchPhotographerUseCase(
+                photographerRespository: DefaultPhotographerRepository()
+            ),
+            fetchReviewUseCase: DefaultFetchReviewUseCase(
+                reviewRepositry: DefaultReviewRepository(),
+                userRepository: DefaultUserRepository(),
+                photographerRepository: DefaultPhotographerRepository()
+            ),
+            mapRepository: DefaultMapRepository(),
+            userId: userId,
+            searchCoordinate: searchCoordinate,
+            coordinator: self
+        )
+        let viewController = PhotographerDetailViewController(
+            viewModel: viewModel
+        )
+        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(viewController, animated: true)
+        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
     }
 }
