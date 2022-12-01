@@ -23,7 +23,7 @@ final class SearchViewModel: ViewModelType {
     
     // MARK: - Properties
     let disposeBag = DisposeBag()
-    private weak var coordinator: MainCoordinator?
+    private weak var coordinator: Coordinator?
     private let searchLocationUseCase: SearchLocationUseCase
     private let currentLocationUseCase: FetchCurrentLocationUseCase
     
@@ -33,7 +33,7 @@ final class SearchViewModel: ViewModelType {
     init(
         searchLocationUseCase: SearchLocationUseCase,
         fetchCurrentLocationUseCase: FetchCurrentLocationUseCase,
-        coordinator: MainCoordinator,
+        coordinator: Coordinator,
         searchText: BehaviorRelay<String>,
         coordinate: BehaviorRelay<Coordinate?>
     ) {
