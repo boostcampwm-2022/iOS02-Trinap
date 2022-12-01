@@ -89,8 +89,6 @@ class PhotographerDetailViewController: BaseViewController {
             make.width.equalTo((view.frame.width - 2 * trinapOffset) / 2)
             make.height.equalTo(48)
         }
-        
-        collectionView.backgroundColor = .red
     }
     
     override func configureAttributes() {
@@ -207,10 +205,6 @@ extension PhotographerDetailViewController {
                 return cell
             }
         }
-        
-        dataSource.supplementaryViewProvider = { [weak self] (collectionView: UICollectionView, kind: String, indexPath: IndexPath) -> UICollectionReusableView? in
-            return nil
-        }
         return dataSource
     }
 }
@@ -284,19 +278,6 @@ extension PhotographerDetailViewController {
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitem: item, count: 3)
         
         let section = NSCollectionLayoutSection(group: group)
-        
-        let isEditable = false
-        
-//        let header = NSCollectionLayoutBoundarySupplementaryItem(
-//            layoutSize: NSCollectionLayoutSize(
-//                widthDimension: .fractionalWidth(1.0),
-//                heightDimension: .absolute(trinapOffset * 8)
-//            ),
-//            elementKind: isEditable ? EditPhotographerPhotoDeleteHeaderView.reuseIdentifier : EditPhotographerPhotoHeaderView.reuseIdentifier,
-//            alignment: .top
-//        )
-//
-//        section.boundarySupplementaryItems = [header]
         
         section.contentInsets = NSDirectionalEdgeInsets(top: inset, leading: 0, bottom: 0, trailing: inset)
         return section
