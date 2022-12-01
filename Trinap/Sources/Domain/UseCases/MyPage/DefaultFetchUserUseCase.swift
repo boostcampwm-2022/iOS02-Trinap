@@ -30,4 +30,8 @@ final class DefaultFetchUserUseCase: FetchUserUseCase {
         
         return userRepository.fetch(userId: token)
     }
+    
+    func fetchUserInfo(userId: String) -> Observable<User> {
+        return userRepository.fetch(userId: userId)
+    }
 }
