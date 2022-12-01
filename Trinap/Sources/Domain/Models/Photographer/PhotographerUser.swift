@@ -17,7 +17,7 @@ struct PhotographerUser: Hashable {
     let tags: [TagType]
     let pricePerHalfHour: Int
     let possibleDate: [Date]
-    let pictures: [Picture?]
+    var pictures: [Picture?]
     
     init(
         user: User,

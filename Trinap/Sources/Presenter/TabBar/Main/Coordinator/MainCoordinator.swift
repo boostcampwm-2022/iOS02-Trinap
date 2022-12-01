@@ -85,7 +85,7 @@ extension MainCoordinator {
         self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
     }
     
-    func showDetailPhotographerViewController(userId: String) {
+    func showDetailPhotographerViewController(userId: String, searchCoordinate: Coordinate) {
         Logger.print(userId)
     }
 }

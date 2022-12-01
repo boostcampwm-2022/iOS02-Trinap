@@ -45,6 +45,7 @@ final class FilterView: UICollectionView, UICollectionViewDelegate {
         
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         
         self.collectionViewLayout = layout
         self.showsHorizontalScrollIndicator = false
@@ -135,10 +136,10 @@ extension FilterView: UICollectionViewDelegateFlowLayout {
         
         if indexPath.row == 0 {
             underlineView.snp.makeConstraints { make in
-                make.left.equalToSuperview()
+                make.left.equalToSuperview().offset(16)
                 make.width.equalTo(size.width)
                 make.height.equalTo(2)
-                make.top.equalToSuperview().offset(trinapOffset * 6)
+                make.bottom.equalToSuperview().offset(trinapOffset * 6)
             }
         }
         return size

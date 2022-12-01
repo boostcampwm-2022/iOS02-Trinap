@@ -1,42 +1,40 @@
-//
-//  EditPhotographerViewModel.swift
+
+//  PhotographerDetailViewModel.swift
 //  Trinap
 //
-//  Created by Doyun Park on 2022/11/23.
+//  Created by kimchansoo on 2022/11/29.
 //  Copyright © 2022 Trinap. All rights reserved.
 //
 
-import Foundation
-
 import RxCocoa
+import RxRelay
 import RxSwift
 
-typealias PhotographerDataSource = [PhotographerSection: [PhotographerSection.Item]]
+final class PhotographerDetailViewModel: ViewModelType {
 
-final class EditPhotographerViewModel: ViewModelType {
-    
     struct Input {
         let viewWillAppear: Observable<Bool>
         let tabState: Observable<Int>
-        let isEditable: Observable<Bool>
-        let selectedPicture: Observable<[Int]>
-        let deleteTrigger: Observable<Void>
+//        let calendarTrigger: Observable<Void>
+//        let confirmTrigger: Observable<Void>
     }
-    
+
     struct Output {
         let dataSource: Driver<[PhotographerDataSource]>
     }
-    
+
     // MARK: - Properties
+    let disposeBag = DisposeBag()
+
+    //TODO: PhotographerUser로 반환하는 UseCase 만들어서 바로 받아오도록 변경
     private let fetchUserUseCase: FetchUserUseCase
     private let fetchPhotographerUseCase: FetchPhotographerUseCase
     private let fetchReviewUseCase: FetchReviewUseCase
     private let editPortfolioPictureUseCase: EditPortfolioPictureUseCase
     private let mapRepository: MapRepository
     
-    var disposeBag = DisposeBag()
+    private let reloadTrigger = BehaviorSubject<Void>(value: ())
     
-    private let reloadTrigger = PublishSubject<Void>()
     // MARK: - Initializer
     init(
         fetchUserUseCase: FetchUserUseCase,
@@ -51,7 +49,9 @@ final class EditPhotographerViewModel: ViewModelType {
         self.editPortfolioPictureUseCase = editPortfolioPictureUseCase
         self.mapRepository = mapRepository
     }
-    
+
+    // MARK: - Initializer
+
     // MARK: - Methods
     func transform(input: Input) -> Output {
         
@@ -74,39 +74,33 @@ final class EditPhotographerViewModel: ViewModelType {
             }
             .share()
         
-        let dataSource = Observable.combineLatest(input.isEditable, input.tabState, photographer, reviewInformation)
-            .map { [weak self] editable, section, photographer, review -> [PhotographerDataSource] in
+        let dataSource = Observable.combineLatest(input.tabState, photographer, reviewInformation)
+            .map { [weak self] section, photographer, review -> [PhotographerDataSource] in
                 guard let self else { return [] }
                 
-                return self.mappingDataSource(isEditable: editable, state: section, photographer: photographer, review: review)
+                return self.mappingDataSource(isEditable: false, state: section, photographer: photographer, review: review)
             }
-        
-        input.deleteTrigger
-            .withLatestFrom(Observable.combineLatest(photographer, input.selectedPicture))
-            .flatMap { photographer, indexs in
-                return self.editPortfolioPictureUseCase.delete(
-                    photographer: photographer.toPhotographer(),
-                    indices: indexs)
-            }
-            .bind(to: reloadTrigger)
-            .disposed(by: disposeBag)
-        
+
         return Output(dataSource: dataSource.asDriver(onErrorJustReturn: []))
     }
 }
 
-extension EditPhotographerViewModel {
+
+extension PhotographerDetailViewModel {
     
     private func fetchPhotographer() -> Observable<PhotographerUser> {
+        //TODO: 내꺼 아니라 다른 사람 userInfo 받아오도록 변경
         return self.fetchUserUseCase.fetchUserInfo()
             .flatMap { user in
                 self.fetchPhotographerUseCase.fetch(photographerUserId: user.userId)
                     .flatMap { photographer in
                         return self.mapRepository.fetchLocationName(
-                            using: Coordinate(lat: photographer.latitude, lng: photographer.longitude)
+                            using: Coordinate(lat: photographer.latitude, lng: photographer.latitude)
                         )
                         .map { location in
-                            return PhotographerUser(user: user, photographer: photographer, location: location)
+                            var photographer = PhotographerUser(user: user, photographer: photographer, location: location)
+                            photographer.pictures.removeFirst()
+                            return photographer
                         }
                     }
             }
@@ -153,7 +147,7 @@ extension EditPhotographerViewModel {
 }
 
 // MARK: - MappingDataSource
-extension EditPhotographerViewModel {
+extension PhotographerDetailViewModel {
     
     private func mappingProfileDataSource(photographer: PhotographerUser) -> PhotographerDataSource {
         return [PhotographerSection.profile: [PhotographerSection.Item.profile(photographer)]]

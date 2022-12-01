@@ -64,7 +64,6 @@ final class PhotographerListViewController: BaseViewController {
     }
 
     override func configureConstraints() {
-        
         searchBarView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide)
             make.leading.equalToSuperview().offset(trinapOffset)
@@ -153,7 +152,7 @@ extension PhotographerListViewController {
                 .subscribe(onNext: { [weak self] _ in
                     self?.viewModel.showDetailPhotographer(userId: itemIdentifier.photographerUserId)
                 })
-                .disposed(by: cell.db)
+                .disposed(by: cell.disposeBag)
             
             return cell
         }

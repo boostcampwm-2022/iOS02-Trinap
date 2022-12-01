@@ -1,8 +1,8 @@
 //
-//  EditPhotographerViewController.swift
+//  PhotographerDetailViewController.swift
 //  Trinap
 //
-//  Created by Doyun Park on 2022/11/23.
+//  Created by kimchansoo on 2022/11/29.
 //  Copyright © 2022 Trinap. All rights reserved.
 //
 
@@ -10,68 +10,98 @@ import UIKit
 
 import RxCocoa
 import RxSwift
+import SnapKit
+import Than
 
-enum PhotographerLayout: Int, CaseIterable {
-    case picture
-    case detail
-    case review
-}
-
-final class EditPhotographerViewController: BaseViewController {
+class PhotographerDetailViewController: BaseViewController {
     
     typealias DataSource = UICollectionViewDiffableDataSource<PhotographerSection, PhotographerSection.Item>
     typealias Snapshot = NSDiffableDataSourceSnapshot<PhotographerSection, PhotographerSection.Item>
     
-    private let tabState = BehaviorRelay<Int>(value: 0)
-    private let isEditable = BehaviorRelay<Bool>(value: false)
-    private let selectedPicture = BehaviorRelay<[Int?]>(value: [])
-    private let deleteTrigger = PublishSubject<Void>()
     
-    // MARK: - Properties
-    weak var coordinator: MyPageCoordinator?
-    
-    private let viewModel: EditPhotographerViewModel
+    // MARK: - UI
     private lazy var collectionView = UICollectionView(
         frame: .zero,
         collectionViewLayout: configureCollectionViewLayout(.picture)
     )
     
+    private lazy var calendarButton = TrinapButton(style: .primary, fillType: .border).than {
+        $0.setTitle("예약 날짜 선택", for: .normal)
+        $0.setTitleColor(TrinapAsset.primary.color, for: .normal)
+        $0.titleLabel?.font = TrinapFontFamily.Pretendard.bold.font(size: 14)
+    }
+    
+    private lazy var confirmButton = TrinapButton(style: .primary, fillType: .fill).than {
+        $0.setTitle("예약 신청", for: .normal)
+        $0.setTitleColor(TrinapAsset.white.color, for: .normal)
+        $0.titleLabel?.font = TrinapFontFamily.Pretendard.bold.font(size: 14)
+    }
+    
+    //TODO: 예약 관련 컴포넌트들 선언 및 연결
+    
+    // MARK: - Properties
+    private let tabState = BehaviorRelay<Int>(value: 0)
+    
+    weak var coordinator: MainCoordinator?
+    
+    private let viewModel: PhotographerDetailViewModel
+    
     private lazy var dataSource = configureDataSource()
     
     // MARK: - Initializers
-    init(viewModel: EditPhotographerViewModel) {
+    init(viewModel: PhotographerDetailViewModel) {
         self.viewModel = viewModel
+
         super.init()
     }
     
     // MARK: - Methods
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+    override func viewDidLoad() {
+        super.viewDidLoad()
         
-        configureNavigation()
+//        collectionView.backgroundColor = .blue
     }
     
-    // MARK: - Configuration
     override func configureHierarchy() {
-        self.view.addSubview(collectionView)
+        self.view.addSubviews([
+            collectionView,
+            calendarButton,
+            confirmButton
+        ])
     }
     
     override func configureConstraints() {
         collectionView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.horizontalEdges.top.equalToSuperview()
+            make.bottom.equalToSuperview().offset(-200)
         }
+        
+        calendarButton.snp.makeConstraints { make in
+            make.top.equalTo(collectionView.snp.bottom).offset(trinapOffset)
+            make.leading.equalToSuperview().offset(trinapOffset)
+            make.width.equalTo((view.frame.width - 4 * trinapOffset) / 2)
+            make.height.equalTo(48)
+        }
+        
+        confirmButton.snp.makeConstraints { make in
+            make.top.equalTo(collectionView.snp.bottom).offset(trinapOffset)
+            make.trailing.equalToSuperview().offset(-trinapOffset)
+            make.width.equalTo((view.frame.width - 2 * trinapOffset) / 2)
+            make.height.equalTo(48)
+        }
+        
+        collectionView.backgroundColor = .red
+    }
+    
+    override func configureAttributes() {
+        configureCollectionView()
     }
     
     override func bind() {
-        let input = EditPhotographerViewModel.Input(
+        let input = PhotographerDetailViewModel.Input(
             viewWillAppear: self.rx.viewWillAppear.asObservable(),
-            tabState: self.tabState.asObservable(),
-            isEditable: self.isEditable.asObservable().distinctUntilChanged(),
-            selectedPicture: self.selectedPicture
-                .map { $0.compactMap { $0 }.map { $0 - 1 } }
-                .filter { !$0.isEmpty }
-                .asObservable(),
-            deleteTrigger: self.deleteTrigger.asObservable()
+            tabState: self.tabState.asObservable()
+//            confirmTrigger:
         )
         
         let output = viewModel.transform(input: input)
@@ -81,9 +111,6 @@ final class EditPhotographerViewController: BaseViewController {
             .withUnretained(self)
             .subscribe(onNext: { owner, section in
                 owner.collectionView.setCollectionViewLayout(owner.configureCollectionViewLayout(section), animated: false)
-                if section != .picture && self.isEditable.value {
-                    self.isEditable.accept(false)
-                }
             })
             .disposed(by: disposeBag)
         
@@ -95,71 +122,20 @@ final class EditPhotographerViewController: BaseViewController {
                 self.dataSource.apply(snapshot, animatingDifferences: false)
             }
             .disposed(by: disposeBag)
-        
-        collectionView.rx.itemSelected
-            .withUnretained(self)
-            .compactMap { owner, indexPath -> Int? in
-                if case let .photo(picture) = owner.dataSource.itemIdentifier(for: indexPath) {
-                    
-                    if picture?.picture == nil {
-                        owner.coordinator?.showUpdatePhotographerViewController()
-                    } else {
-                        return indexPath.row
-                    }
-                }
-                return nil
-            }
-            .withUnretained(self)
-            .subscribe(onNext: { owner, i in
-                owner.selectedPicture.accept(owner.selectedPicture.value + [i])
-            })
-            .disposed(by: disposeBag)
 
-        collectionView.rx.itemDeselected
-            .withUnretained(self)
-            .compactMap { owner, indexPath in
-                if case .photo = owner.dataSource.itemIdentifier(for: indexPath) {
-                    return indexPath.row
-                }
-                return nil
-            }
-            .withUnretained(self)
-            .subscribe(onNext: { owner, pictureURL in
-                let removedValue = owner.selectedPicture.value.filter { $0 != pictureURL }
-                self.selectedPicture.accept(removedValue)
-            })
-            .disposed(by: self.disposeBag)
-        
-        deleteTrigger
-            .map { _ in false }
-            .bind(to: isEditable)
-            .disposed(by: disposeBag)
-    }
-    
-    override func configureAttributes() {
-        configureCollectionView()
-    }
-    
-    private func configureNavigation() {
-        self.navigationItem.title = "작가 프로필 설정"
-        self.navigationController?.navigationBar.isHidden = false
-        self.navigationController?.navigationBar.topItem?.title = " "
-        self.navigationController?.navigationBar.tintColor = .black
     }
 }
 
+
 // MARK: - CollectionVIew
-extension EditPhotographerViewController {
+extension PhotographerDetailViewController {
     
     private func configureCollectionView() {
-        collectionView.register(EditPhotographerProfileCell.self)
-        collectionView.registerReusableView(EditPhotographerPhotoHeaderView.self)
+        collectionView.register(PhotographerProfileCell.self)
         collectionView.register(PhotographerDetailIntroductionCell.self)
         collectionView.register(PhotoCell.self)
         collectionView.register(PhotographerSummaryReviewcell.self)
         collectionView.register(PhotographerReivewCell.self)
-        collectionView.registerReusableView(EditPhotographerPhotoDeleteHeaderView.self)
-        collectionView.allowsMultipleSelection = true
     }
     
     private func generateSnapShot(_ data: [PhotographerDataSource]) -> Snapshot {
@@ -176,26 +152,18 @@ extension EditPhotographerViewController {
     }
     
     private func configureDataSource() -> DataSource {
-        
         let dataSource = DataSource(collectionView: self.collectionView) { [weak self] collectionView, indexPath, item in
             guard let self else { return UICollectionViewCell() }
             
             switch item {
             case let .profile(profile):
-                guard let cell = collectionView.dequeueCell(EditPhotographerProfileCell.self, for: indexPath) else {
+                guard let cell = collectionView.dequeueCell(PhotographerProfileCell.self, for: indexPath) else {
                     return UICollectionViewCell()
                 }
                 
                 cell.filterView.rx.itemSelected
                     .map { $0.row }
                     .bind(to: self.tabState)
-                    .disposed(by: self.disposeBag)
-                
-                cell.editButton.rx.tap
-                    .throttle(.seconds(1), scheduler: MainScheduler.instance)
-                    .subscribe(onNext: {
-                        self.coordinator?.showUpdatePhotographerViewController()
-                    })
                     .disposed(by: self.disposeBag)
                 
                 cell.configure(with: profile)
@@ -231,55 +199,19 @@ extension EditPhotographerViewController {
         }
         
         dataSource.supplementaryViewProvider = { [weak self] (collectionView: UICollectionView, kind: String, indexPath: IndexPath) -> UICollectionReusableView? in
-            
-            guard let self else { return nil }
-            
-            switch kind {
-            case EditPhotographerPhotoHeaderView.reuseIdentifier:
-                
-                guard let header = collectionView.dequeResuableView(EditPhotographerPhotoHeaderView.self, for: indexPath) else {
-                    return UICollectionReusableView()
-                }
-                
-                header.editButton.rx.tap
-                    .subscribe(onNext: {
-                        self.isEditable.accept(!self.isEditable.value)
-                    })
-                    .disposed(by: header.disposeBag)
-                return header
-                
-            case EditPhotographerPhotoDeleteHeaderView.reuseIdentifier:
-                
-                guard let header = collectionView.dequeResuableView(EditPhotographerPhotoDeleteHeaderView.self, for: indexPath) else {
-                    return UICollectionReusableView()
-                }
-                header.containerView.rx.tapGesture()
-                    .when(.recognized)
-                    .asObservable()
-                    .map { _ in }
-                    .bind(to: self.deleteTrigger)
-                    .disposed(by: header.disposeBag)
-                
-                self.selectedPicture
-                    .map { $0.count }
-                    .bind(to: header.rx.setCount)
-                    .disposed(by: self.disposeBag)
-                
-                return header
-                
-            default:
-                return UICollectionReusableView()
-            }
+            return nil
         }
         return dataSource
     }
 }
 
+
 // MARK: - CollectionViewLayout
-extension EditPhotographerViewController {
+extension PhotographerDetailViewController {
     
     private func configureCollectionViewLayout(_ section: PhotographerLayout) -> UICollectionViewLayout {
         return UICollectionViewCompositionalLayout { index, _ -> NSCollectionLayoutSection? in
+            
             switch section {
             case .picture:
                 return self.photoSectionLayout(index: index)
@@ -343,18 +275,18 @@ extension EditPhotographerViewController {
         
         let section = NSCollectionLayoutSection(group: group)
         
-        let isEditable = self.isEditable.value
+        let isEditable = false
         
-        let header = NSCollectionLayoutBoundarySupplementaryItem(
-            layoutSize: NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(trinapOffset * 8)
-            ),
-            elementKind: isEditable ? EditPhotographerPhotoDeleteHeaderView.reuseIdentifier : EditPhotographerPhotoHeaderView.reuseIdentifier,
-            alignment: .top
-        )
-        
-        section.boundarySupplementaryItems = [header]
+//        let header = NSCollectionLayoutBoundarySupplementaryItem(
+//            layoutSize: NSCollectionLayoutSize(
+//                widthDimension: .fractionalWidth(1.0),
+//                heightDimension: .absolute(trinapOffset * 8)
+//            ),
+//            elementKind: isEditable ? EditPhotographerPhotoDeleteHeaderView.reuseIdentifier : EditPhotographerPhotoHeaderView.reuseIdentifier,
+//            alignment: .top
+//        )
+//
+//        section.boundarySupplementaryItems = [header]
         
         section.contentInsets = NSDirectionalEdgeInsets(top: inset, leading: 0, bottom: 0, trailing: inset)
         return section

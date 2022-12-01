@@ -30,13 +30,13 @@ final class PhotographerPreviewCell: BaseCollectionViewCell {
     private lazy var ratingLabel = StarView()
     
     // MARK: Properties
-    var db = DisposeBag()
+    var cellDisposeBag = DisposeBag()
     
     // MARK: Methods
     override func prepareForReuse() {
         super.prepareForReuse()
         
-        db = DisposeBag()
+        cellDisposeBag = DisposeBag()
     }
     
     override func configureHierarchy() {
@@ -79,12 +79,9 @@ final class PhotographerPreviewCell: BaseCollectionViewCell {
                 guard let self else { return }
                 self.configureCell(preview)
             }
-            .disposed(by: self.disposeBag)
+            .disposed(by: self.cellDisposeBag)
     }
     
-    override func configureAttributes() {
-//        self.backgroundColor = .blue
-    }
 }
 
 extension PhotographerPreviewCell {
