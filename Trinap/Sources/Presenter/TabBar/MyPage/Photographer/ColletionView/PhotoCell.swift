@@ -12,10 +12,14 @@ import Queenfisher
 
 final class PhotoCell: BaseCollectionViewCell {
     
+    private lazy var plusImage: UIImage? = {
+        return UIImage(systemName: "plus.circle")
+    }()
+    
     private lazy var imageView = UIImageView().than {
         $0.backgroundColor = TrinapAsset.background.color
         $0.layer.cornerRadius = 8
-        $0.image = UIImage(systemName: "plus.circle")
+        $0.image = plusImage
         $0.tintColor = TrinapAsset.white.color
         $0.layer.masksToBounds = true
     }
@@ -37,7 +41,7 @@ final class PhotoCell: BaseCollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        self.imageView.image = nil
+        self.imageView.image = plusImage
     }
     
     override func configureHierarchy() {
