@@ -8,10 +8,10 @@
 
 import UIKit
 
-import FirestoreService
+import RxSwift
+import RxCocoa
 
 final class MyPageCoordinator: Coordinator {
-    
     // MARK: - Properties
     weak var delegate: CoordinatorDelegate?
     var navigationController: UINavigationController
@@ -33,7 +33,7 @@ extension MyPageCoordinator {
     
     func showMyPageViewController() {
         let useCase = DefaultFetchUserUseCase(
-            userRepository: DefaultUserRepository(firestoreService: DefaultFireStoreService())
+            userRepository: DefaultUserRepository()
         )
         let viewModel = MyPageViewModel(fetchUserUseCase: useCase)
         let viewController = MyPageViewController(viewModel: viewModel)
@@ -86,8 +86,47 @@ extension MyPageCoordinator {
     }
     
     func showUpdatePhotographerViewController() {
-        let viewController = UpdateDetailPhotographerViewController(viewModel: UpdateDetailPhotographerViewModel())
-        navigationController.present(viewController, animated: true)
+        let coordinator = RegisterPhotographerInfoCoordinator(UINavigationController())
+        coordinator.delegate = self
+        coordinator.start()
+        self.childCoordinators.append(coordinator)
+//        let viewModel = RegisterPhotographerInfoViewModel(
+//            coordinator: self,
+//            fetchPhotographerUseCase: DefaultFetchPhotographerUseCase(photographerRespository: DefaultPhotographerRepository()),
+//            editPhotographerUseCase: DefaultEditPhotographerUseCase(photographerRepository: DefaultPhotographerRepository()),
+//            mapRepository: DefaultMapRepository()
+//        )
+//
+//        let viewController = RegisterPhotographerInfoViewController(viewModel: viewModel)
+//        self.navigationController.pushViewController(viewController, animated: true)
+    }
+    
+    func showSearchViewController(
+        searchText: BehaviorRelay<String>,
+        coordinate: BehaviorRelay<Coordinate?>
+    ) {
+        let viewModel = SearchViewModel(
+            searchLocationUseCase: DefaultSearchLocationUseCase(
+                mapService: DefaultMapRepository()
+            ),
+            fetchCurrentLocationUseCase: DefaultFetchCurrentLocationUseCase(
+                mapRepository: DefaultMapRepository()
+            ),
+            coordinator: self,
+            searchText: searchText,
+            coordinate: coordinate
+        )
+        let viewController = SearchViewController(
+            viewModel: viewModel
+        )
+        
+        self.navigationController.present(viewController, animated: true)
+    }
+}
+
+extension MyPageCoordinator: CoordinatorDelegate {
+    func didFinish(childCoordinator: Coordinator) {
+        
     }
 }
 
