@@ -23,6 +23,7 @@ protocol Coordinator: AnyObject {
 
     func start()
     func finish()
+    func pop()
 }
 
 extension Coordinator {
@@ -30,5 +31,9 @@ extension Coordinator {
     func finish() {
         childCoordinators.removeAll()
         delegate?.didFinish(childCoordinator: self)
+    }
+    
+    func pop() {
+        self.navigationController.popViewController(animated: true)
     }
 }

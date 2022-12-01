@@ -34,6 +34,10 @@ final class ReservationCell: BaseTableViewCell {
     // MARK: - Initializers
     
     // MARK: - Methods
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(false, animated: false)
+    }
+    
     override func configureHierarchy() {
         super.configureHierarchy()
         
