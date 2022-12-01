@@ -35,6 +35,7 @@ final class InformationStackView: BaseView {
     private lazy var keyStackView = UIStackView().than {
         $0.axis = .vertical
         $0.spacing = 8.0
+        $0.setContentHuggingPriority(.required, for: .horizontal)
     }
     
     private lazy var valueStackView = UIStackView().than {
