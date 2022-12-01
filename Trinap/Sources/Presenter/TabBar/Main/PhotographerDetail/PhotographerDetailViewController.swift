@@ -73,7 +73,7 @@ class PhotographerDetailViewController: BaseViewController {
     override func configureConstraints() {
         collectionView.snp.makeConstraints { make in
             make.horizontalEdges.top.equalToSuperview()
-            make.bottom.equalToSuperview().offset(-200)
+            make.bottom.equalToSuperview().offset(-88)
         }
         
         calendarButton.snp.makeConstraints { make in
