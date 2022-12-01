@@ -8,6 +8,7 @@
 
 import UIKit
 
+import RxCocoa
 import SnapKit
 
 final class ReservationButtonView: BaseView {
@@ -18,11 +19,17 @@ final class ReservationButtonView: BaseView {
         $0.spacing = 8.0
     }
     
-    private lazy var primaryButton = TrinapButton(style: .black)
     private lazy var primaryButton = TrinapButton(style: .disabled)
     private lazy var secondaryButton = TrinapButton(style: .disabled)
     
     // MARK: - Properties
+    var primaryButtonTap: ControlEvent<Void> {
+        return primaryButton.rx.tap
+    }
+    
+    var secondaryButtonTap: ControlEvent<Void> {
+        return secondaryButton.rx.tap
+    }
     
     // MARK: - Initializers
     
@@ -51,14 +58,31 @@ final class ReservationButtonView: BaseView {
     }
     
     func setPrimaryContent(title: String, fillType: TrinapButton.FillType, style: TrinapButton.ColorType) {
+        if !buttonStackView.arrangedSubviews.contains(primaryButton) {
+            let lastIndex = buttonStackView.arrangedSubviews.isEmpty ? 0 : buttonStackView.arrangedSubviews.endIndex - 1
+            buttonStackView.insertArrangedSubview(primaryButton, at: lastIndex)
+        }
+        
         primaryButton.fill = fillType
         primaryButton.style = style
         primaryButton.setTitle(title, for: .normal)
     }
     
+    func removePrimaryButton() {
+        buttonStackView.removeArrangedSubview(primaryButton)
+    }
+    
     func setSecondaryContent(title: String, fillType: TrinapButton.FillType, style: TrinapButton.ColorType) {
+        if !buttonStackView.arrangedSubviews.contains(secondaryButton) {
+            buttonStackView.insertArrangedSubview(secondaryButton, at: 0)
+        }
+        
         secondaryButton.fill = fillType
         secondaryButton.style = style
         secondaryButton.setTitle(title, for: .normal)
+    }
+    
+    func removeSecondaryButton() {
+        buttonStackView.removeArrangedSubview(secondaryButton)
     }
 }
