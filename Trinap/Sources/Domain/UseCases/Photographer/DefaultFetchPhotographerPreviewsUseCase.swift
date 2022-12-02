@@ -92,7 +92,7 @@ final class DefaultFetchPhotographerPreviewsUseCase: FetchPhotographerPreviewsUs
         let rating = fetchAverageReview(photographerId: photographer.photographerUserId)
         
         return Observable.zip(name, user, rating)
-            .map { (location, user, rating) -> PhotographerPreview in
+            .map { location, user, rating -> PhotographerPreview in
                 return PhotographerPreview(
                     photographer: photographer,
                     location: location,

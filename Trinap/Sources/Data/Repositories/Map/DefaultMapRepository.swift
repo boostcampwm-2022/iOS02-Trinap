@@ -120,7 +120,7 @@ extension DefaultMapRepository: MKLocalSearchCompleterDelegate {
         })
         .map { locations -> [Space] in
             let filtered = locations.filter { $0 != nil }
-            return filtered.compactMap{ $0 }
+            return filtered.compactMap { $0 }
         }
         .bind(to: results)
         .disposed(by: disposebag)

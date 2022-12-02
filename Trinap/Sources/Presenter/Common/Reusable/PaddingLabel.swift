@@ -8,7 +8,7 @@
 
 import UIKit
 
-//양 옆 패딩(마진)설정이 가능한 커스텀 레이블
+// 양 옆 패딩(마진)설정이 가능한 커스텀 레이블
 class PaddingLabel: UILabel {
     
     var top: CGFloat = 0

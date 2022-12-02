@@ -33,7 +33,11 @@ extension Coordinator {
         delegate?.didFinish(childCoordinator: self)
     }
     
-    func pop() {
+    func popViewController() {
         self.navigationController.popViewController(animated: true)
+    }
+    
+    func dismissViewController() {
+        navigationController.dismiss(animated: true)
     }
 }
