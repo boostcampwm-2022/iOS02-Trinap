@@ -23,7 +23,8 @@ protocol Coordinator: AnyObject {
 
     func start()
     func finish()
-    func pop()
+    func popViewController()
+    func dismissViewController()
 }
 
 extension Coordinator {
