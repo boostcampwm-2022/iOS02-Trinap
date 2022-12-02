@@ -69,7 +69,6 @@ final class EditPhotographerViewController: BaseViewController {
             isEditable: self.isEditable.asObservable().distinctUntilChanged(),
             selectedPicture: self.selectedPicture
                 .map { $0.compactMap { $0 }.map { $0 - 1 } }
-                .filter { !$0.isEmpty }
                 .asObservable(),
             deleteTrigger: self.deleteTrigger.asObservable()
         )

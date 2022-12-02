@@ -49,7 +49,7 @@ final class ReservationDetailViewModel: ViewModelType {
     func transform(input: Input) -> Output {
         input.backButtonTap
             .emit(onNext: { [weak self] _ in
-                self?.reservationCoordinator?.pop()
+                self?.reservationCoordinator?.popViewController()
             })
             .disposed(by: disposeBag)
         
