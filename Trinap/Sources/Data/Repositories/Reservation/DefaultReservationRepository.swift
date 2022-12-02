@@ -26,6 +26,18 @@ final class DefaultReservationRepository: ReservationRepository {
     }
     
     // MARK: Methods
+    func fetchUserType(customerId: String, photographerId: String) -> Reservation.UserType? {
+        guard let userId = keychainManager.getToken(with: .userId) else { return nil }
+        
+        if customerId == userId {
+            return .customer
+        } else if photographerId == userId {
+            return .photographer
+        } else {
+            return nil
+        }
+    }
+    
     func fetchReceivedReservations() -> Observable<[Reservation.Mapper]> {
         guard let userId = keychainManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
