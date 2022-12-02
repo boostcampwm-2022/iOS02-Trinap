@@ -73,6 +73,7 @@ final class EditProfileViewController: BaseViewController {
     }
     
     override func configureAttributes() {
+        self.hideKeyboardWhenTapped()
         imagePicker.delegate = self
         self.navigationController?.navigationBar.isHidden = false
         self.navigationController?.navigationBar.topItem?.title = " "
@@ -81,17 +82,6 @@ final class EditProfileViewController: BaseViewController {
     }
     
     override func bind() {
-        
-        let textField = self.nickNameInputView.textField.rx
-            .controlEvent(.editingDidEndOnExit)
-            .asObservable()
-            .withLatestFrom(
-                nickNameInputView.textField.rx.text
-                    .orEmpty
-                    .asObservable()
-                    .distinctUntilChanged()
-            )
-        
         let imageData = self.profileImageView.rx.tapGesture()
             .when(.recognized)
             .withUnretained(self)
@@ -104,7 +94,7 @@ final class EditProfileViewController: BaseViewController {
             .disposed(by: disposeBag)
         
         let input = EditProfileViewModel.Input(
-            nickname: textField,
+            nickname: nickNameInputView.textField.rx.text.orEmpty.asObservable(),
             nicknameTrigger: nickNameInputView.generateButton.rx.tap.asObservable(),
             profileImage: imageData.map { $0.jpegData(compressionQuality: 1.0) },
             buttonTrigger: doneButton.rx.tap.asObservable())

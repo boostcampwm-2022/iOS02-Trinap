@@ -89,12 +89,6 @@ extension MainCoordinator {
         self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
         self.navigationController.pushViewController(viewController, animated: true)
         self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
-
-    }
-    
-    func popViewController() {
-        navigationController.popViewController(animated: true)
-        
     }
     
     func showDetailPhotographerViewController(userId: String, searchCoordinate: Coordinate) {

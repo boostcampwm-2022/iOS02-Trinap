@@ -30,7 +30,6 @@ final class DefaultFetchCurrentLocationUseCase: FetchCurrentLocationUseCase {
         }
         
         return mapRepository.fetchLocationName(using: coor)
-            .map { (coor, $0)}
+            .map { (coor, $0) }
     }
-
 }

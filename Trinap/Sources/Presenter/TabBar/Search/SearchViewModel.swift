@@ -23,7 +23,7 @@ final class SearchViewModel: ViewModelType {
     
     // MARK: - Properties
     let disposeBag = DisposeBag()
-    private weak var coordinator: MainCoordinator?
+    private weak var coordinator: Coordinator?
     private let searchLocationUseCase: SearchLocationUseCase
     private let currentLocationUseCase: FetchCurrentLocationUseCase
     
@@ -33,7 +33,7 @@ final class SearchViewModel: ViewModelType {
     init(
         searchLocationUseCase: SearchLocationUseCase,
         fetchCurrentLocationUseCase: FetchCurrentLocationUseCase,
-        coordinator: MainCoordinator,
+        coordinator: Coordinator,
         searchText: BehaviorRelay<String>,
         coordinate: BehaviorRelay<Coordinate?>
     ) {
@@ -54,15 +54,6 @@ final class SearchViewModel: ViewModelType {
                 owner.searchLocationUseCase.fetchSearchList(with: value)
             }
             .asDriver(onErrorJustReturn: [])
-        
-        input.selectedSpace
-            .withUnretained(self)
-            .subscribe(onNext: { owner, space in
-                Logger.print("쨔스! \(space) 선택됨")
-                // searchText를 space.address로 바꿔주고 popviewcontroller
-                owner.coordinator?.popViewController()
-            })
-            .disposed(by: disposeBag)
         
         guard let coordinate else { return Output(spaces: spaces) }
         
