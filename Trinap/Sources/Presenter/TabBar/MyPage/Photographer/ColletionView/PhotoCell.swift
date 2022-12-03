@@ -17,13 +17,10 @@ final class PhotoCell: BaseCollectionViewCell {
     }()
     
     private lazy var imageView = UIImageView().than {
-        $0.backgroundColor = TrinapAsset.background.color
-        $0.layer.cornerRadius = 8
         $0.image = plusImage
         $0.tintColor = TrinapAsset.white.color
-        $0.layer.masksToBounds = true
     }
-
+    
     private lazy var editButton = UIImageView().than {
         $0.layer.borderColor = TrinapAsset.gray40.color.cgColor
         $0.layer.cornerRadius = 4
@@ -41,11 +38,17 @@ final class PhotoCell: BaseCollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        self.imageView.image = plusImage
+        self.configurePlusImageView()
     }
     
     override func configureHierarchy() {
         self.addSubviews([imageView, editButton])
+    }
+    
+    override func configureAttributes() {
+        self.backgroundColor = TrinapAsset.background.color
+        self.layer.cornerRadius = 8
+        self.layer.masksToBounds = true
     }
     
     override func configureConstraints() {
@@ -62,12 +65,12 @@ final class PhotoCell: BaseCollectionViewCell {
     func configure(picture: Picture?) {
         guard let picture, let url = picture.picture else {
             self.editButton.isHidden = true
-            self.isUserInteractionEnabled = false
+            self.configurePlusImageView()
             return
         }
         
-        self.editButton.isHidden = !picture.isEditable
         self.isUserInteractionEnabled = picture.isEditable
+        self.editButton.isHidden = !picture.isEditable
         imageView.qf.setImage(at: URL(string: url))
     }
     
@@ -75,5 +78,10 @@ final class PhotoCell: BaseCollectionViewCell {
         self.editButton.alpha = isSelected ? 1.0 : 0.5
         self.editButton.image = isSelected ? TrinapAsset.selectedMark.image : nil
         self.editButton.layer.borderColor = isSelected ? nil : TrinapAsset.background.color.cgColor
+    }
+    
+    private func configurePlusImageView() {
+        let inset = -trinapOffset * 6
+        self.imageView.image = plusImage?.withAlignmentRectInsets(UIEdgeInsets(top: inset, left: inset, bottom: inset, right: inset))
     }
 }

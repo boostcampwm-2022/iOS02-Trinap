@@ -66,6 +66,10 @@ final class PhotographerDetailIntroductionCell: BaseCollectionViewCell {
         self.containerView.addSubviews([timeUnitLabel, priceLabel])
     }
     
+    override func configureAttributes() {
+        self.isUserInteractionEnabled = false
+    }
+    
     override func configureConstraints() {
         
         let offset = trinapOffset * 2
