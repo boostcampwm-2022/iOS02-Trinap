@@ -38,7 +38,7 @@ final class PhotoCell: BaseCollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        self.configurePlusImageView()
+//        self.configurePlusImageView()
     }
     
     override func configureHierarchy() {
@@ -68,8 +68,6 @@ final class PhotoCell: BaseCollectionViewCell {
             self.configurePlusImageView()
             return
         }
-        
-        self.isUserInteractionEnabled = picture.isEditable
         self.editButton.isHidden = !picture.isEditable
         imageView.qf.setImage(at: URL(string: url))
     }
