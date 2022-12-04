@@ -17,10 +17,18 @@ struct ReservationDone {
     private let reservation: Reservation
     private let userType: Reservation.UserType
     
+    // TODO: - ***** 리뷰 작성 화면으로의 전환 로직이 들어가며, 임시로 작성해 놓은 부분이라 수정이 필요합니다. *****
+    private let navigateToWriteReview: (Reservation) -> Void
+    
     // MARK: - Initializers
-    init(reservation: Reservation, userType: Reservation.UserType) {
+    init(
+        reservation: Reservation,
+        userType: Reservation.UserType,
+        navigateToWriteReview: @escaping (Reservation) -> Void
+    ) {
         self.reservation = reservation
         self.userType = userType
+        self.navigateToWriteReview = navigateToWriteReview
     }
 }
 
@@ -51,9 +59,8 @@ extension ReservationDone: ReservationUseCaseExecutable {
         case .photographer:
             return nil
         case .customer:
-            // TODO: WriteReviewUseCase
-#warning("유즈케이스 구현하면 없애기 유즈케이스 구현하면 없애기 유즈케이스 구현하면 없애기 유즈케이스 구현하면 없애기")
-            return mockReservationResult()
+            navigateToWriteReview(reservation)
+            return nil
         }
     }
 }
