@@ -38,7 +38,6 @@ final class PhotoCell: BaseCollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-//        self.configurePlusImageView()
     }
     
     override func configureHierarchy() {
