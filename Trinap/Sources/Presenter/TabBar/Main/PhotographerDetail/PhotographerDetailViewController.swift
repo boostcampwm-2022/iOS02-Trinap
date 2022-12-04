@@ -36,7 +36,7 @@ class PhotographerDetailViewController: BaseViewController {
         $0.setTitleColor(TrinapAsset.white.color, for: .normal)
         $0.titleLabel?.font = TrinapFontFamily.Pretendard.bold.font(size: 14)
     }
-    
+
     //TODO: 예약 관련 컴포넌트들 선언 및 연결
     
     // MARK: - Properties
@@ -58,6 +58,7 @@ class PhotographerDetailViewController: BaseViewController {
     // MARK: - Methods
     override func viewDidLoad() {
         super.viewDidLoad()
+        configureNavigationBar()
     }
     
     override func configureHierarchy() {
@@ -95,6 +96,7 @@ class PhotographerDetailViewController: BaseViewController {
     }
     
     override func bind() {
+        
         let input = PhotographerDetailViewModel.Input(
             viewWillAppear: self.rx.viewWillAppear.asObservable(),
             tabState: self.tabState.asObservable(),
@@ -135,6 +137,23 @@ class PhotographerDetailViewController: BaseViewController {
                 self?.configureCalendarButton(startDate: start, endDate: end)
             }
             .disposed(by: disposeBag)
+    }
+    
+    private func configureNavigationBar() {
+        navigationController?.navigationBar.backIndicatorImage = UIImage(systemName: "arrow.backward")
+        navigationController?.navigationBar.backIndicatorTransitionMaskImage = UIImage(systemName: "arrow.backward")
+        navigationController?.navigationBar.tintColor = .black
+        self.navigationController?.navigationBar.topItem?.title = ""
+        
+        
+        let aad = UIBarButtonItem(
+            image: TrinapAsset.dotdotdot.image,
+            style: .plain,
+            target: self,
+            action: #selector(showActionSheet)
+        )
+        
+        navigationItem.setRightBarButton(aad, animated: false)
     }
     
     @objc private func showActionSheet() {
