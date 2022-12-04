@@ -19,10 +19,20 @@ struct ReservationConfirmed {
     private let reservation: Reservation
     private let userType: Reservation.UserType
     
+    private let makeCompletePhotoshootUseCase: () -> CompletePhotoshootUseCase
+    private let makeCancelReservationRequestUseCase: () -> CancelReservationRequestUseCase
+    
     // MARK: - Initializers
-    init(reservation: Reservation, userType: Reservation.UserType) {
+    init(
+        reservation: Reservation,
+        userType: Reservation.UserType,
+        completePhotoshootUseCaseFactory: @escaping () -> CompletePhotoshootUseCase,
+        cancelReservationRequestUseCaseFactory: @escaping () -> CancelReservationRequestUseCase
+    ) {
         self.reservation = reservation
         self.userType = userType
+        self.makeCompletePhotoshootUseCase = completePhotoshootUseCaseFactory
+        self.makeCancelReservationRequestUseCase = cancelReservationRequestUseCaseFactory
     }
 }
 
@@ -66,9 +76,7 @@ extension ReservationConfirmed: ReservationUseCaseExecutable {
     
     func executePrimaryAction() -> Observable<Reservation>? {
         if userType == .customer && isReservationEnded() {
-            // TODO: CompletePhotoshootUseCase
-#warning("유즈케이스 구현하면 없애기 유즈케이스 구현하면 없애기 유즈케이스 구현하면 없애기 유즈케이스 구현하면 없애기")
-            return mockReservationResult()
+            return makeCompletePhotoshootUseCase().execute(reservation: reservation)
         }
         
         return nil
@@ -77,8 +85,6 @@ extension ReservationConfirmed: ReservationUseCaseExecutable {
     func executeSecondaryAction() -> Observable<Reservation>? {
         if userType == .customer && isReservationEnded() { return nil }
         
-        // TODO: CancelReservationRequestUseCase
-#warning("유즈케이스 구현하면 없애기 유즈케이스 구현하면 없애기 유즈케이스 구현하면 없애기 유즈케이스 구현하면 없애기")
-        return mockReservationResult()
+        return makeCancelReservationRequestUseCase().execute(reservation: reservation)
     }
 }
