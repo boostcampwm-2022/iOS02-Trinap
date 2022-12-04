@@ -136,6 +136,30 @@ class PhotographerDetailViewController: BaseViewController {
             }
             .disposed(by: disposeBag)
     }
+    
+    @objc private func showActionSheet() {
+        let alert = UIAlertController()
+            .appendingAction(title: "신고하기", style: .default) {
+                //TODO: 해당 아이 userId로 신고박는 페이지로 이동
+                
+            }
+            .appendingAction(title: "차단하기", style: .default) {
+                self.confirmBlock()
+            }
+            .appendingAction(title: "취소", style: .cancel)
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    private func confirmBlock() {
+        self.viewModel.blockPhotographer()
+            .asObservable()
+            .subscribe(onNext: {
+                let alert = UIAlertController(title: "신고 완료", message: "신고가 완료되었습니다.", preferredStyle: .alert)
+                alert.appendingAction(title: "확인", style: .default)
+                self.present(alert, animated: true)
+            })
+            .disposed(by: disposeBag)
+    }
 }
 
 
