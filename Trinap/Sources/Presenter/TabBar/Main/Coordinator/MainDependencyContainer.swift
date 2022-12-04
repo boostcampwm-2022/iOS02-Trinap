@@ -17,6 +17,7 @@ final class MainDependencyContainer {
     let reviewRepository: ReviewRepository
     let userRepository: UserRepository
     let reservationRepository: ReservationRepository
+    let blockRepository: BlockRepository
     
     weak var mainCoordinator: MainCoordinator?
     
@@ -29,6 +30,7 @@ final class MainDependencyContainer {
         self.reviewRepository = DefaultReviewRepository()
         self.userRepository = DefaultUserRepository()
         self.reservationRepository = DefaultReservationRepository(firebaseStoreService: firestoreService)
+        self.blockRepository = DefaultBlockRepository(fireStoreService: firestoreService, keychainManager: KeychainTokenManager())
     }
     
     // MARK: PhotographerPreviewList
@@ -79,6 +81,7 @@ final class MainDependencyContainer {
             fetchPhotographerUseCase: makeFetchPhotographerUseCase(),
             fetchReviewUseCase: makeFetchReviewUseCase(),
             createReservationUseCase: makeCreateReservationUseCase(),
+            createBlockUseCase: makeCreateBlockUseCase(),
             mapRepository: mapRepository,
             userId: userId,
             searchCoordinate: searchCoordinate,
@@ -104,5 +107,9 @@ final class MainDependencyContainer {
     
     private func makeCreateReservationUseCase() -> CreateReservationUseCase {
         return DefaultCreateReservationUseCase(reservationRepository: reservationRepository)
+    }
+    
+    private func makeCreateBlockUseCase() -> CreateBlockUseCase {
+        return DefaultCreateBlockUseCase(blockRepository: blockRepository)
     }
 }

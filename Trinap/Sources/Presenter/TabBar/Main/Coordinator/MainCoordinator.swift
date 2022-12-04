@@ -95,6 +95,7 @@ extension MainCoordinator {
             searchCoordinate: searchCoordinate
         )
 
+        self.navigationController.isNavigationBarHidden = false
         self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
         self.navigationController.pushViewController(viewController, animated: true)
         self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
