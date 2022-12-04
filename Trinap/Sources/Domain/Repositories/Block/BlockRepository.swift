@@ -10,8 +10,9 @@ import Foundation
 
 import RxSwift
 
-protocol ReportRepository {
+protocol BlockRepository {
     
     // MARK: Methods
-    func reportUser(reportInfo: Report) -> Single<Void>
+    func blockUser(blockedUserId: String) -> Single<Void>
+    func fetchBlockedUser() -> Single<[Block]>
 }
