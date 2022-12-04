@@ -69,12 +69,11 @@ final class ThumbnailImageView: BaseView {
     }
     
     override func configureAttributes() {
-//        thumbnailScrollView.delegate = self
-        
+        thumbnailScrollView.delegate = self
     }
 }
 
-extension ThumbnailImageView {
+extension ThumbnailImageView: UIScrollViewDelegate {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let page = scrollView.contentOffset.x / scrollView.frame.size.width
@@ -91,13 +90,12 @@ extension ThumbnailImageView {
     
     //TODO: 여기서 오직 꼬이는 중,ㄴㅇㄹ.ㄴㅇ.ㄹㄴ.ㄹㅇㄴ.ㄹ.ㄹ.ㅇㄴ
     private func configureThumbnailImage(_ imageNames: [String]) {
-//        Logger.printArray(imageNames)
+        Logger.printArray(imageNames)
         for (index, name) in imageNames.enumerated() {
 //            Logger.print(name)
             guard let url = URL(string: name) else { continue }
             let imageView = UIImageView()
             let imageSize = thumbnailScrollView.frame.size
-            imageView.backgroundColor = .systemPink
 
             imageView.kf.setImage(with: url) { [weak self] _ in
                 guard
