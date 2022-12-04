@@ -53,27 +53,27 @@ final class ReservationDetailViewModel: ViewModelType {
             })
             .disposed(by: disposeBag)
         
-        let fetchReservation = fetchReservationUseCase.execute(reservationId: reservationId).share()
+        let fetchReservation = fetchReservationUseCase.execute(reservationId: reservationId)
         let reservationStatus = fetchReservation
             .withUnretained(self) { owner, reservation in
                 return owner.reservationStatus(reservation: reservation)
             }
-            .share()
         
-        executePrimaryAction(primaryButtonTap: input.primaryButtonTap, reservationStatus: reservationStatus)
-            .bind(onNext: { reservation in
-                Logger.print("Primary Executed: \(reservation)")
-            })
-            .disposed(by: disposeBag)
+        let executePrimaryAction = input.primaryButtonTap
+            .flatMap { reservationStatus }
+            .flatMap { $0.executePrimaryAction() ?? .empty() }
         
-        executeSecondaryAction(secondaryButtonTap: input.secondaryButtonTap, reservationStatus: reservationStatus)
-            .bind(onNext: { reservation in
-                Logger.print("Secondary Executed: \(reservation)")
-            })
-            .disposed(by: disposeBag)
+        let executeSecondaryAction = input.secondaryButtonTap
+            .flatMap { reservationStatus }
+            .flatMap { $0.executeSecondaryAction() ?? .empty() }
+        
+        let reservationUpdated = Observable
+            .of(fetchReservation, executePrimaryAction, executeSecondaryAction)
+            .merge()
+            .distinctUntilChanged { $0.status == $1.status }
         
         return Output(
-            reservation: fetchReservation,
+            reservation: reservationUpdated,
             reservationStatus: reservationStatus
         )
     }
@@ -83,7 +83,6 @@ final class ReservationDetailViewModel: ViewModelType {
 private extension ReservationDetailViewModel {
     
     func reservationStatus(reservation: Reservation) -> ReservationStatus {
-        // TODO: - 에러 처리를 어떻게 하지 (후보: ReservationError: ReservationStatusConvertible, ReservationUseCaseExecutable)
         let userType = fetchReservationUserTypeUseCase.execute(
             customerId: reservation.customerUser.userId,
             photographerId: reservation.photographerUser.userId
