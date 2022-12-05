@@ -154,6 +154,37 @@ final class PhotographerDetailViewModel: ViewModelType {
             dataSource: dataSource.asDriver(onErrorJustReturn: [])
         )
     }
+    
+    private func showAlert() -> Observable<Bool> {
+        return Observable.create { [weak self] observable in
+            guard
+                let dates = self?.reservationDate.value,
+                let startDate = dates[safe: 0],
+                let endDate = dates[safe: 1]
+            else {
+                observable.onNext(false)
+                return Disposables.create()
+            }
+            
+            let alert = TrinapAlert(
+                title: "예약을 확인해주세요",
+                timeText: self?.formattingCalendarButtonText(
+                    startDate: startDate,
+                    endDate: endDate
+                ),
+                subtitle: "선택한 날짜로 예약 신청하시겠어요?"
+            )
+            alert.addAction(title: "확인", style: .primary) {
+                observable.onNext(true)
+            }
+            alert.addAction(title: "취소", style: .disabled) {
+                Logger.print("취소")
+                observable.onNext(false)
+            }
+            alert.showAlert(navigationController: self?.coordiantor?.navigationController)
+            return Disposables.create()
+        }
+    }
 }
 
 
