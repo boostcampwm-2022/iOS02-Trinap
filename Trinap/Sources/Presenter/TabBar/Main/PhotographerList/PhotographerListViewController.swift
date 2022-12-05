@@ -109,7 +109,7 @@ final class PhotographerListViewController: BaseViewController {
         let searchTrigger = searchBarView.rx.tapGesture()
             .when(.recognized)
             .asObservable()
-            .map { _ in return () }
+            .map { _ in }
                 
         let input = PhotographerListViewModel.Input(
             viewWillAppear: self.rx.viewWillAppear.asObservable(),
