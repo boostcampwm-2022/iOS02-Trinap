@@ -54,7 +54,7 @@ final class CreateReviewViewController: BaseViewController {
         $0.textContainerInset = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
     }
     
-    private lazy var submitButton = TrinapButton(style: .disabled).than {
+    private lazy var submitButton = TrinapButton(style: .primary).than {
         $0.setTitle("작성 완료", for: .normal)
         $0.isEnabled = false
     }
