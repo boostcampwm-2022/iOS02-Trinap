@@ -47,4 +47,13 @@ extension ReservationCoordinator {
         self.navigationController.pushViewController(reservationDetailViewController, animated: true)
         self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
     }
+    
+    func showCreateReviewViewController(reservation: Reservation) {
+        let photographerUserId = reservation.photographerUser.userId
+        let createReviewViewController = dependencies.makeCreateReviewViewController(
+            photographerUserId: photographerUserId
+        )
+        
+        self.navigationController.present(createReviewViewController, animated: true)
+    }
 }

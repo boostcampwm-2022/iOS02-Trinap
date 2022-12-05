@@ -85,6 +85,32 @@ final class ReservationDependencyContainer {
     private func makeMapRepository() -> MapRepository {
         return DefaultMapRepository()
     }
+    
+    // MARK: - Reservation Create Review
+    func makeCreateReviewViewController(photographerUserId: String) -> CreateReviewViewController {
+        let viewModel = makeCreateReviewViewModel(photographerUserId: photographerUserId)
+        
+        return CreateReviewViewController(viewModel: viewModel)
+    }
+    
+    private func makeCreateReviewViewModel(photographerUserId: String) -> CreateReviewViewModel {
+        let createReviewUseCase = makeCreateReviewUseCase()
+        
+        return CreateReviewViewModel(
+            photographerId: photographerUserId,
+            createReviewUseCase: createReviewUseCase
+        )
+    }
+    
+    private func makeCreateReviewUseCase() -> CreateReviewUseCase {
+        let repository = makeReviewRepository()
+        
+        return DefaultCreateReviewUseCase(reviewRepository: repository)
+    }
+    
+    private func makeReviewRepository() -> ReviewRepository {
+        return DefaultReviewRepository()
+    }
 }
 
 // MARK: - Reservation Status Factory
@@ -120,7 +146,7 @@ extension ReservationDependencyContainer: ReservationStatusFactory {
         return ReservationDone(
             reservation: reservation,
             userType: userType,
-            navigateToWriteReview: { Logger.print($0) }
+            navigateToWriteReview: reservationCoordinator?.showCreateReviewViewController
         )
     }
     
