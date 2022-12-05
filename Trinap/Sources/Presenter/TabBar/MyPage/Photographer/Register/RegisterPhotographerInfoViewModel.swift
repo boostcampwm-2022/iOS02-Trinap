@@ -46,7 +46,7 @@ final class RegisterPhotographerInfoViewModel: ViewModelType {
     
     // MARK: - Initializer
     init(
-        coordinator: MyPageCoordinator,
+        coordinator: MyPageCoordinator?,
         fetchPhotographerUseCase: FetchPhotographerUseCase,
         editPhotographerUseCase: EditPhotographerUseCase,
         mapRepository: MapRepository
