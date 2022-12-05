@@ -11,25 +11,25 @@
 //import FirestoreService
 //
 //protocol DetailChatShowable {
-//    
+//
 //}
 //
 //extension DetailChatShowable {
 //    func showChatDetailViewController(chatroomId: String) {
 //        guard let self = self as? Coordinator else { return }
-//        
+//
 //        let chatRepository = DefaultChatRepository(
 //            firestoreService: DefaultFireStoreService()
 //        )
 //        let userRepository = DefaultUserRepository()
-//        
+//
 //        let uploadImageRepository = DefaultUploadImageRepository()
-//        
+//
 //        let sendChatUseCase = DefaultSendChatUseCase(
 //            chatRepository: chatRepository)
 //        let uploadImageUseCase = DefaultUploadImageUseCase(uploadImageRepository: uploadImageRepository)
 //        let updateIsCheckedUseCase = DefaultUpdateIsCheckedUseCase(chatRepository: chatRepository)
-//        
+//
 //        //MARK: 여기서 coordinator 타입이 initalizer에서 chatCoordinator라서... 우짤까요?
 //        let chatDetailViewModel = ChatDetailViewModel(
 //            coordinator: self,
@@ -43,7 +43,7 @@
 //            updateIsCheckedUseCase: updateIsCheckedUseCase
 //        )
 //        let viewController = ChatDetailViewController(viewModel: chatDetailViewModel)
-//        
+//
 //        self.navigationController.setNavigationBarHidden(false, animated: false)
 //        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
 //        self.navigationController.pushViewController(viewController, animated: true)
