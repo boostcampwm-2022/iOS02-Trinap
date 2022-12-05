@@ -18,6 +18,8 @@ final class MainCoordinator: Coordinator {
     var navigationController: UINavigationController
     var childCoordinators: [Coordinator]
     
+    private lazy var dependencies = MainDependencyContainer(mainCoordinator: self)
+    
     // MARK: - Initializers
     init(_ navigationController: UINavigationController) {
         self.navigationController = navigationController
@@ -33,18 +35,7 @@ final class MainCoordinator: Coordinator {
 extension MainCoordinator {
     
     func showPhotographerListViewController() {
-        let viewController = PhotographerListViewController(
-            viewModel: PhotographerListViewModel(
-                previewsUseCase: DefaultFetchPhotographerPreviewsUseCase(
-                    photographerRepository: DefaultPhotographerRepository(),
-                    mapRepository: DefaultMapRepository(),
-                    userRepository: DefaultUserRepository(),
-                    reviewRepository: DefaultReviewRepository()),
-                fetchCurrentLocationUseCase: DefaultFetchCurrentLocationUseCase(
-                    mapRepository: DefaultMapRepository()
-                ),
-                coordinator: self
-            ))
+        let viewController = dependencies.makePhotographerListViewController()
         self.navigationController.setNavigationBarHidden(true, animated: false)
         self.navigationController.pushViewController(viewController, animated: true)
     }
@@ -72,10 +63,10 @@ extension MainCoordinator {
     ) {
         let viewModel = SearchViewModel(
             searchLocationUseCase: DefaultSearchLocationUseCase(
-                mapService: DefaultMapRepository()
+                mapService: dependencies.mapRepository
             ),
             fetchCurrentLocationUseCase: DefaultFetchCurrentLocationUseCase(
-                mapRepository: DefaultMapRepository()
+                mapRepository: dependencies.mapRepository
             ),
             coordinator: self,
             searchText: searchText,
@@ -92,31 +83,13 @@ extension MainCoordinator {
     }
     
     func showDetailPhotographerViewController(userId: String, searchCoordinate: Coordinate) {
-        let viewModel = PhotographerDetailViewModel(
-            fetchUserUseCase: DefaultFetchUserUseCase(
-                userRepository: DefaultUserRepository()
-            ),
-            fetchPhotographerUseCase: DefaultFetchPhotographerUseCase(
-                photographerRespository: DefaultPhotographerRepository()
-            ),
-            fetchReviewUseCase: DefaultFetchReviewUseCase(
-                reviewRepositry: DefaultReviewRepository(),
-                userRepository: DefaultUserRepository(),
-                photographerRepository: DefaultPhotographerRepository()
-            ),
-            createReservationUseCase: DefaultCreateReservationUseCase(
-                reservationRepository: DefaultReservationRepository(
-                    firebaseStoreService: DefaultFireStoreService()
-                )
-            ),
-            mapRepository: DefaultMapRepository(),
+
+        let viewController = dependencies.makePhotographerDetailViewController(
             userId: userId,
-            searchCoordinate: searchCoordinate,
-            coordinator: self
+            searchCoordinate: searchCoordinate
         )
-        let viewController = PhotographerDetailViewController(
-            viewModel: viewModel
-        )
+
+        self.navigationController.isNavigationBarHidden = false
         self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
         self.navigationController.pushViewController(viewController, animated: true)
         self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false

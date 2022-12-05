@@ -99,7 +99,15 @@ private extension TabBarCoordinator {
     
     func connectMyPageFlow(to tabNavigationController: UINavigationController) {
         let myPageCoordinator = MyPageCoordinator(tabNavigationController)
+        myPageCoordinator.delegate = self
         myPageCoordinator.start()
         childCoordinators.append(myPageCoordinator)
+    }
+}
+
+extension TabBarCoordinator: CoordinatorDelegate {
+    func didFinish(childCoordinator: Coordinator) {
+        self.navigationController.popToRootViewController(animated: false)
+        self.finish()
     }
 }

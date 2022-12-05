@@ -63,7 +63,8 @@ final class ReservationDependencyContainer {
             reservationCoordinator: reservationCoordinator,
             fetchReservationUseCase: fetchReservationUseCase,
             fetchReservationUserTypeUseCase: reservationUserTypeUseCase,
-            reservationId: reservationId
+            reservationId: reservationId,
+            reservationStatusFactory: self
         )
     }
     
@@ -83,5 +84,55 @@ final class ReservationDependencyContainer {
     
     private func makeMapRepository() -> MapRepository {
         return DefaultMapRepository()
+    }
+}
+
+// MARK: - Reservation Status Factory
+extension ReservationDependencyContainer: ReservationStatusFactory {
+    
+    func makeReservationRequested(reservation: Reservation, userType: Reservation.UserType) -> ReservationRequested {
+        return ReservationRequested(
+            reservation: reservation,
+            userType: userType,
+            acceptReservationRequestUseCaseFactory: makeAcceptReservationRequestUseCase,
+            cancelReservationRequestUseCaseFactory: makeCancelReservationRequestUseCase
+        )
+    }
+    
+    func makeReservationConfirmed(reservation: Reservation, userType: Reservation.UserType) -> ReservationConfirmed {
+        return ReservationConfirmed(
+            reservation: reservation,
+            userType: userType,
+            completePhotoshootUseCaseFactory: makeCompletePhotoshootUseCase,
+            cancelReservationRequestUseCaseFactory: makeCancelReservationRequestUseCase
+        )
+    }
+    
+    func makeReservationCancelled(reservation: Reservation, userType: Reservation.UserType) -> ReservationCancelled {
+        return ReservationCancelled(
+            reservation: reservation,
+            userType: userType,
+            navigateToReservationDetail: { Logger.print($0) }
+        )
+    }
+    
+    func makeReservationDone(reservation: Reservation, userType: Reservation.UserType) -> ReservationDone {
+        return ReservationDone(
+            reservation: reservation,
+            userType: userType,
+            navigateToWriteReview: { Logger.print($0) }
+        )
+    }
+    
+    private func makeAcceptReservationRequestUseCase() -> AcceptReservationRequestUseCase {
+        return DefaultAcceptReservationRequestUseCase(repository: reservationRepository)
+    }
+    
+    private func makeCancelReservationRequestUseCase() -> CancelReservationRequestUseCase {
+        return DefaultCancelReservationRequestUseCase(repository: reservationRepository)
+    }
+    
+    private func makeCompletePhotoshootUseCase() -> CompletePhotoshootUseCase {
+        return DefaultCompletePhotoshootUseCase(repository: reservationRepository)
     }
 }

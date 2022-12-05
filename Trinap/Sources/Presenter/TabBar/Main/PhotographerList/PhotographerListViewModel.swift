@@ -37,7 +37,7 @@ final class PhotographerListViewModel: ViewModelType {
     init(
         previewsUseCase: FetchPhotographerPreviewsUseCase,
         fetchCurrentLocationUseCase: FetchCurrentLocationUseCase,
-        coordinator: MainCoordinator
+        coordinator: MainCoordinator?
     ) {
         self.previewsUseCase = previewsUseCase
         self.fetchCurrentLocationUseCase = fetchCurrentLocationUseCase
@@ -76,6 +76,7 @@ final class PhotographerListViewModel: ViewModelType {
         )
             .withUnretained(self)
             .flatMap { (owner, val) -> Observable<[PhotographerPreview]> in
+                Logger.print("몇번???")
                 let (coordinate, type) = val
                 return owner.previewsUseCase.fetch(coordinate: coordinate, type: type)
             }

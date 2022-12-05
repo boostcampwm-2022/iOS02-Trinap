@@ -52,7 +52,7 @@ extension AppCoordinator {
     }
     
     func connectTabBarFlow() {
-        self.navigationController.viewControllers.removeAll()
+        self.navigationController.popToRootViewController(animated: true)
         let tabBarCoordinator = TabBarCoordinator(self.navigationController)
         tabBarCoordinator.delegate = self
         tabBarCoordinator.start()

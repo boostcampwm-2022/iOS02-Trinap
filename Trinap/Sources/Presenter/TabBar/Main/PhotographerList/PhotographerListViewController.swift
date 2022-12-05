@@ -107,8 +107,9 @@ final class PhotographerListViewController: BaseViewController {
             .map { TagType(index: $0.row) }
         
         let searchTrigger = searchBarView.rx.tapGesture()
-            .when(.recognized).asObservable()
-            .map { _ in return () }
+            .when(.recognized)
+            .asObservable()
+            .map { _ in }
                 
         let input = PhotographerListViewModel.Input(
             viewWillAppear: self.rx.viewWillAppear.asObservable(),
@@ -123,7 +124,7 @@ final class PhotographerListViewController: BaseViewController {
                 self?.generateSnapshot(sources: previews)
             }
             .drive(onNext: { [weak self] snapshot in
-                self?.dataSource?.apply(snapshot, animatingDifferences: true)
+                self?.dataSource?.apply(snapshot, animatingDifferences: false)
             })
             .disposed(by: disposeBag)
     }
@@ -147,6 +148,7 @@ extension PhotographerListViewController {
         return UICollectionViewDiffableDataSource(collectionView: collectionView) { collectionView, indexPath, itemIdentifier in
             guard let cell = collectionView.dequeueCell(PhotographerPreviewCell.self, for: indexPath)
             else { return UICollectionViewCell() }
+            
             cell.configureCell(itemIdentifier)
             
             cell.rx.tapGesture()

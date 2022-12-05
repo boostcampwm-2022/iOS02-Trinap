@@ -17,10 +17,20 @@ struct ReservationRequested {
     private let reservation: Reservation
     private let userType: Reservation.UserType
     
+    private let makeAcceptReservationRequestUseCase: () -> AcceptReservationRequestUseCase
+    private let makeCancelReservationRequestUseCase: () -> CancelReservationRequestUseCase
+    
     // MARK: - Initializers
-    init(reservation: Reservation, userType: Reservation.UserType) {
+    init(
+        reservation: Reservation,
+        userType: Reservation.UserType,
+        acceptReservationRequestUseCaseFactory: @escaping () -> AcceptReservationRequestUseCase,
+        cancelReservationRequestUseCaseFactory: @escaping () -> CancelReservationRequestUseCase
+    ) {
         self.reservation = reservation
         self.userType = userType
+        self.makeAcceptReservationRequestUseCase = acceptReservationRequestUseCaseFactory
+        self.makeCancelReservationRequestUseCase = cancelReservationRequestUseCaseFactory
     }
 }
 
@@ -49,60 +59,13 @@ extension ReservationRequested: ReservationUseCaseExecutable {
     func executePrimaryAction() -> Observable<Reservation>? {
         switch userType {
         case .photographer:
-            // TODO: AcceptReservationRequestUseCase
-#warning("유즈케이스 구현하면 없애기 유즈케이스 구현하면 없애기 유즈케이스 구현하면 없애기 유즈케이스 구현하면 없애기")
-            return mockReservationResult()
+            return makeAcceptReservationRequestUseCase().execute(reservation: reservation)
         case .customer:
             return nil
         }
     }
     
     func executeSecondaryAction() -> Observable<Reservation>? {
-        // TODO: CancelReservationRequestUseCase
-#warning("유즈케이스 구현하면 없애기 유즈케이스 구현하면 없애기 유즈케이스 구현하면 없애기 유즈케이스 구현하면 없애기")
-        return mockReservationResult()
+        return makeCancelReservationRequestUseCase().execute(reservation: reservation)
     }
 }
-
-#warning("유즈케이스 구현하면 없애기 유즈케이스 구현하면 없애기 유즈케이스 구현하면 없애기 유즈케이스 구현하면 없애기")
-import Foundation
-
-func mockReservationResult() -> Observable<Reservation> {
-    return .create { observer in
-        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
-            observer.onNext(mockReservation)
-        }
-        
-        observer.onCompleted()
-        
-        return Disposables.create()
-    }
-}
-
-let mockReservation = Reservation(
-    reservationId: UUID().uuidString,
-    customerUser: customerUser,
-    photographerUser: photographerUser,
-    reservationStartDate: Date(),
-    reservationEndDate: Date().addingTimeInterval(2 * 60 * 60),
-    location: "제주시 한라산",
-    status: .confirm
-)
-
-let customerUser = User(
-    userId: UUID().uuidString,
-    nickname: "고객고객",
-    profileImage: nil,
-    isPhotographer: false,
-    fcmToken: "sometoken",
-    status: .activate
-)
-
-let photographerUser = User(
-    userId: UUID().uuidString,
-    nickname: "작가가작",
-    profileImage: nil,
-    isPhotographer: true,
-    fcmToken: "sometoken2",
-    status: .activate
-)

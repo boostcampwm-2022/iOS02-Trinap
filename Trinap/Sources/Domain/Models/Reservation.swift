@@ -29,7 +29,7 @@ struct Reservation {
     let reservationStartDate: Date
     let reservationEndDate: Date
     let location: String
-    let status: Status
+    var status: Status
 }
 
 extension Reservation: Hashable {

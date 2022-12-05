@@ -36,7 +36,7 @@ class PhotographerDetailViewController: BaseViewController {
         $0.setTitleColor(TrinapAsset.white.color, for: .normal)
         $0.titleLabel?.font = TrinapFontFamily.Pretendard.bold.font(size: 14)
     }
-    
+
     //TODO: 예약 관련 컴포넌트들 선언 및 연결
     
     // MARK: - Properties
@@ -58,6 +58,7 @@ class PhotographerDetailViewController: BaseViewController {
     // MARK: - Methods
     override func viewDidLoad() {
         super.viewDidLoad()
+        configureNavigationBar()
     }
     
     override func configureHierarchy() {
@@ -95,6 +96,7 @@ class PhotographerDetailViewController: BaseViewController {
     }
     
     override func bind() {
+        
         let input = PhotographerDetailViewModel.Input(
             viewWillAppear: self.rx.viewWillAppear.asObservable(),
             tabState: self.tabState.asObservable(),
@@ -134,6 +136,47 @@ class PhotographerDetailViewController: BaseViewController {
                       
                 self?.configureCalendarButton(startDate: start, endDate: end)
             }
+            .disposed(by: disposeBag)
+    }
+    
+    private func configureNavigationBar() {
+        navigationController?.navigationBar.backIndicatorImage = UIImage(systemName: "arrow.backward")
+        navigationController?.navigationBar.backIndicatorTransitionMaskImage = UIImage(systemName: "arrow.backward")
+        navigationController?.navigationBar.tintColor = .black
+        self.navigationController?.navigationBar.topItem?.title = ""
+        
+        
+        let buttonItem = UIBarButtonItem(
+            image: TrinapAsset.dotdotdot.image,
+            style: .plain,
+            target: self,
+            action: #selector(showActionSheet)
+        )
+        
+        navigationItem.setRightBarButton(buttonItem, animated: false)
+    }
+    
+    @objc private func showActionSheet() {
+        let alert = UIAlertController()
+            .appendingAction(title: "신고하기", style: .default) {
+                //TODO: 해당 아이 userId로 신고박는 페이지로 이동
+                
+            }
+            .appendingAction(title: "차단하기", style: .default) {
+                self.confirmBlock()
+            }
+            .appendingAction(title: "취소", style: .cancel)
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    private func confirmBlock() {
+        self.viewModel.blockPhotographer()
+            .asObservable()
+            .subscribe(onNext: { [weak self] in
+                let alert = UIAlertController(title: "신고 완료", message: "신고가 완료되었습니다.", preferredStyle: .alert)
+                    .appendingAction(title: "확인", style: .default)
+                self?.present(alert, animated: true)
+            })
             .disposed(by: disposeBag)
     }
 }

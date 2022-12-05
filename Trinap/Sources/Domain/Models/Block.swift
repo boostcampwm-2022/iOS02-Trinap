@@ -1,5 +1,5 @@
 //
-//  Report.swift
+//  Block.swift
 //  Trinap
 //
 //  Created by kimchansoo on 2022/11/16.
@@ -8,8 +8,13 @@
 
 import Foundation
 
-struct Report {
+struct Block {
     
+    enum BlockStatus: String {
+        case active
+        case inactive
+    }
+
     // MARK: Properties
     let blockId: String
     let blockedUserId: String
