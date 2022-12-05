@@ -33,11 +33,9 @@ final class DefaultDropOutUseCase: DropOutUseCase {
             }
             .withUnretained(self)
             .flatMap { owner, photographerId in
-                return owner.authRepository.removePhotographerInfo(with: photographerId)
-            }
-            .withUnretained(self)
-            .flatMap { owner, _ in
-                return owner.authRepository.removeUser()
+                return owner.authRepository
+                    .removeUserInfo(photographerId: photographerId)
+                    .asObservable()
             }
             .withUnretained(self)
             .flatMap { owner, _ in
