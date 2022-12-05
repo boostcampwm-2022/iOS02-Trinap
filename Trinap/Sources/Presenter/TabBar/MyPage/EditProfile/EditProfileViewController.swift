@@ -45,7 +45,7 @@ final class EditProfileViewController: BaseViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        
+        super.viewWillAppear(animated)
     }
     
     // MARK: - Configure
@@ -75,8 +75,8 @@ final class EditProfileViewController: BaseViewController {
     override func configureAttributes() {
         self.hideKeyboardWhenTapped()
         imagePicker.delegate = self
+        
         self.navigationController?.navigationBar.isHidden = false
-        self.navigationController?.navigationBar.topItem?.title = " "
         self.navigationController?.navigationBar.tintColor = .black
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: doneButton)
     }
