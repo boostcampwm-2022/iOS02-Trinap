@@ -174,7 +174,7 @@ class PhotographerDetailViewController: BaseViewController {
             .asObservable()
             .subscribe(onNext: {
                 let alert = UIAlertController(title: "신고 완료", message: "신고가 완료되었습니다.", preferredStyle: .alert)
-                alert.appendingAction(title: "확인", style: .default)
+                    .appendingAction(title: "확인", style: .default)
                 self.present(alert, animated: true)
             })
             .disposed(by: disposeBag)
