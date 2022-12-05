@@ -38,7 +38,7 @@ extension ReservationCancelled: ReservationStatusConvertible {
         case .photographer:
             return Configurations(
                 status: Configuration(title: "예약 취소", fillType: .fill, style: .error),
-                primary: nil,
+                primary: Configuration(title: "예약이 취소되었습니다.", fillType: .fill, style: .disabled),
                 secondary: nil
             )
         case .customer:
