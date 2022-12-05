@@ -28,7 +28,7 @@ final class DropOutViewModel: ViewModelType {
     
     // MARK: - Initializer
     init(
-        coordinator: MyPageCoordinator,
+        coordinator: MyPageCoordinator?,
         dropOutUseCase: DropOutUseCase
     ) {
         self.coordinator = coordinator
