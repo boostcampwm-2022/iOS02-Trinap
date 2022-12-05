@@ -22,6 +22,17 @@ final class DefaultCreateChatroomUseCase: CreateChatroomUseCase {
     
     // MARK: Methods
     func create(photographerUserId: String) -> Observable<String> {
-        return chatroomRepository.create(photographerUserId: photographerUserId)
+        chatroomRepository.fetchChatrooms()
+            .map {
+                $0.filter { $0.photographerUserId == photographerUserId || $0.customerUserId == photographerUserId }
+            }
+            .withUnretained(self)
+            .flatMap { owner, chatrooms -> Observable<String> in
+                guard let chatroom = chatrooms.first
+                else {
+                    return owner.chatroomRepository.create(photographerUserId: photographerUserId)
+                }
+                return Observable.just(chatroom.chatroomId)
+            }
     }
 }
