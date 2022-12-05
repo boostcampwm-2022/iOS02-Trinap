@@ -41,6 +41,15 @@ final class DefaultChatroomRepository: ChatroomRepository {
             .map { $0.map { $0.toModel() } }
     }
     
+    func fetchChatrooms() -> Observable<[Chatroom]> {
+        fetchChatrooms(field: "photographerUserId")
+            .withUnretained(self)
+            .flatMap { owner, chatrooms -> Observable<[Chatroom]> in
+                return owner.fetchChatrooms(field: "customerUserId")
+                    .map { $0 + chatrooms }
+            }
+    }
+    
     func updateDate(chatroomId: String) -> Observable<Void> {
         let values = ["updatedAt": Date().toString(type: .timeStamp)]
         
@@ -86,5 +95,21 @@ private extension DefaultChatroomRepository {
             .observe(collection: .chatrooms, field: userType, in: [userId])
             .map { $0.compactMap { $0.toObject() } }
             .map { $0.sorted(by: { $0.updatedAt > $1.updatedAt }) }
+    }
+    
+    private func fetchChatrooms(field: String) -> Observable<[Chatroom]> {
+        guard let userId = tokenManager.getToken(with: .userId) else {
+            return .error(TokenManagerError.notFound)
+        }
+        
+        return firebaseStoreService.getDocument(
+            collection: .chatrooms,
+            field: field,
+            in: [userId]
+        )
+        .asObservable()
+        .map { data -> [Chatroom] in
+            data.compactMap { $0.toObject(ChatroomDTO.self)?.toModel()}
+        }
     }
 }
