@@ -29,6 +29,8 @@ struct Reservation {
     let reservationStartDate: Date
     let reservationEndDate: Date
     let location: String
+    let latitude: Double
+    let longitude: Double
     var status: Status
 }
 
