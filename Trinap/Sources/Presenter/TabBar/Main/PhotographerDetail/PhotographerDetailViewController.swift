@@ -172,10 +172,10 @@ class PhotographerDetailViewController: BaseViewController {
     private func confirmBlock() {
         self.viewModel.blockPhotographer()
             .asObservable()
-            .subscribe(onNext: {
+            .subscribe(onNext: { [weak self] in
                 let alert = UIAlertController(title: "신고 완료", message: "신고가 완료되었습니다.", preferredStyle: .alert)
                     .appendingAction(title: "확인", style: .default)
-                self.present(alert, animated: true)
+                self?.present(alert, animated: true)
             })
             .disposed(by: disposeBag)
     }
