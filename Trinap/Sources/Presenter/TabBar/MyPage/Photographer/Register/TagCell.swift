@@ -11,7 +11,7 @@ import UIKit
 import RxRelay
 import RxCocoa
 
-final class RegisterTagCell: BaseCollectionViewCell {
+final class TagCell: BaseCollectionViewCell {
     
     private lazy var tagLabel = UILabel().than {
         $0.backgroundColor = TrinapAsset.background.color
@@ -46,8 +46,16 @@ final class RegisterTagCell: BaseCollectionViewCell {
         self.layer.cornerRadius = self.frame.height / 2
     }
     
-    func configure(tag: TagItem) {
-        tagLabel.text = "#\(tag.tag.title)"
+    func configure(
+        tag: TagType,
+        backgroundColor: UIColor = TrinapAsset.background.color,
+        textColor: UIColor = TrinapAsset.subtext2.color,
+        fontSize: CGFloat = 16
+    ) {
+        self.tagLabel.text = "#\(tag.title)"
+        self.tagLabel.backgroundColor = backgroundColor
+        self.tagLabel.textColor = textColor
+        self.tagLabel.font = TrinapFontFamily.Pretendard.regular.font(size: fontSize)
     }
     
     private func setSelected() {
@@ -60,10 +68,11 @@ final class TagCollectionViewLeftAlignFlowLayout: UICollectionViewFlowLayout {
     
     private let offset: CGFloat
     
-    init(offset: CGFloat) {
+    init(offset: CGFloat, direction: UICollectionView.ScrollDirection) {
         self.offset = offset
-        
         super.init()
+        
+        self.scrollDirection = direction
     }
     
     required init?(coder: NSCoder) {
