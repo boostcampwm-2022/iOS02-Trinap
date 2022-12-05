@@ -75,7 +75,10 @@ final class ReservationPreviewListViewController: BaseViewController {
             .withUnretained(self) { $0.filterMode(of: $1) }
             .startWith(.receive)
         
-        let input = ReservationPreviewListViewModel.Input(reservationType: reservationType)
+        let input = ReservationPreviewListViewModel.Input(
+            viewWillAppear: self.rx.viewWillAppear.map { _ in return },
+            reservationType: reservationType
+        )
         let output = viewModel.transform(input: input)
         
         output.reservationPreviews
@@ -83,7 +86,7 @@ final class ReservationPreviewListViewController: BaseViewController {
                 self?.generateSnapshot(previews)
             }
             .drive(onNext: { [weak self] snapshot in
-                self?.dataSource?.apply(snapshot)
+                self?.dataSource?.apply(snapshot, animatingDifferences: false)
             })
             .disposed(by: disposeBag)
         
