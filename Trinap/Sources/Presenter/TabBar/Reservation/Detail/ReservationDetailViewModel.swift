@@ -16,6 +16,8 @@ final class ReservationDetailViewModel: ViewModelType {
     
     struct Input {
         var backButtonTap: Signal<Void>
+        var customerUserViewTap: Observable<Void>
+        var photographerUserViewTap: Observable<Void>
         var primaryButtonTap: Observable<Void>
         var secondaryButtonTap: Observable<Void>
     }
@@ -54,6 +56,14 @@ final class ReservationDetailViewModel: ViewModelType {
             .emit(onNext: { [weak self] _ in
                 self?.reservationCoordinator?.popViewController()
             })
+            .disposed(by: disposeBag)
+        
+        input.customerUserViewTap
+            .bind(onNext: { Logger.print("Customer") })
+            .disposed(by: disposeBag)
+        
+        input.photographerUserViewTap
+            .bind(onNext: { Logger.print("Photographer") })
             .disposed(by: disposeBag)
         
         let fetchReservation = fetchReservationUseCase.execute(reservationId: reservationId)
