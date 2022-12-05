@@ -16,7 +16,7 @@ final class DropOutViewController: BaseViewController {
     
     // MARK: - UI
     private lazy var titleLabel = UILabel().than {
-        $0.text = "맨도롱또똣님과\n좋은 추억을 더 남기지 못해서 아쉬워요.."
+        $0.text = "고객님과\n좋은 추억을 더 남기지 못해서 아쉬워요.."
         $0.font = TrinapFontFamily.Pretendard.bold.font(size: 16)
         $0.textColor = TrinapAsset.black.color
         $0.numberOfLines = 0
@@ -164,13 +164,9 @@ final class DropOutViewController: BaseViewController {
     private func configureButton() {
         self.agreeDropOutButton.rx.tap.asObservable()
             .withUnretained(self)
-            .subscribe(onNext: { owner, _ in
+            .do { owner, _ in
                 owner.agreeDropOutButton.isSelected.toggle()
-            })
-            .disposed(by: disposeBag)
-        
-        self.agreeDropOutButton.rx.tap.asObservable()
-            .withUnretained(self)
+            }
             .map { owner, _ -> Bool in
                 return owner.agreeDropOutButton.isSelected
             }
