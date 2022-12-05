@@ -13,5 +13,6 @@ protocol ChatroomRepository {
     // MARK: - Methods
     func observe() -> Observable<[Chatroom]>
     func updateDate(chatroomId: String) -> Observable<Void>
-    func create(customerUserId: String, photographerUserId: String) -> Observable<Void>
+    func create(customerUserId: String, photographerUserId: String) -> Observable<String>
+    func create(photographerUserId: String) -> Observable<String>
 }
