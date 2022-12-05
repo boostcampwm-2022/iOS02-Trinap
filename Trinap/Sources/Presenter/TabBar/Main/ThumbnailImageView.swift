@@ -97,7 +97,14 @@ extension ThumbnailImageView {
             let imageView = UIImageView()
             let imageSize = thumbnailScrollView.frame.size
 
-            imageView.kf.setImage(with: url) { [weak self] _ in
+            imageView.kf.setImage(
+                with: url
+//                options: [
+//                    .processor(DownsamplingImageProcessor(size: imageSize)),
+//                    .scaleFactor(UIScreen.main.scale),
+//                    .cacheOriginalImage
+//                ]
+            ) { [weak self] _ in
                 guard
                     let width = self?.thumbnailScrollView.frame.width,
                     let y = self?.thumbnailScrollView.frame.minY,
@@ -108,6 +115,7 @@ extension ThumbnailImageView {
                 self?.thumbnailScrollView.contentSize.width = imageView.frame.width * CGFloat(index + 1)
                 self?.thumbnailScrollView.addSubview(imageView)
             }
+            
         }
     }
 }
