@@ -24,11 +24,14 @@ final class EditPhotographerViewController: BaseViewController {
     
     private let tabState = BehaviorRelay<Int>(value: 0)
     private let isEditable = BehaviorRelay<Bool>(value: false)
-    private let selectedPicture = BehaviorRelay<[Int?]>(value: [])
+    private let selectedPicture = BehaviorRelay<[Int]>(value: [])
     private let deleteTrigger = PublishSubject<Void>()
+    private let portfolioUpdateTigger = PublishSubject<Void>()
     
     // MARK: - Properties
     weak var coordinator: MyPageCoordinator?
+    
+    private lazy var imagePicker = ImagePickerController()
     
     private let viewModel: EditPhotographerViewModel
     private lazy var collectionView = UICollectionView(
@@ -63,13 +66,29 @@ final class EditPhotographerViewController: BaseViewController {
     }
     
     override func bind() {
+        
+        self.isEditable
+            .map { _ in [] }
+            .bind(to: selectedPicture)
+            .disposed(by: disposeBag)
+        
+        let willUploadImage = portfolioUpdateTigger
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .withUnretained(self)
+            .flatMap { owner, _ in
+                owner.imagePicker
+                    .pickImage()
+                    .compactMap { $0.jpegData(compressionQuality: 0.7) }
+            }
+            .share()
+            
         let input = EditPhotographerViewModel.Input(
-            viewWillAppear: self.rx.viewWillAppear.asObservable(),
             tabState: self.tabState.asObservable(),
             isEditable: self.isEditable.asObservable().distinctUntilChanged(),
             selectedPicture: self.selectedPicture
                 .map { $0.compactMap { $0 }.map { $0 - 1 } }
                 .asObservable(),
+            uploadImage: willUploadImage,
             deleteTrigger: self.deleteTrigger.asObservable()
         )
         
@@ -101,7 +120,7 @@ final class EditPhotographerViewController: BaseViewController {
                 if case let .photo(picture) = owner.dataSource.itemIdentifier(for: indexPath) {
                     
                     if picture?.picture == nil {
-                        owner.coordinator?.showUpdatePhotographerViewController()
+                        owner.portfolioUpdateTigger.onNext(())
                     } else {
                         return indexPath.row
                     }
@@ -125,7 +144,7 @@ final class EditPhotographerViewController: BaseViewController {
             .withUnretained(self)
             .subscribe(onNext: { owner, pictureURL in
                 let removedValue = owner.selectedPicture.value.filter { $0 != pictureURL }
-                self.selectedPicture.accept(removedValue)
+                owner.selectedPicture.accept(removedValue)
             })
             .disposed(by: self.disposeBag)
         
@@ -137,6 +156,7 @@ final class EditPhotographerViewController: BaseViewController {
     
     override func configureAttributes() {
         configureCollectionView()
+        imagePicker.delegate = self
     }
     
     private func configureNavigation() {

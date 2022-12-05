@@ -17,7 +17,6 @@ final class PhotoCell: BaseCollectionViewCell {
     }()
     
     private lazy var imageView = UIImageView().than {
-        $0.image = plusImage
         $0.tintColor = TrinapAsset.white.color
     }
     
@@ -38,6 +37,7 @@ final class PhotoCell: BaseCollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        self.imageView.image = nil
     }
     
     override func configureHierarchy() {

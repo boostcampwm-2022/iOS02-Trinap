@@ -18,7 +18,7 @@ final class MyPageViewController: BaseViewController {
     private let viewModel: MyPageViewModel
     private lazy var tableView = UITableView(frame: .zero, style: .plain)
     
-    private lazy var dataSource: UITableViewDiffableDataSource<MyPageSection, MyPageCellType> = generateDataSource()
+    private var dataSource: UITableViewDiffableDataSource<MyPageSection, MyPageCellType>?
     // MARK: - Initializers
     init(viewModel: MyPageViewModel) {
         self.viewModel = viewModel
@@ -58,7 +58,7 @@ final class MyPageViewController: BaseViewController {
                 self?.generateSnapshot(dataSource)
             }
             .drive { [weak self] snapshot in
-                self?.dataSource.apply(snapshot)
+                self?.dataSource?.apply(snapshot, animatingDifferences: false)
             }
             .disposed(by: disposeBag)
         
@@ -153,7 +153,7 @@ extension MyPageViewController: UITableViewDelegate {
     }
     
     private func showNextViewController(indexPath: IndexPath) {
-        guard let type = dataSource.itemIdentifier(for: indexPath) else { return }
+        guard let type = dataSource?.itemIdentifier(for: indexPath) else { return }
         
         self.coordinator?.showNextView(state: type)
     }
