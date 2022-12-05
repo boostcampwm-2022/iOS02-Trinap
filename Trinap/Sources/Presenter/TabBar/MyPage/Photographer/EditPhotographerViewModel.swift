@@ -16,6 +16,7 @@ typealias PhotographerDataSource = [PhotographerSection: [PhotographerSection.It
 final class EditPhotographerViewModel: ViewModelType {
     
     struct Input {
+        let viewWillAppear: Observable<Bool>
         let tabState: Observable<Int>
         let isEditable: Observable<Bool>
         let selectedPicture: Observable<[Int]>
@@ -37,7 +38,7 @@ final class EditPhotographerViewModel: ViewModelType {
     
     var disposeBag = DisposeBag()
     
-    private let reloadTrigger = BehaviorSubject<Void>(value: ())
+    private let reloadTrigger = PublishSubject<Void>()
     
     // MARK: - Initializer
     init(
@@ -58,6 +59,11 @@ final class EditPhotographerViewModel: ViewModelType {
     
     // MARK: - Methods
     func transform(input: Input) -> Output {
+        
+        input.viewWillAppear
+            .map { _ in }
+            .bind(to: reloadTrigger)
+            .disposed(by: disposeBag)
         
         let photographer = self.reloadTrigger
             .withUnretained(self)

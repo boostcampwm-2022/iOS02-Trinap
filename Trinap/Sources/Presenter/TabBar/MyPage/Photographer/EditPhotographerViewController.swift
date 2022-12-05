@@ -39,7 +39,7 @@ final class EditPhotographerViewController: BaseViewController {
         collectionViewLayout: configureCollectionViewLayout(.picture)
     )
     
-    private lazy var dataSource = configureDataSource()
+    private var dataSource: DataSource?
     
     // MARK: - Initializers
     init(viewModel: EditPhotographerViewModel) {
@@ -81,8 +81,9 @@ final class EditPhotographerViewController: BaseViewController {
                     .compactMap { $0.jpegData(compressionQuality: 0.7) }
             }
             .share()
-            
+        
         let input = EditPhotographerViewModel.Input(
+            viewWillAppear: self.rx.viewWillAppear.asObservable(),
             tabState: self.tabState.asObservable(),
             isEditable: self.isEditable.asObservable().distinctUntilChanged(),
             selectedPicture: self.selectedPicture
@@ -110,19 +111,23 @@ final class EditPhotographerViewController: BaseViewController {
                 self.generateSnapShot(dataSource)
             }
             .drive { snapshot in
-                self.dataSource.apply(snapshot, animatingDifferences: false)
+                self.dataSource?.apply(snapshot, animatingDifferences: false)
             }
             .disposed(by: disposeBag)
         
         collectionView.rx.itemSelected
             .withUnretained(self)
             .compactMap { owner, indexPath -> Int? in
-                if case let .photo(picture) = owner.dataSource.itemIdentifier(for: indexPath) {
-                    
+                if case let .photo(picture) = owner.dataSource?.itemIdentifier(for: indexPath) {
                     if picture?.picture == nil {
                         owner.portfolioUpdateTigger.onNext(())
                     } else {
-                        return indexPath.row
+                        if owner.isEditable.value {
+                            return indexPath.row
+                        } else {
+                            owner.coordinator?.showDetailImageView(urlString: picture?.picture)
+                            return nil
+                        }
                     }
                 }
                 return nil
@@ -132,14 +137,15 @@ final class EditPhotographerViewController: BaseViewController {
                 owner.selectedPicture.accept(owner.selectedPicture.value + [i])
             })
             .disposed(by: disposeBag)
-
+        
         collectionView.rx.itemDeselected
             .withUnretained(self)
-            .compactMap { owner, indexPath in
-                if case .photo = owner.dataSource.itemIdentifier(for: indexPath) {
+            .compactMap { owner, indexPath -> Int? in
+                if case .photo = owner.dataSource?.itemIdentifier(for: indexPath) {
                     return indexPath.row
+                } else {
+                    return nil
                 }
-                return nil
             }
             .withUnretained(self)
             .subscribe(onNext: { owner, pictureURL in
@@ -155,6 +161,7 @@ final class EditPhotographerViewController: BaseViewController {
     }
     
     override func configureAttributes() {
+        configureDataSource()
         configureCollectionView()
         imagePicker.delegate = self
     }
@@ -194,9 +201,9 @@ extension EditPhotographerViewController {
         return snapshot
     }
     
-    private func configureDataSource() -> DataSource {
+    private func configureDataSource() {
         
-        let dataSource = DataSource(collectionView: self.collectionView) { [weak self] collectionView, indexPath, item in
+        self.dataSource = DataSource(collectionView: self.collectionView) { [weak self] collectionView, indexPath, item in
             guard let self else { return UICollectionViewCell() }
             
             switch item {
@@ -249,7 +256,7 @@ extension EditPhotographerViewController {
             }
         }
         
-        dataSource.supplementaryViewProvider = { [weak self] (collectionView: UICollectionView, kind: String, indexPath: IndexPath) -> UICollectionReusableView? in
+        self.dataSource?.supplementaryViewProvider = { [weak self] (collectionView: UICollectionView, kind: String, indexPath: IndexPath) -> UICollectionReusableView? in
             
             guard let self else { return nil }
             
@@ -290,7 +297,6 @@ extension EditPhotographerViewController {
                 return UICollectionReusableView()
             }
         }
-        return dataSource
     }
 }
 
@@ -335,7 +341,7 @@ extension EditPhotographerViewController {
             layoutSize:
                 NSCollectionLayoutSize(
                     widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .estimated(trinapOffset * 19)
+                    heightDimension: .estimated(trinapOffset * 24)
                 ),
             subitems: [item]
         )
