@@ -33,6 +33,7 @@ final class PhotographerDetailViewModel: ViewModelType {
     private let fetchPhotographerUseCase: FetchPhotographerUseCase
     private let fetchReviewUseCase: FetchReviewUseCase
     private let createReservationUseCase: CreateReservationUseCase
+    private let createBlockUseCase: CreateBlockUseCase
     private let mapRepository: MapRepository
     
     private let reloadTrigger = BehaviorSubject<Void>(value: ())
@@ -50,15 +51,17 @@ final class PhotographerDetailViewModel: ViewModelType {
         fetchPhotographerUseCase: FetchPhotographerUseCase,
         fetchReviewUseCase: FetchReviewUseCase,
         createReservationUseCase: CreateReservationUseCase,
+        createBlockUseCase: CreateBlockUseCase,
         mapRepository: MapRepository,
         userId: String,
         searchCoordinate: Coordinate,
-        coordinator: MainCoordinator
+        coordinator: MainCoordinator?
     ) {
         self.fetchUserUseCase = fetchUserUseCase
         self.fetchPhotographerUseCase = fetchPhotographerUseCase
         self.fetchReviewUseCase = fetchReviewUseCase
         self.createReservationUseCase = createReservationUseCase
+        self.createBlockUseCase = createBlockUseCase
         self.mapRepository = mapRepository
         self.coordiantor = coordinator
         self.searchCoordinate = searchCoordinate
@@ -234,5 +237,16 @@ extension PhotographerDetailViewModel: SelectReservationDateViewModelDelegate {
     
     func selectedReservationDate(startDate: Date, endDate: Date) {
         self.reservationDate.accept([startDate, endDate])
+    }
+}
+
+// MARK: 차단, 신고 관련 메소드
+extension PhotographerDetailViewModel {
+    func blockPhotographer() -> Single<Void> {
+        self.createBlockUseCase.create(blockedUserId: self.userId)
+    }
+    
+    func reportPhotographer() {
+        
     }
 }
