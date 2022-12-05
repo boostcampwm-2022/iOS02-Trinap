@@ -146,14 +146,14 @@ class PhotographerDetailViewController: BaseViewController {
         self.navigationController?.navigationBar.topItem?.title = ""
         
         
-        let aad = UIBarButtonItem(
+        let buttonItem = UIBarButtonItem(
             image: TrinapAsset.dotdotdot.image,
             style: .plain,
             target: self,
             action: #selector(showActionSheet)
         )
         
-        navigationItem.setRightBarButton(aad, animated: false)
+        navigationItem.setRightBarButton(buttonItem, animated: false)
     }
     
     @objc private func showActionSheet() {
