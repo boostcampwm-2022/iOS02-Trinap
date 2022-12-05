@@ -48,7 +48,7 @@ final class DefaultChatroomRepository: ChatroomRepository {
             .asObservable()
     }
 
-    func create(customerUserId: String, photographerUserId: String) -> Observable<Void> {
+    func create(customerUserId: String, photographerUserId: String) -> Observable<String> {
         let chatroom = ChatroomDTO(
             chatroomId: UUID().uuidString,
             customerUserId: customerUserId,
@@ -67,6 +67,15 @@ final class DefaultChatroomRepository: ChatroomRepository {
             values: values
         )
         .asObservable()
+        .map { chatroom.chatroomId }
+    }
+    
+    func create(photographerUserId: String) -> Observable<String> {
+        guard let userId = tokenManager.getToken(with: .userId) else {
+            return .error(TokenManagerError.notFound)
+        }
+        
+        return self.create(customerUserId: userId, photographerUserId: photographerUserId)
     }
 }
 
