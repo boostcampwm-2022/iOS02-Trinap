@@ -35,9 +35,14 @@ extension MyPageCoordinator {
         let useCase = DefaultFetchUserUseCase(
             userRepository: DefaultUserRepository()
         )
-        let viewModel = MyPageViewModel(fetchUserUseCase: useCase)
+        let viewModel = MyPageViewModel(
+            fetchUserUseCase: useCase,
+            signOutUseCase: DefaultSignOutUseCase(
+                authRepository: DefaultAuthRepository()
+            )
+            , coordinator: self
+        )
         let viewController = MyPageViewController(viewModel: viewModel)
-        viewController.coordinator = self
         self.navigationController.pushViewController(viewController, animated: true)
     }
     
