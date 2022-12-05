@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "Star_fill_review.png",
+      "filename" : "star_fill_review.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "Star_fill_review@2x.png",
+      "filename" : "star_fill_review@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "Star_fill_review@3x.png",
+      "filename" : "star_fill_review@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
