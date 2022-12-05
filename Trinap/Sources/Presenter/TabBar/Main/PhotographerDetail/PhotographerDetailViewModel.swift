@@ -34,6 +34,8 @@ final class PhotographerDetailViewModel: ViewModelType {
     private let fetchReviewUseCase: FetchReviewUseCase
     private let createReservationUseCase: CreateReservationUseCase
     private let createBlockUseCase: CreateBlockUseCase
+    private let createChatroomUseCase: CreateChatroomUseCase
+    private let sendFirstChatUseCase: SendFirstChatUseCase
     private let mapRepository: MapRepository
     
     private let reloadTrigger = BehaviorSubject<Void>(value: ())
@@ -52,6 +54,8 @@ final class PhotographerDetailViewModel: ViewModelType {
         fetchReviewUseCase: FetchReviewUseCase,
         createReservationUseCase: CreateReservationUseCase,
         createBlockUseCase: CreateBlockUseCase,
+        createChatroomUseCase: CreateChatroomUseCase,
+        sendFirstChatUseCase: SendFirstChatUseCase,
         mapRepository: MapRepository,
         userId: String,
         searchCoordinate: Coordinate,
@@ -63,6 +67,8 @@ final class PhotographerDetailViewModel: ViewModelType {
         self.createReservationUseCase = createReservationUseCase
         self.createBlockUseCase = createBlockUseCase
         self.mapRepository = mapRepository
+        self.createChatroomUseCase = createChatroomUseCase
+        self.sendFirstChatUseCase = sendFirstChatUseCase
         self.coordiantor = coordinator
         self.searchCoordinate = searchCoordinate
         self.userId = userId
