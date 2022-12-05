@@ -98,14 +98,14 @@ final class DefaultReservationRepository: ReservationRepository {
         )
         guard let values = dto.asDictionary else {
             return .error(LocalError.structToDictionaryError)
-            
         }
         
         return fireStore.createDocument(
             collection: .reservations,
             document: dto.reservationId,
             values: values
-        ).asObservable()
+        )
+        .asObservable()
     }
     
     func fetchReservation(reservationId: String) -> Observable<Reservation.Mapper> {
@@ -117,33 +117,10 @@ final class DefaultReservationRepository: ReservationRepository {
         .asObservable()
     }
     
-//
-//    func addReservation(reservation: Reservation) -> Observable<Bool> {
-//        guard let data = reservation.asDictionary else { return Observable.just(false) }
-//        return fireStore
-//            .createDocument(
-//                collection: .reservations,
-//                document: reservation.reservationId,
-//                values: data
-//            )
-//            .asObservable()
-//            .map { true }
-//    }
-//
-//    func deleteReservation(reservationId: String) -> Observable<Void> {
-//        return fireStore.deleteDocument(
-//            collection: .reservations,
-//            document: reservationId
-//        )
-//        .asObservable()
-//    }
-//
-//    func updateState(reservationId: String, state: Reservation.Status) -> Observable<Void> {
-//        return fireStore.updateDocument(
-//            collection: .reservations,
-//            document: reservationId,
-//            values: ["status": state.rawValue]
-//        )
-//        .asObservable()
-//    }
+    func updateReservationStatus(reservationId: String, status: Reservation.Status) -> Observable<Void> {
+        let values = ["status": status.rawValue]
+        
+        return fireStore.updateDocument(collection: .reservations, document: reservationId, values: values)
+            .asObservable()
+    }
 }

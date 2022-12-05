@@ -12,6 +12,7 @@ import RxCocoa
 final class ReservationPreviewListViewModel: ViewModelType {
     
     struct Input {
+        var viewWillAppear: Observable<Void>
         var reservationType: Observable<ReservationFilter>
     }
     
@@ -36,7 +37,8 @@ final class ReservationPreviewListViewModel: ViewModelType {
     
     // MARK: - Methods
     func transform(input: Input) -> Output {
-        let reservationPreviews = input.reservationType
+        let reservationPreviews = Observable.combineLatest(input.viewWillAppear, input.reservationType)
+            .map { _, reservationType in return reservationType }
             .withUnretained(self)
             .flatMap { $0.mapFilterToPreviews($1) }
         

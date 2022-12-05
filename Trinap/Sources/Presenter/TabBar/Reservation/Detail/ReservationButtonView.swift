@@ -70,6 +70,7 @@ final class ReservationButtonView: BaseView {
     
     func removePrimaryButton() {
         buttonStackView.removeArrangedSubview(primaryButton)
+        primaryButton.removeFromSuperview()
     }
     
     func setSecondaryContent(title: String, fillType: TrinapButton.FillType, style: TrinapButton.ColorType) {
@@ -84,5 +85,6 @@ final class ReservationButtonView: BaseView {
     
     func removeSecondaryButton() {
         buttonStackView.removeArrangedSubview(secondaryButton)
+        secondaryButton.removeFromSuperview()
     }
 }
