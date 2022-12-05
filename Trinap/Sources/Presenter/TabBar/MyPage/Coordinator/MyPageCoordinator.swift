@@ -119,6 +119,16 @@ extension MyPageCoordinator {
         self.navigationController.pushViewController(viewController, animated: true)
     }
 
+    func showDetailImageView(urlString: String?) {
+        guard let urlString, let url = URL(string: urlString) else {
+            return
+        }
+        let viewController = DetailImageViewController()
+        viewController.configureImageView(url: url)
+        viewController.modalPresentationStyle = .overCurrentContext
+        self.navigationController.present(viewController, animated: false)
+    }
+    
     private func showEditPossibleDateViewController() {
         let photographerRepository = DefaultPhotographerRepository()
         let viewModel = EditPossibleDateViewModel(
