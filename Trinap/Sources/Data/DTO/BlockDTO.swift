@@ -1,5 +1,5 @@
 //
-//  ReportDTO.swift
+//  BlockDTO.swift
 //  Trinap
 //
 //  Created by kimchansoo on 2022/11/16.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct ReportDTO: Codable {
+struct BlockDTO: Codable {
     
     // MARK: Properties
     let blockId: String
@@ -23,16 +23,16 @@ struct ReportDTO: Codable {
         self.status = status
     }
     
-    init(report: Report, status: String) {
-        self.blockId = report.blockId
-        self.blockedUserId = report.blockedUserId
-        self.userId = report.userId
+    init(block: Block, status: String) {
+        self.blockId = block.blockId
+        self.blockedUserId = block.blockedUserId
+        self.userId = block.userId
         self.status = status
     }
         
     // MARK: Methods
-    func toReport() -> Report {
-        return Report(
+    func toBlock() -> Block {
+        return Block(
             blockId: blockId,
             blockedUserId: blockedUserId,
             userId: userId

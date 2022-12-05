@@ -39,7 +39,7 @@ final class PhotographerPreviewCell: BaseCollectionViewCell {
         
         self.disposeBag = DisposeBag()
     }
-    
+
     override func configureHierarchy() {
         contentView.addSubviews(
             [
@@ -74,14 +74,15 @@ final class PhotographerPreviewCell: BaseCollectionViewCell {
         }
     }
     
-    func bind(photographerPreview: Driver<PhotographerPreview>) {
-        photographerPreview
-            .drive { [weak self] preview in
-                guard let self else { return }
-                self.configureCell(preview)
-            }
-            .disposed(by: self.disposeBag)
-    }
+//    func bind(photographerPreview: Driver<PhotographerPreview>) {
+//        Logger.print("bind쨔쟈스")
+//        photographerPreview
+//            .drive { [weak self] preview in
+//                guard let self else { return }
+//                self.configureCell(preview)
+//            }
+//            .disposed(by: self.disposeBag)
+//    }
 }
 
 extension PhotographerPreviewCell {
