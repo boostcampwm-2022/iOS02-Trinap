@@ -20,6 +20,7 @@ final class EditPhotographerViewModel: ViewModelType {
         let tabState: Observable<Int>
         let isEditable: Observable<Bool>
         let selectedPicture: Observable<[Int]>
+        let uploadImage: Observable<Data>
         let deleteTrigger: Observable<Void>
     }
     
@@ -32,23 +33,27 @@ final class EditPhotographerViewModel: ViewModelType {
     private let fetchPhotographerUseCase: FetchPhotographerUseCase
     private let fetchReviewUseCase: FetchReviewUseCase
     private let editPortfolioPictureUseCase: EditPortfolioPictureUseCase
+    private let uploadImageUseCase: UploadImageUseCase
     private let mapRepository: MapRepository
     
     var disposeBag = DisposeBag()
     
     private let reloadTrigger = PublishSubject<Void>()
+    
     // MARK: - Initializer
     init(
         fetchUserUseCase: FetchUserUseCase,
         fetchPhotographerUseCase: FetchPhotographerUseCase,
         fetchReviewUseCase: FetchReviewUseCase,
         editPortfolioPictureUseCase: EditPortfolioPictureUseCase,
+        uploadImageUseCase: UploadImageUseCase,
         mapRepository: MapRepository
     ) {
         self.fetchUserUseCase = fetchUserUseCase
         self.fetchPhotographerUseCase = fetchPhotographerUseCase
         self.fetchReviewUseCase = fetchReviewUseCase
         self.editPortfolioPictureUseCase = editPortfolioPictureUseCase
+        self.uploadImageUseCase = uploadImageUseCase
         self.mapRepository = mapRepository
     }
     
@@ -60,13 +65,6 @@ final class EditPhotographerViewModel: ViewModelType {
             .bind(to: reloadTrigger)
             .disposed(by: disposeBag)
         
-        let reviewInformation = self.reloadTrigger
-            .withUnretained(self)
-            .flatMap { owner, _ in
-                owner.fetchReviews()
-            }
-            .share()
-        
         let photographer = self.reloadTrigger
             .withUnretained(self)
             .flatMap { owner, _ in
@@ -74,24 +72,65 @@ final class EditPhotographerViewModel: ViewModelType {
             }
             .share()
         
-        let dataSource = Observable.combineLatest(input.isEditable, input.tabState, photographer, reviewInformation)
-            .map { [weak self] editable, section, photographer, review -> [PhotographerDataSource] in
-                guard let self else { return [] }
-                
-                return self.mappingDataSource(isEditable: editable, state: section, photographer: photographer, review: review)
+        let reviewInformation = self.reloadTrigger
+            .withUnretained(self)
+            .flatMap { owner, _ in
+                owner.fetchReviews()
             }
+            .share()
+        
+        input.uploadImage
+            .withUnretained(self)
+            .withLatestFrom(photographer, resultSelector: { args, photographer in
+                let (owner, image) = args
+                return owner.updatePortfolioImage(photographer: photographer, image: image)
+            })
+            .flatMap { $0 }
+            .bind(to: reloadTrigger)
+            .disposed(by: disposeBag)
+            
         
         input.deleteTrigger
             .withLatestFrom(Observable.combineLatest(photographer, input.selectedPicture))
-            .flatMap { photographer, indexs in
-                return self.editPortfolioPictureUseCase.delete(
+            .withUnretained(self)
+            .flatMap { owner, arg in
+                let (photographer, indexs) = arg
+                return owner.editPortfolioPictureUseCase.delete(
                     photographer: photographer.toPhotographer(),
-                    indices: indexs)
+                    indices: indexs
+                )
             }
             .bind(to: reloadTrigger)
             .disposed(by: disposeBag)
         
+        let dataSource = Observable.combineLatest(
+            input.isEditable,
+            input.tabState,
+            photographer,
+            reviewInformation
+        )
+            .withUnretained(self)
+            .map { owner, arg in
+                let (editable, section, photographer, review) = arg
+                
+                return owner.mappingDataSource(
+                    isEditable: editable,
+                    state: section,
+                    photographer: photographer,
+                    review: review
+                )
+            }
+        
         return Output(dataSource: dataSource.asDriver(onErrorJustReturn: []))
+    }
+    
+    private func updatePortfolioImage(photographer: PhotographerUser, image: Data) -> Observable<Void> {
+        print(photographer, image)
+        return self.editPortfolioPictureUseCase.add(
+            photographerId: photographer.photographerId,
+            currentPictures: photographer.pictures.compactMap { $0?.picture },
+            pictureData: image
+        )
     }
 }
 
@@ -99,14 +138,16 @@ extension EditPhotographerViewModel {
     
     private func fetchPhotographer() -> Observable<PhotographerUser> {
         return self.fetchUserUseCase.fetchUserInfo()
-            .flatMap { user in
-                self.fetchPhotographerUseCase.fetch(photographerUserId: user.userId)
-                    .flatMap { photographer in
-                        return self.mapRepository.fetchLocationName(
+            .withUnretained(self)
+            .flatMap { owner, user in
+                owner.fetchPhotographerUseCase.fetch(photographerUserId: user.userId)
+                    .withUnretained(self)
+                    .flatMap { owner, photographer in
+                        owner.mapRepository.fetchLocationName(
                             using: Coordinate(lat: photographer.latitude, lng: photographer.longitude)
                         )
                         .map { location in
-                            return PhotographerUser(user: user, photographer: photographer, location: location)
+                            PhotographerUser(user: user, photographer: photographer, location: location)
                         }
                     }
             }
@@ -153,22 +194,22 @@ extension EditPhotographerViewModel {
 }
 
 // MARK: - MappingDataSource
-extension EditPhotographerViewModel {
+private extension EditPhotographerViewModel {
     
-    private func mappingProfileDataSource(photographer: PhotographerUser) -> PhotographerDataSource {
+    func mappingProfileDataSource(photographer: PhotographerUser) -> PhotographerDataSource {
         return [PhotographerSection.profile: [PhotographerSection.Item.profile(photographer)]]
     }
     
-    private func mappingPictureDataSource(isEditable: Bool, photographer: PhotographerUser) -> PhotographerDataSource {
+    func mappingPictureDataSource(isEditable: Bool, photographer: PhotographerUser) -> PhotographerDataSource {
         return [PhotographerSection.photo: updatePictureState(isEditable: isEditable, pictures: photographer.pictures).map { PhotographerSection.Item.photo($0) } ]
     }
     
-    private func mappingDetailDataSource(photographer: PhotographerUser) -> PhotographerDataSource {
+    func mappingDetailDataSource(photographer: PhotographerUser) -> PhotographerDataSource {
         return [PhotographerSection.detail: [PhotographerSection.Item.detail(photographer)]]
     }
     
-    private func mappingReviewDataSource(review: ReviewInformation) -> [PhotographerDataSource] {
+    func mappingReviewDataSource(review: ReviewInformation) -> [PhotographerDataSource] {
         return [ [.detail: [.summaryReview(review.summary)]] ] +
-            [ [.review: review.reviews.map { PhotographerSection.Item.review($0) } ] ]
+        [ [.review: review.reviews.map { PhotographerSection.Item.review($0) } ] ]
     }
 }
