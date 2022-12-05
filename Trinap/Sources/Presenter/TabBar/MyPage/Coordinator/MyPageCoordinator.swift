@@ -166,6 +166,25 @@ extension MyPageCoordinator {
         self.navigationController.pushViewController(viewController, animated: true)
         self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
     }
+    
+    func showSigOutAlert(completion: @escaping () -> Void) {
+        let alert = TrinapAlert(
+            title: "로그아웃",
+            timeText: nil,
+            subtitle: "정말 로그아웃 하ㅅㅣ겠어요?"
+        )
+        alert.addAction(
+            title: "취소",
+            style: .disabled,
+            completion: { }
+        )
+        alert.addAction(
+            title: "로그아웃",
+            style: .primary,
+            completion: completion
+        )
+        alert.showAlert(navigationController: self.navigationController)
+    }
 }
 
 extension MyPageCoordinator: CoordinatorDelegate {
