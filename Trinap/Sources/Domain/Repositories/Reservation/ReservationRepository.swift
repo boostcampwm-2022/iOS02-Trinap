@@ -23,5 +23,5 @@ protocol ReservationRepository {
         coordinate: Coordinate
     ) -> Observable<Void>
     func fetchReservation(reservationId: String) -> Observable<Reservation.Mapper>
-    func updateReservationStatus(reservationId: String, status: Reservation.Status) -> Observable<Reservation>
+    func updateReservationStatus(reservationId: String, status: Reservation.Status) -> Observable<Void>
 }
