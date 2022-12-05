@@ -30,7 +30,7 @@ final class DetailImageViewController: BaseViewController {
     }
     
     override func configureHierarchy() {
-        self.view.addSubviews([imageView, backbutton])
+        self.view.addSubviews([imageView, backButton])
     }
     
     override func viewDidLayoutSubviews() {
@@ -45,7 +45,7 @@ final class DetailImageViewController: BaseViewController {
             make.width.height.equalTo(size)
         }
         
-        backbutton.snp.makeConstraints { make in
+        backButton.snp.makeConstraints { make in
             make.leading.equalToSuperview().inset(trinapOffset * 2)
             make.top.equalToSuperview().offset(trinapOffset * 8)
         }
@@ -56,7 +56,7 @@ final class DetailImageViewController: BaseViewController {
     }
     
     override func bind() {
-        backbutton.rx.tap
+        backButton.rx.tap
             .subscribe(onNext: {
                 print("gd")
                 self.dismiss(animated: true)
