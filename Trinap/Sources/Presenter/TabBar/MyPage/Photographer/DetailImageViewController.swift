@@ -23,7 +23,7 @@ final class DetailImageViewController: BaseViewController {
         $0.contentMode = .scaleAspectFill
     }
     
-    private lazy var backbutton = UIButton().than {
+    private lazy var backButton = UIButton().than {
         $0.contentMode = .scaleAspectFill
         $0.imageView?.tintColor = .white
         $0.setImage(UIImage(systemName: "xmark"), for: .normal)
