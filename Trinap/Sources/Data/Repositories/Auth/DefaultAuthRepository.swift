@@ -121,7 +121,7 @@ final class DefaultAuthRepository: AuthRepository {
                     single(.failure(LocalError.signInError))
                     return
                 }
-                self?.tokenManager.save(token: userId, with: .userId)
+                let result = self?.tokenManager.save(token: userId, with: .userId)
                 single(.success(userId))
             }
             return Disposables.create()
@@ -135,7 +135,6 @@ final class DefaultAuthRepository: AuthRepository {
             do {
                 try Auth.auth().signOut()
                 self.tokenManager.deleteToken(with: .userId)
-                self.tokenManager.deleteToken(with: .fcmToken)
                 single(.success(()))
             } catch let error {
                 single(.failure(error))
