@@ -45,7 +45,7 @@ final class MyPageViewModel: ViewModelType {
             .withUnretained(self)
             .subscribe(onNext: { owner, type in
                 switch type {
-                case .logout:
+                case .signOut:
                     owner.coordinator?.showSigOutAlert(completion: owner.signOut)
                 default:
                     owner.coordinator?.showNextView(state: type)
@@ -115,7 +115,7 @@ extension MyPageViewModel {
             .contact,
             .version(version: version),
             .opensource,
-            .logout,
+            .signOut,
             .dropout
         ]
         
