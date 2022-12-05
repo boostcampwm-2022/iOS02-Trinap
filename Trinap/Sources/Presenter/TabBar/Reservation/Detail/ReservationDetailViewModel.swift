@@ -31,18 +31,21 @@ final class ReservationDetailViewModel: ViewModelType {
     private let fetchReservationUseCase: FetchReservationUseCase
     private let fetchReservationUserTypeUseCase: FetchReservationUserTypeUseCase
     private let reservationId: String
+    private weak var reservationStatusFactory: ReservationStatusFactory?
     
     // MARK: - Initializer
     init(
         reservationCoordinator: ReservationCoordinator?,
         fetchReservationUseCase: FetchReservationUseCase,
         fetchReservationUserTypeUseCase: FetchReservationUserTypeUseCase,
-        reservationId: String
+        reservationId: String,
+        reservationStatusFactory: ReservationStatusFactory
     ) {
         self.reservationCoordinator = reservationCoordinator
         self.fetchReservationUseCase = fetchReservationUseCase
         self.fetchReservationUserTypeUseCase = fetchReservationUserTypeUseCase
         self.reservationId = reservationId
+        self.reservationStatusFactory = reservationStatusFactory
     }
     
     // MARK: - Methods
@@ -62,19 +65,24 @@ final class ReservationDetailViewModel: ViewModelType {
         let executePrimaryAction = input.primaryButtonTap
             .flatMap { reservationStatus }
             .flatMap { $0.executePrimaryAction() ?? .empty() }
+            .withUnretained(self) { owner, reservation in
+                return owner.reservationStatus(reservation: reservation)
+            }
         
         let executeSecondaryAction = input.secondaryButtonTap
             .flatMap { reservationStatus }
             .flatMap { $0.executeSecondaryAction() ?? .empty() }
+            .withUnretained(self) { owner, reservation in
+                return owner.reservationStatus(reservation: reservation)
+            }
         
         let reservationUpdated = Observable
-            .of(fetchReservation, executePrimaryAction, executeSecondaryAction)
+            .of(reservationStatus, executePrimaryAction, executeSecondaryAction)
             .merge()
-            .distinctUntilChanged { $0.status == $1.status }
         
         return Output(
-            reservation: reservationUpdated,
-            reservationStatus: reservationStatus
+            reservation: fetchReservation,
+            reservationStatus: reservationUpdated
         )
     }
 }
@@ -95,15 +103,19 @@ private extension ReservationDetailViewModel {
         reservation: Reservation,
         userType: Reservation.UserType
     ) -> ReservationStatus {
+        guard let reservationStatusFactory else {
+            return ReservationError()
+        }
+        
         switch reservation.status {
         case .request:
-            return ReservationRequested(reservation: reservation, userType: userType)
+            return reservationStatusFactory.makeReservationRequested(reservation: reservation, userType: userType)
         case .confirm:
-            return ReservationConfirmed(reservation: reservation, userType: userType)
-        case .done:
-            return ReservationDone(reservation: reservation, userType: userType)
+            return reservationStatusFactory.makeReservationConfirmed(reservation: reservation, userType: userType)
         case .cancel:
-            return ReservationCancelled(reservation: reservation, userType: userType)
+            return reservationStatusFactory.makeReservationCancelled(reservation: reservation, userType: userType)
+        case .done:
+            return reservationStatusFactory.makeReservationDone(reservation: reservation, userType: userType)
         }
     }
     
@@ -124,4 +136,12 @@ private extension ReservationDetailViewModel {
         
         return secondaryButtonTap.flatMap { return secondaryAction }
     }
+}
+
+protocol ReservationStatusFactory: AnyObject {
+    
+    func makeReservationRequested(reservation: Reservation, userType: Reservation.UserType) -> ReservationRequested
+    func makeReservationConfirmed(reservation: Reservation, userType: Reservation.UserType) -> ReservationConfirmed
+    func makeReservationCancelled(reservation: Reservation, userType: Reservation.UserType) -> ReservationCancelled
+    func makeReservationDone(reservation: Reservation, userType: Reservation.UserType) -> ReservationDone
 }
