@@ -12,6 +12,7 @@ struct ReviewDTO: Codable {
     
     // MARK: - Properties
     let creatorUserId, photographerUserId, reviewId, contents, status: String
+    let createdAt: String
     let rating: Int
     
     // MARK: - Methods
@@ -22,6 +23,7 @@ struct ReviewDTO: Codable {
             creatorUserId: creatorUserId,
             contents: contents,
             status: status,
+            createdAt: Date.fromStringOrNow(createdAt),
             rating: rating
         )
     }

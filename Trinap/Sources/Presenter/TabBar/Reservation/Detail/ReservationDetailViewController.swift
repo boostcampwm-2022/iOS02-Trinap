@@ -118,6 +118,8 @@ final class ReservationDetailViewController: BaseViewController {
         
         let input = ReservationDetailViewModel.Input(
             backButtonTap: backButtonTap,
+            customerUserViewTap: customerUserView.tap,
+            photographerUserViewTap: photographerUserView.tap,
             primaryButtonTap: reservationButtonView.primaryButtonTap.asObservable(),
             secondaryButtonTap: reservationButtonView.secondaryButtonTap.asObservable()
         )

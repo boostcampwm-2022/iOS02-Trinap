@@ -8,6 +8,8 @@
 
 import UIKit
 
+import RxGesture
+import RxSwift
 import SnapKit
 
 final class ReservationUserView: BaseView {
@@ -31,6 +33,13 @@ final class ReservationUserView: BaseView {
     
     // MARK: - Properties
     private let userType: UserType
+    
+    var tap: Observable<Void> {
+        return self.rx.tapGesture()
+            .when(.recognized)
+            .asObservable()
+            .map { _ in return }
+    }
     
     // MARK: - Initializers
     init(userType: UserType) {

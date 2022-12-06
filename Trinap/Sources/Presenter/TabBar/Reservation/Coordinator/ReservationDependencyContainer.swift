@@ -85,6 +85,64 @@ final class ReservationDependencyContainer {
     private func makeMapRepository() -> MapRepository {
         return DefaultMapRepository()
     }
+    
+    // MARK: - Reservation Create Review
+    func makeCreateReviewViewController(photographerUserId: String) -> CreateReviewViewController {
+        let viewModel = makeCreateReviewViewModel(photographerUserId: photographerUserId)
+        
+        return CreateReviewViewController(viewModel: viewModel)
+    }
+    
+    private func makeCreateReviewViewModel(photographerUserId: String) -> CreateReviewViewModel {
+        let createReviewUseCase = makeCreateReviewUseCase()
+        
+        return CreateReviewViewModel(
+            photographerId: photographerUserId,
+            createReviewUseCase: createReviewUseCase
+        )
+    }
+    
+    private func makeCreateReviewUseCase() -> CreateReviewUseCase {
+        let repository = makeReviewRepository()
+        
+        return DefaultCreateReviewUseCase(reviewRepository: repository)
+    }
+    
+    private func makeReviewRepository() -> ReviewRepository {
+        return DefaultReviewRepository()
+    }
+    
+    // MARK: - Customer Review List
+    func makeCustomerReviewListViewController(creatorUser: User) -> CustomerReviewListViewController {
+        let viewModel = makeCustomerReviewListViewModel(creatorUser: creatorUser)
+        
+        return CustomerReviewListViewController(viewModel: viewModel)
+    }
+    
+    private func makeCustomerReviewListViewModel(creatorUser: User) -> CustomerReviewListViewModel {
+        let fetchReviewUseCase = makeFetchReviewUseCase()
+        
+        return CustomerReviewListViewModel(
+            fetchReviewUseCase: fetchReviewUseCase,
+            creatorUser: creatorUser,
+            reservationCoordinator: reservationCoordinator
+        )
+    }
+    
+    private func makeFetchReviewUseCase() -> FetchReviewUseCase {
+        let reviewRepository = makeReviewRepository()
+        let photographerRepository = makePhotographerRepository()
+        
+        return DefaultFetchReviewUseCase(
+            reviewRepository: reviewRepository,
+            userRepository: userRepository,
+            photographerRepository: photographerRepository
+        )
+    }
+    
+    private func makePhotographerRepository() -> PhotographerRepository {
+        return DefaultPhotographerRepository(firestoreService: firestoreService)
+    }
 }
 
 // MARK: - Reservation Status Factory
@@ -120,7 +178,7 @@ extension ReservationDependencyContainer: ReservationStatusFactory {
         return ReservationDone(
             reservation: reservation,
             userType: userType,
-            navigateToWriteReview: { Logger.print($0) }
+            navigateToWriteReview: reservationCoordinator?.showCreateReviewViewController
         )
     }
     

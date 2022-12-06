@@ -15,5 +15,6 @@ enum ReviewTarget: String {
 
 struct Review: Equatable, Hashable {
     let reviewId, photographerUserId, creatorUserId, contents, status: String
+    let createdAt: Date
     let rating: Int
 }

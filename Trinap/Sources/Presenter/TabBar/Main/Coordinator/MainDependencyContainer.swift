@@ -99,7 +99,7 @@ final class MainDependencyContainer {
     
     private func makeFetchReviewUseCase() -> FetchReviewUseCase {
         return DefaultFetchReviewUseCase(
-            reviewRepositry: reviewRepository,
+            reviewRepository: reviewRepository,
             userRepository: userRepository,
             photographerRepository: photographerRepository
         )
