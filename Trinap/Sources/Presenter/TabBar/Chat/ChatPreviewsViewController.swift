@@ -50,6 +50,8 @@ final class ChatPreviewsViewController: BaseViewController {
     
     override func configureAttributes() {
         self.dataSource = self.configureDataSource()
+        
+        self.dataSource?.defaultRowAnimation = .fade
     }
     
     override func bind() {
@@ -60,7 +62,7 @@ final class ChatPreviewsViewController: BaseViewController {
                 return self?.generateSnapshot(chatPreviews)
             }
             .drive { [weak self] snapshot in
-                self?.dataSource?.apply(snapshot, animatingDifferences: false)
+                self?.dataSource?.apply(snapshot, animatingDifferences: true)
             }
             .disposed(by: disposeBag)
         
@@ -87,6 +89,29 @@ private extension ChatPreviewsViewController {
     }
     
     func generateSnapshot(_ after: [ChatPreview]) -> NSDiffableDataSourceSnapshot<Section, ChatPreview> {
+        guard
+            let dataSource,
+            let target = after.first,
+            let before = dataSource.snapshot().itemIdentifiers.first(where: { $0.chatroomId == target.chatroomId })
+        else {
+            return defaultSnapshot(after)
+        }
+        
+        var snapshot = dataSource.snapshot()
+        
+        if snapshot.sectionIdentifiers.isEmpty {
+            snapshot.appendSections([.main])
+        }
+        
+        snapshot.deleteItems([before])
+        
+        guard let firstItem = snapshot.itemIdentifiers.first else { return defaultSnapshot(after) }
+        
+        snapshot.insertItems([target], beforeItem: firstItem)
+        return snapshot
+    }
+    
+    func defaultSnapshot(_ after: [ChatPreview]) -> NSDiffableDataSourceSnapshot<Section, ChatPreview> {
         var snapshot = NSDiffableDataSourceSnapshot<Section, ChatPreview>()
         
         snapshot.appendSections([.main])

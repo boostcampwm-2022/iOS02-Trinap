@@ -9,7 +9,7 @@
 import UIKit
 
 import RxSwift
-import Queenfisher
+import Kingfisher
 
 final class ProfileImageView: UIImageView {
     
@@ -39,14 +39,17 @@ final class ProfileImageView: UIImageView {
     }
     
     func setImage(at profileImageURL: URL?) {
-        self.qf.setImage(at: profileImageURL, scale: 2)
+        let maxProfileImageSize = CGSize(width: 80, height: 80)
+        let downsamplingProcessor = DownsamplingImageProcessor(size: maxProfileImageSize)
+        self.kf.setImage(with: profileImageURL, options: [.processor(downsamplingProcessor)])
     }
 }
 
 extension Reactive where Base: ProfileImageView {
     var setImage: Binder<URL?> {
         return Binder(self.base) { imageView, url in
-            imageView.qf.setImage(at: url, scale: 2)
+            let downsamplingProcessor = DownsamplingImageProcessor(size: imageView.frame.size)
+            imageView.kf.setImage(with: url, options: [.processor(downsamplingProcessor)])
         }
     }
 }
