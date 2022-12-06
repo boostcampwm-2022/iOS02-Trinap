@@ -70,6 +70,18 @@ final class MyPageDependencyContainter {
     func makeDropOutViewController() -> DropOutViewController {
         return DropOutViewController(viewModel: makeDropOutViewModel())
     }
+    
+    func makeContactListViewController() -> ContactListViewController {
+        return ContactListViewController(viewModel: makeContactListViewModel())
+    }
+    
+    func makeDetailContactViewController(contactId: String) -> DetailContactViewController {
+        return DetailContactViewController(viewModel: makeDetailContactViewModel(contactId: contactId))
+    }
+    
+    func makeCreateContactViewController() -> CreateContactViewController {
+        return CreateContactViewController(viewModel: makeCreateContactViewModel())
+    }
 }
 
 private extension MyPageDependencyContainter {
@@ -133,6 +145,25 @@ private extension MyPageDependencyContainter {
             dropOutUseCase: makeDropOutUseCase()
         )
     }
+    
+    // MARK: - Contact
+    func makeContactListViewModel() -> ContactListViewModel {
+        return ContactListViewModel(
+            coordinator: self.mypageCoordinator,
+            fetchContactUsUseCase: self.makeFetchContactUseCase()
+        )
+    }
+    
+    func makeDetailContactViewModel(contactId: String) -> DetailContactViewModel {
+        return DetailContactViewModel(contactId: contactId, fetchContactUseCase: makeFetchContactUseCase())
+    }
+    
+    func makeCreateContactViewModel() -> CreateContactViewModel {
+        return CreateContactViewModel(
+            coordinator: self.mypageCoordinator,
+            createContactUseCase: DefaultCreateContactUseCase(userRepository: userRepository)
+        )
+    }
 }
 
 // MARK: - UseCase
@@ -187,5 +218,9 @@ private extension MyPageDependencyContainter {
     
     func makeSignOutUseCase() -> SignOutUseCase {
         return DefaultSignOutUseCase(authRepository: authRepository)
+    }
+    
+    func makeFetchContactUseCase() -> FetchContactUseCase {
+        return DefaultFetchContactUseCase(userRepository: userRepository)
     }
 }
