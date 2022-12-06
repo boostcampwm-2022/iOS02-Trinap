@@ -18,5 +18,5 @@ protocol CreateReservationUseCase {
         startDate: Date,
         endDate: Date,
         coordinate: Coordinate
-    ) -> Observable<Void>
+    ) -> Observable<String>
 }
