@@ -57,9 +57,8 @@ final class DetailImageViewController: BaseViewController {
     
     override func bind() {
         backButton.rx.tap
-            .subscribe(onNext: {
-                print("gd")
-                self.dismiss(animated: true)
+            .subscribe(onNext: { [weak self] _ in
+                self?.dismiss(animated: true)
             })
             .disposed(by: disposeBag)
     }

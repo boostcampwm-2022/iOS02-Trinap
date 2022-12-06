@@ -62,7 +62,7 @@ enum MyPageCellType: Hashable {
         case .contact:
             return "직접 문의"
         case .version:
-            return "오픈버전 정보"
+            return "어플버전 정보"
         case .opensource:
             return "오픈소스 라이선스"
         case .signOut:
