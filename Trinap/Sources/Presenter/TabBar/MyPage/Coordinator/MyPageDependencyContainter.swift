@@ -74,7 +74,11 @@ final class MyPageDependencyContainter {
 
 private extension MyPageDependencyContainter {
     func makeMyPageViewModel() -> MyPageViewModel {
-        return MyPageViewModel(fetchUserUseCase: makeFetchUserUseCase())
+        return MyPageViewModel(
+            fetchUserUseCase: makeFetchUserUseCase(),
+            signOutUseCase: makeSignOutUseCase(),
+            coordinator: self.mypageCoordinator
+        )
     }
     
     func makeEditProfileViewModel() -> EditProfileViewModel {
@@ -179,5 +183,9 @@ private extension MyPageDependencyContainter {
             authRepository: authRepository,
             photographerRepository: photographerRepository
         )
+    }
+    
+    func makeSignOutUseCase() -> SignOutUseCase {
+        return DefaultSignOutUseCase(authRepository: authRepository)
     }
 }
