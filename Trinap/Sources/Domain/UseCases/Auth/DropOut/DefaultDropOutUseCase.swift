@@ -27,7 +27,11 @@ final class DefaultDropOutUseCase: DropOutUseCase {
     
     // MARK: - Methods
     func dropOut() -> Observable<Bool> {
-        return self.photographerRepository.fetchDetailPhotographer()
+        return self.authRepository.revokeToken()
+            .withUnretained(self)
+            .flatMap { owner, _ in
+                return owner.photographerRepository.fetchDetailPhotographer()
+            }
             .map { photographer -> String in
                 return photographer.photographerId
             }
@@ -36,6 +40,10 @@ final class DefaultDropOutUseCase: DropOutUseCase {
                 return owner.authRepository
                     .removeUserInfo(photographerId: photographerId)
                     .asObservable()
+            }
+            .withUnretained(self)
+            .flatMap { owner, _ in
+                return owner.authRepository.revokeToken()
             }
             .withUnretained(self)
             .flatMap { owner, _ in
