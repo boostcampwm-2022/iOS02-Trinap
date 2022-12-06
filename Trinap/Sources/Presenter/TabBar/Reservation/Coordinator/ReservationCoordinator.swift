@@ -44,9 +44,8 @@ extension ReservationCoordinator {
             reservationId: reservationId
         )
         
-        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
+        reservationDetailViewController.hidesBottomBarWhenPushed = true
         self.navigationController.pushViewController(reservationDetailViewController, animated: true)
-        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
     }
     
     func showCreateReviewViewController(reservation: Reservation) {
@@ -63,8 +62,7 @@ extension ReservationCoordinator {
             creatorUser: customerUser
         )
         
-        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
+        customerReviewListViewController.hidesBottomBarWhenPushed = true
         self.navigationController.pushViewController(customerReviewListViewController, animated: true)
-        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
     }
 }
