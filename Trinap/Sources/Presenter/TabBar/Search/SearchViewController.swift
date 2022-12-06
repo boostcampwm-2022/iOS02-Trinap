@@ -59,6 +59,7 @@ final class SearchViewController: BaseViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         navigationController?.navigationBar.topItem?.titleView = searchBar
     }
     

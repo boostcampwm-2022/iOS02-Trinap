@@ -38,6 +38,7 @@ final class DefaultSignInUseCase: SignInUseCase {
         if Auth.auth().currentUser != nil {
             return self.authRepository.checkUser()
                 .asObservable()
+                .catchAndReturn(false)
         } else {
             return Observable.just(false)
         }

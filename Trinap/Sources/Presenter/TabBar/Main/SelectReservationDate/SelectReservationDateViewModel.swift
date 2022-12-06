@@ -30,6 +30,7 @@ final class SelectReservationDateViewModel: ViewModelType {
         let reservationTime: Observable<([Date], [Date])>
         let selectDoneButtonEnable: Observable<Bool>
         let fetchPossibleDate: Driver<[Date]>
+        let selectDone: Observable<Bool>
     }
     
     // MARK: - Properties
@@ -55,18 +56,28 @@ final class SelectReservationDateViewModel: ViewModelType {
     
     // MARK: - Methods
     func transform(input: Input) -> Output {
-        input.selectDoneButtonTap
+        let selectDone = input.selectDoneButtonTap
             .withUnretained(self)
-            .subscribe(onNext: { owner, _ in
+            .map { owner, _ -> Bool in
                 guard
                     let startDate = owner.selectedStartDate.value?.date,
                     let endDate = owner.selectedEndDate.value?.date
                 else {
-                    return
+                    return false
                 }
                 owner.delegate?.selectedReservationDate(startDate: startDate, endDate: endDate)
-            })
-            .disposed(by: disposeBag)
+                return true
+            }
+        //            .subscribe(onNext: { owner, _ in
+        //                guard
+        //                    let startDate = owner.selectedStartDate.value?.date,
+        //                    let endDate = owner.selectedEndDate.value?.date
+        //                else {
+        //                    return
+        //                }
+        //                owner.delegate?.selectedReservationDate(startDate: startDate, endDate: endDate)
+        //            })
+        //            .disposed(by: disposeBag)
         
         input.deselectedDate
             .withUnretained(self)
@@ -120,7 +131,8 @@ final class SelectReservationDateViewModel: ViewModelType {
             newSelectDate: newSelectDate,
             reservationTime: reservationTime,
             selectDoneButtonEnable: selectDoneButtonEnable,
-            fetchPossibleDate: fetchPossibleDate
+            fetchPossibleDate: fetchPossibleDate,
+            selectDone: selectDone
         )
     }
 }

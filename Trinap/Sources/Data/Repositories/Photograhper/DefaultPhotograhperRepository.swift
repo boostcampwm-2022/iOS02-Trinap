@@ -67,7 +67,7 @@ final class DefaultPhotographerRepository: PhotographerRepository {
     }
     
     func fetchDetailPhotographer() -> Observable<Photographer> {
-        guard let userId = tokenManager.getToken(with: .userId) else {
+        guard let userId = self.tokenManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
         }
         

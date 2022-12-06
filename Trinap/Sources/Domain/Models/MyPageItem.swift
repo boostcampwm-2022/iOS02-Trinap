@@ -40,7 +40,7 @@ enum MyPageCellType: Hashable {
     case contact
     case version(version: String)
     case opensource
-    case logout
+    case signOut
     case dropout
     
     var title: String {
@@ -62,10 +62,10 @@ enum MyPageCellType: Hashable {
         case .contact:
             return "직접 문의"
         case .version:
-            return "오픈버전 정보"
+            return "어플버전 정보"
         case .opensource:
             return "오픈소스 라이선스"
-        case .logout:
+        case .signOut:
             return "로그아웃"
         case .dropout:
             return "탈퇴하기"

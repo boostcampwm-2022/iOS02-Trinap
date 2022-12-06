@@ -97,6 +97,17 @@ final class SelectReservationDateViewController: BaseViewController {
                 owner.trinapCalenderView.configurePossibleDate(possibleDate: possibleDate)
             })
             .disposed(by: disposeBag)
+        
+        output.selectDone
+            .withUnretained(self)
+            .subscribe(onNext: { owner, isDone in
+                if isDone {
+                    owner.dismiss(animated: true)
+                } else {
+                    Logger.print("날짜선택 실패!")
+                }
+            })
+            .disposed(by: disposeBag)
     }
     
     override func configureHierarchy() {
