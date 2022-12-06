@@ -111,6 +111,38 @@ final class ReservationDependencyContainer {
     private func makeReviewRepository() -> ReviewRepository {
         return DefaultReviewRepository()
     }
+    
+    // MARK: - Customer Review List
+    func makeCustomerReviewListViewController(creatorUser: User) -> CustomerReviewListViewController {
+        let viewModel = makeCustomerReviewListViewModel(creatorUser: creatorUser)
+        
+        return CustomerReviewListViewController(viewModel: viewModel)
+    }
+    
+    private func makeCustomerReviewListViewModel(creatorUser: User) -> CustomerReviewListViewModel {
+        let fetchReviewUseCase = makeFetchReviewUseCase()
+        
+        return CustomerReviewListViewModel(
+            fetchReviewUseCase: fetchReviewUseCase,
+            creatorUser: creatorUser,
+            reservationCoordinator: reservationCoordinator
+        )
+    }
+    
+    private func makeFetchReviewUseCase() -> FetchReviewUseCase {
+        let reviewRepository = makeReviewRepository()
+        let photographerRepository = makePhotographerRepository()
+        
+        return DefaultFetchReviewUseCase(
+            reviewRepository: reviewRepository,
+            userRepository: userRepository,
+            photographerRepository: photographerRepository
+        )
+    }
+    
+    private func makePhotographerRepository() -> PhotographerRepository {
+        return DefaultPhotographerRepository(firestoreService: firestoreService)
+    }
 }
 
 // MARK: - Reservation Status Factory

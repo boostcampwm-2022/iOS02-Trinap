@@ -33,6 +33,7 @@ final class ReservationDetailViewModel: ViewModelType {
     private let fetchReservationUseCase: FetchReservationUseCase
     private let fetchReservationUserTypeUseCase: FetchReservationUserTypeUseCase
     private let reservationId: String
+    private var reservation: Reservation?
     private weak var reservationStatusFactory: ReservationStatusFactory?
     
     // MARK: - Initializer
@@ -59,7 +60,12 @@ final class ReservationDetailViewModel: ViewModelType {
             .disposed(by: disposeBag)
         
         input.customerUserViewTap
-            .bind(onNext: { Logger.print("Customer") })
+            .compactMap { [weak self] _ in
+                return self?.reservation?.customerUser
+            }
+            .bind(onNext: { [weak self] customerUser in
+                self?.reservationCoordinator?.showCustomerReviewListViewController(customerUser: customerUser)
+            })
             .disposed(by: disposeBag)
         
         input.photographerUserViewTap
@@ -69,6 +75,7 @@ final class ReservationDetailViewModel: ViewModelType {
         let fetchReservation = fetchReservationUseCase.execute(reservationId: reservationId)
         let reservationStatus = fetchReservation
             .withUnretained(self) { owner, reservation in
+                owner.reservation = reservation
                 return owner.reservationStatus(reservation: reservation)
             }
         

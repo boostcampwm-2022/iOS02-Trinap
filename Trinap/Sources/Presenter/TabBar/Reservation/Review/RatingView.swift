@@ -110,7 +110,7 @@ final class RatingView: BaseView {
         let imageConfiguration = UIImage.SymbolConfiguration(pointSize: pointSize)
         
         let button = UIButton()
-        button.imageView?.contentMode = .scaleAspectFill
+        button.imageView?.contentMode = .scaleAspectFit
         button.setPreferredSymbolConfiguration(imageConfiguration, forImageIn: .normal)
         button.setImage(starImage, for: .normal)
         button.imageView?.tintColor = TrinapAsset.secondary.color

@@ -9,9 +9,9 @@
 import Foundation
 
 /// 작가에게 작성된 리뷰
-// TODO: - UI작업할 때 수정 필요
 struct UserReview: Hashable {
     let user: User
     let contents: String
     let rating: Int
+    let createdAt: Date
 }

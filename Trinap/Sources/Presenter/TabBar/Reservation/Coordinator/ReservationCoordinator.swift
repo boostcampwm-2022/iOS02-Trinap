@@ -35,6 +35,7 @@ extension ReservationCoordinator {
         let reservationPreviewListViewController = dependencies.makeReservationPreviewListViewController()
         
         self.navigationController.navigationBar.isHidden = true
+        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
         self.navigationController.pushViewController(reservationPreviewListViewController, animated: true)
     }
     
@@ -55,5 +56,15 @@ extension ReservationCoordinator {
         )
         
         self.navigationController.present(createReviewViewController, animated: true)
+    }
+    
+    func showCustomerReviewListViewController(customerUser: User) {
+        let customerReviewListViewController = dependencies.makeCustomerReviewListViewController(
+            creatorUser: customerUser
+        )
+        
+        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(customerReviewListViewController, animated: true)
+        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
     }
 }
