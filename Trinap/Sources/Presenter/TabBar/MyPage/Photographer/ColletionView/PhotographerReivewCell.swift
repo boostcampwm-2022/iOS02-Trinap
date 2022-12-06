@@ -33,6 +33,10 @@ final class PhotographerReivewCell: BaseCollectionViewCell {
         ])
     }
     
+    override func configureAttributes() {
+        self.isUserInteractionEnabled = false
+    }
+    
     override func configureConstraints() {
         profileImage.snp.makeConstraints { make in
             make.leading.top.equalToSuperview()

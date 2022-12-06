@@ -80,6 +80,7 @@ extension MyPageCoordinator {
                 photographerRepository: DefaultPhotographerRepository()
             ),
             editPortfolioPictureUseCase: DefaultEditPortfolioPictureUseCase(photographerRepository: DefaultPhotographerRepository()),
+            uploadImageUseCase: DefaultUploadImageUseCase(uploadImageRepository: DefaultUploadImageRepository()),
             mapRepository: DefaultMapRepository()
         )
         let viewController = EditPhotographerViewController(viewModel: viewModel)
@@ -119,6 +120,16 @@ extension MyPageCoordinator {
         let viewController = SearchViewController(viewModel: viewModel)
         self.navigationController.pushViewController(viewController, animated: true)
     }
+
+    func showDetailImageView(urlString: String?) {
+        guard let urlString, let url = URL(string: urlString) else {
+            return
+        }
+        let viewController = DetailImageViewController()
+        viewController.configureImageView(url: url)
+        viewController.modalPresentationStyle = .overCurrentContext
+        self.navigationController.present(viewController, animated: false)
+    }
     
     private func showEditPossibleDateViewController() {
         let photographerRepository = DefaultPhotographerRepository()
@@ -154,10 +165,6 @@ extension MyPageCoordinator {
         self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
         self.navigationController.pushViewController(viewController, animated: true)
         self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
-    }
-    
-    func popViewController() {
-        self.navigationController.popViewController(animated: true)
     }
 }
 

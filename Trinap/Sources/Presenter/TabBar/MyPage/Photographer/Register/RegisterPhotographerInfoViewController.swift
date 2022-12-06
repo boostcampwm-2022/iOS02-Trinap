@@ -27,7 +27,7 @@ final class RegisterPhotographerInfoViewController: BaseViewController {
     private lazy var contentView = UIView()
     
     private var dataSource: UICollectionViewDiffableDataSource<Int, TagItem>?
-    private lazy var tagCollectionView = UICollectionView(frame: .zero, collectionViewLayout: TagCollectionViewLeftAlignFlowLayout(offset: trinapOffset))
+    private lazy var tagCollectionView = UICollectionView(frame: .zero, collectionViewLayout: TagCollectionViewLeftAlignFlowLayout(offset: trinapOffset, direction: .vertical))
     
     private let viewModel: RegisterPhotographerInfoViewModel
     
@@ -316,7 +316,7 @@ extension RegisterPhotographerInfoViewController {
 extension RegisterPhotographerInfoViewController: UICollectionViewDelegateFlowLayout {
     
     private func configureCollectionView() {
-        self.tagCollectionView.register(RegisterTagCell.self)
+        self.tagCollectionView.register(TagCell.self)
         self.generateDataSource()
         self.tagCollectionView.allowsMultipleSelection = true
         self.tagCollectionView.rx
@@ -335,10 +335,10 @@ extension RegisterPhotographerInfoViewController: UICollectionViewDelegateFlowLa
     
     private func generateDataSource() {
         self.dataSource = UICollectionViewDiffableDataSource(collectionView: tagCollectionView) { collectionView, indexPath, itemIdentifier in
-            guard let cell = collectionView.dequeueCell(RegisterTagCell.self, for: indexPath) else {
+            guard let cell = collectionView.dequeueCell(TagCell.self, for: indexPath) else {
                 return UICollectionViewCell()
             }
-            cell.configure(tag: itemIdentifier)
+            cell.configure(tag: itemIdentifier.tag)
             if itemIdentifier.isSelected {
                 collectionView.selectItem(at: indexPath, animated: false, scrollPosition: .left)
             }
