@@ -20,15 +20,18 @@ final class DefaultAuthRepository: AuthRepository {
     
     // MARK: - Properties
     private let firebaseStoreService: FireStoreService
+    private let networkService: NetworkService
     private let tokenManager: TokenManager
     
     // MARK: Initializer
     init(
         firebaseStoreService: FireStoreService = DefaultFireStoreService(),
-        tokenManager: TokenManager = KeychainTokenManager()
+        tokenManager: TokenManager = KeychainTokenManager(),
+        networkService: NetworkService = DefaultNetworkService()
     ) {
         self.firebaseStoreService = firebaseStoreService
         self.tokenManager = tokenManager
+        self.networkService = networkService
     }
     
     // MARK: - Methods
@@ -181,5 +184,16 @@ final class DefaultAuthRepository: AuthRepository {
                 (.photographers, photographerId)
             ]
         )
+    }
+    
+    func fetchRefreshToken(with authorizationCode: String) -> Observable<Void> {
+        let endpoint = TokenEndpoint.refresh(authorizationCode: authorizationCode)
+        
+        return self.networkService.request(endpoint)
+            .withUnretained(self)
+            .map { owner, data -> Void in
+                let refreshToken = String(data: data, encoding: .utf8) ?? ""
+                owner.tokenManager.save(token: refreshToken, with: .refreshToken)
+            }
     }
 }
