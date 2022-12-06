@@ -20,7 +20,7 @@ protocol ReservationRepository {
         startDate: Date,
         endDate: Date,
         coordinate: Coordinate
-    ) -> Observable<Void>
+    ) -> Observable<String>
     func fetchReservation(reservationId: String) -> Observable<Reservation.Mapper>
 
 //    func addReservation(reservation: Reservation) -> Observable<Bool>
