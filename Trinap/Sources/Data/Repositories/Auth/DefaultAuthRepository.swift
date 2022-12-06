@@ -196,4 +196,16 @@ final class DefaultAuthRepository: AuthRepository {
                 owner.tokenManager.save(token: refreshToken, with: .refreshToken)
             }
     }
+    
+    func revokeToken() -> Observable<Void> {
+        guard let token = self.tokenManager.getToken(with: .refreshToken) else {
+            return .error(TokenManagerError.notFound)
+        }
+        let endpoint = TokenEndpoint.revoke(refreshToken: token)
+        
+        return self.networkService.request(endpoint)
+            .map { _ -> Void in
+                return ()
+            }
+    }
 }
