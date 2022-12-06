@@ -121,7 +121,7 @@ final class DefaultAuthRepository: AuthRepository {
                     single(.failure(LocalError.signInError))
                     return
                 }
-                let result = self?.tokenManager.save(token: userId, with: .userId)
+                self?.tokenManager.save(token: userId, with: .userId)
                 single(.success(userId))
             }
             return Disposables.create()

@@ -46,7 +46,7 @@ final class MyPageViewModel: ViewModelType {
             .subscribe(onNext: { owner, type in
                 switch type {
                 case .signOut:
-                    owner.coordinator?.showSigOutAlert(completion: owner.signOut)
+                    owner.coordinator?.showSignOutAlert(completion: owner.signOut)
                 default:
                     owner.coordinator?.showNextView(state: type)
                 }
