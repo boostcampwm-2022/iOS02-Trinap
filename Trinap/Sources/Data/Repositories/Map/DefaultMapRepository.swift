@@ -108,7 +108,6 @@ extension DefaultMapRepository: CLLocationManagerDelegate {
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         self.curCoordinate.accept(Coordinate(lat: 0.0, lng: 0.0))
-        Logger.print(error)
     }
 }
 
