@@ -135,7 +135,6 @@ final class DefaultAuthRepository: AuthRepository {
             do {
                 try Auth.auth().signOut()
                 self.tokenManager.deleteToken(with: .userId)
-                self.tokenManager.deleteToken(with: .fcmToken)
                 single(.success(()))
             } catch let error {
                 single(.failure(error))

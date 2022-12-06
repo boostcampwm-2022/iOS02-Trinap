@@ -168,9 +168,7 @@ final class EditPhotographerViewController: BaseViewController {
     
     private func configureNavigation() {
         self.navigationItem.title = "작가 프로필 설정"
-        self.navigationController?.navigationBar.isHidden = false
-        self.navigationController?.navigationBar.topItem?.title = " "
-        self.navigationController?.navigationBar.tintColor = .black
+        self.navigationController?.navigationBar.tintColor = TrinapAsset.black.color
     }
 }
 
@@ -341,7 +339,7 @@ extension EditPhotographerViewController {
             layoutSize:
                 NSCollectionLayoutSize(
                     widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .estimated(trinapOffset * 24)
+                    heightDimension: .estimated(trinapOffset * 22)
                 ),
             subitems: [item]
         )

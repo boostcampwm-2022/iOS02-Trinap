@@ -33,7 +33,7 @@ final class SearchViewModel: ViewModelType {
     init(
         searchLocationUseCase: SearchLocationUseCase,
         fetchCurrentLocationUseCase: FetchCurrentLocationUseCase,
-        coordinator: Coordinator,
+        coordinator: Coordinator?,
         searchText: BehaviorRelay<String>,
         coordinate: BehaviorRelay<Coordinate?>
     ) {
