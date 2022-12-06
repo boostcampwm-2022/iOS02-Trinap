@@ -35,9 +35,14 @@ extension MyPageCoordinator {
         let useCase = DefaultFetchUserUseCase(
             userRepository: DefaultUserRepository()
         )
-        let viewModel = MyPageViewModel(fetchUserUseCase: useCase)
+        let viewModel = MyPageViewModel(
+            fetchUserUseCase: useCase,
+            signOutUseCase: DefaultSignOutUseCase(
+                authRepository: DefaultAuthRepository()
+            )
+            , coordinator: self
+        )
         let viewController = MyPageViewController(viewModel: viewModel)
-        viewController.coordinator = self
         self.navigationController.pushViewController(viewController, animated: true)
     }
     
@@ -165,6 +170,25 @@ extension MyPageCoordinator {
         self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
         self.navigationController.pushViewController(viewController, animated: true)
         self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
+    }
+    
+    func showSignOutAlert(completion: @escaping () -> Void) {
+        let alert = TrinapAlert(
+            title: "로그아웃",
+            timeText: nil,
+            subtitle: "정말 로그아웃 하시겠어요?"
+        )
+        alert.addAction(
+            title: "취소",
+            style: .disabled,
+            completion: { }
+        )
+        alert.addAction(
+            title: "로그아웃",
+            style: .primary,
+            completion: completion
+        )
+        alert.showAlert(navigationController: self.navigationController)
     }
 }
 
