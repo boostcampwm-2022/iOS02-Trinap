@@ -13,5 +13,5 @@ import RxSwift
 protocol SendFirstChatUseCase {
 
     // MARK: Methods
-    func send(chatroomId: String) -> Observable<Void>
+    func send(chatroomId: String, reservationId: String) -> Observable<Void>
 }
