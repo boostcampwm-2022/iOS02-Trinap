@@ -118,12 +118,12 @@ final class PhotographerDetailViewModel: ViewModelType {
             .distinctUntilChanged()
             .withLatestFrom(reservationDate.asObservable())
             .withUnretained(self)
-            .flatMap { owner, dates -> Observable<Void> in
+            .flatMap { owner, dates -> Observable<String> in
                 Logger.print(111)
                 guard
                     let start = dates[safe: 0],
                     let end = dates[safe: 1]
-                else { return Observable.just(()) }
+                else { return Observable.just("") }
                 
                 return owner.createReservationUseCase.create(
                     photographerUserId: owner.userId,
@@ -133,14 +133,16 @@ final class PhotographerDetailViewModel: ViewModelType {
                 )
             }
             .withUnretained(self)
-            .flatMap { owner, _ in
+            .flatMap { owner, reservationId -> Observable<(String, String)> in
                 Logger.print(222)
                 return owner.createChatroomUseCase.create(photographerUserId: owner.userId)
+                    .map { ($0, reservationId) }
             }
             .withUnretained(self)
-            .flatMap { owner, chatroomId in
+            .flatMap { owner, value in
                 Logger.print(333)
-                return owner.sendFirstChatUseCase.send(chatroomId: chatroomId)
+                let (chatroomId, reservationId) = value
+                return owner.sendFirstChatUseCase.send(chatroomId: chatroomId, reservationId: reservationId)
             }
             .subscribe()
             .disposed(by: disposeBag)
