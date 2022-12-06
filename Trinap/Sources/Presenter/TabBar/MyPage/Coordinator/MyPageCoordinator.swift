@@ -35,7 +35,6 @@ extension MyPageCoordinator {
     
     func showMyPageViewController() {
         let viewController = dependencies.makeMyPageViewController()
-        viewController.coordinator = self
         self.navigationController.pushViewController(viewController, animated: true)
     }
     

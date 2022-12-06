@@ -33,7 +33,7 @@ final class MyPageViewModel: ViewModelType {
     init(
         fetchUserUseCase: FetchUserUseCase,
         signOutUseCase: SignOutUseCase,
-        coordinator: MyPageCoordinator
+        coordinator: MyPageCoordinator?
     ) {
         self.fetchUserUseCase = fetchUserUseCase
         self.signOutUseCase = signOutUseCase
