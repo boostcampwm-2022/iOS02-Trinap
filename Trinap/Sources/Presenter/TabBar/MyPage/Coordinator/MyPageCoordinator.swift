@@ -50,6 +50,8 @@ extension MyPageCoordinator {
             showContactListViewController()
         case .photographerDate:
             showEditPossibleDateViewController()
+        case .userBlock:
+            showBlockListViewController()
         case .dropout:
             showDropOutViewController()
         default:
@@ -134,6 +136,12 @@ extension MyPageCoordinator {
     func showCreateContactViewController() {
         let viewController = dependencies.makeCreateContactViewController()
         self.navigationController.present(viewController, animated: true)
+    }
+    
+    func showBlockListViewController() {
+        let viewController = dependencies.makeBlockListViewController()
+        viewController.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(viewController, animated: true)
     }
 }
 
