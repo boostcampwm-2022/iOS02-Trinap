@@ -44,7 +44,7 @@ final class ChatPreviewsViewController: BaseViewController {
     
     override func configureConstraints() {
         chatPreviewsTableView.snp.makeConstraints { make in
-            make.leading.trailing.top.bottom.equalToSuperview()
+            make.edges.equalTo(self.view.safeAreaLayoutGuide)
         }
     }
     
@@ -52,6 +52,12 @@ final class ChatPreviewsViewController: BaseViewController {
         self.dataSource = self.configureDataSource()
         
         self.dataSource?.defaultRowAnimation = .fade
+        
+        self.navigationController?.navigationBar.setBackgroundImage(
+            UIImage().withTintColor(TrinapAsset.white.color),
+            for: .default
+        )
+        self.navigationItem.titleView = LargeNavigationTitleView(title: "채팅")
     }
     
     override func bind() {
