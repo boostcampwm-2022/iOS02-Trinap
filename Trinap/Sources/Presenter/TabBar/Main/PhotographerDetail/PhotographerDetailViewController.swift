@@ -41,9 +41,6 @@ class PhotographerDetailViewController: BaseViewController {
     
     // MARK: - Properties
     private let tabState = BehaviorRelay<Int>(value: 0)
-    
-    weak var coordinator: MainCoordinator?
-    
     private let viewModel: PhotographerDetailViewModel
     
     private lazy var dataSource = configureDataSource()
@@ -96,6 +93,15 @@ class PhotographerDetailViewController: BaseViewController {
     }
     
     override func bind() {
+        
+        collectionView.rx.itemSelected
+            .withUnretained(self)
+            .subscribe(onNext: { owner, indexPath in
+                if case let .photo(picture) = owner.dataSource.itemIdentifier(for: indexPath) {
+                    owner.viewModel.showDetailImage(urlString: picture?.picture)
+                }
+            })
+            .disposed(by: disposeBag)
         
         let input = PhotographerDetailViewModel.Input(
             viewWillAppear: self.rx.viewWillAppear.asObservable(),
@@ -160,7 +166,7 @@ class PhotographerDetailViewController: BaseViewController {
         let alert = UIAlertController()
             .appendingAction(title: "신고하기", style: .default) {
                 //TODO: 해당 아이 userId로 신고박는 페이지로 이동
-                
+                self.viewModel.showSueController()
             }
             .appendingAction(title: "차단하기", style: .default) {
                 self.confirmBlock()
@@ -173,9 +179,9 @@ class PhotographerDetailViewController: BaseViewController {
         self.viewModel.blockPhotographer()
             .asObservable()
             .subscribe(onNext: { [weak self] in
-                let alert = UIAlertController(title: "신고 완료", message: "신고가 완료되었습니다.", preferredStyle: .alert)
-                    .appendingAction(title: "확인", style: .default)
-                self?.present(alert, animated: true)
+                let alert = TrinapAlert(title: "신고 완료", timeText: nil, subtitle: "신고가 완료되었습니다.")
+                alert.addAction(title: "확인", style: .primary) { }
+                alert.showAlert(navigationController: self?.navigationController)
             })
             .disposed(by: disposeBag)
     }
