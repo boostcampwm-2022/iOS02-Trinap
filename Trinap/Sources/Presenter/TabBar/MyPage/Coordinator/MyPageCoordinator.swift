@@ -46,6 +46,8 @@ extension MyPageCoordinator {
             showAuthorizationSetting(state: state)
         case .profile:
             showEditProfileViewController()
+        case .contact:
+            showContactListViewController()
         case .photographerDate:
             showEditPossibleDateViewController()
         case .dropout:
@@ -117,6 +119,21 @@ extension MyPageCoordinator {
             completion: completion
         )
         alert.showAlert(navigationController: self.navigationController)
+    }
+    
+    func showContactListViewController() {
+        let viewController = dependencies.makeContactListViewController()
+        self.navigationController.pushViewControllerHideBottomBar(rootViewController: viewController, animated: false)
+    }
+    
+    func showDetailContactViewController(contactId: String) {
+        let viewController = dependencies.makeDetailContactViewController(contactId: contactId)
+        self.navigationController.pushViewControllerHideBottomBar(rootViewController: viewController, animated: false)
+    }
+    
+    func showCreateContactViewController() {
+        let viewController = dependencies.makeCreateContactViewController()
+        self.navigationController.present(viewController, animated: true)
     }
 }
 

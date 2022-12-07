@@ -93,15 +93,14 @@ extension AppDelegate: CLLocationManagerDelegate {
         @unknown default:
             fatalError()
         }
-        print(status.rawValue)
     }
 }
 
 // MARK: - Photo
 extension AppDelegate {
     func requestPhotoAuthorization() {
-        PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
-            Logger.print(status)
+        PHPhotoLibrary.requestAuthorization(for: .readWrite) { _ in
+            
         }
     }
 }
