@@ -18,7 +18,7 @@ final class MyPageInfoCell: BaseTableViewCell {
         $0.text = "작가 프로필 설정"
     }
     
-    private lazy var exposureSwitch = UISwitch()
+    lazy var exposureSwitch = UISwitch()
     
     private lazy var versionLabel = UILabel().than {
         $0.textColor = TrinapAsset.primary.color
