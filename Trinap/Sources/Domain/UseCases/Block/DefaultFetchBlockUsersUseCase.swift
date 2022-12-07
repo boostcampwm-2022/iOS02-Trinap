@@ -26,13 +26,36 @@ final class DefaultFetchBlockUsersUseCase: FetchBlockUsersUseCase {
     }
     
     // MARK: Methods
-    func fetchBlockUsers() -> Observable<[User]> {
+    func fetchBlockUsers() -> Observable<[Block.BlockedUser]> {
         return blockRepository.fetchBlockedUser()
             .asObservable()
-            .map { $0.map { $0.blockedUserId } }
-            .withUnretained(self)
-            .flatMap { owner, blockedIds -> Observable<[User]> in
-                owner.userRepository.fetchUsers(userIds: blockedIds)
+            .map { blocks -> ([Block], [String]) in
+                let blockIds = blocks.map { $0.blockedUserId }
+                return (blocks, blockIds)
             }
+            .withUnretained(self)
+            .flatMap { owner, blockedInfo -> Observable<[Block.BlockedUser]> in
+                let (blocks, bloeckedUserIds) = blockedInfo
+                return owner.userRepository.fetchUsers(userIds: bloeckedUserIds)
+                    .map { owner.makeBlockedUser(users: $0, blocks: blocks) }
+            }
+    }
+    
+    private func makeBlockedUser(users: [User], blocks: [Block]) -> [Block.BlockedUser] {
+        var blockedUsers: [Block.BlockedUser] = []
+        for user in users {
+            for block in blocks {
+                if user.userId == block.blockedUserId {
+                    blockedUsers.append(
+                        Block.BlockedUser(
+                            blockId: block.blockId,
+                            blockedUser: user
+                        )
+                    )
+                }
+            }
+        }
+        
+        return blockedUsers
     }
 }
