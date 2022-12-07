@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "Pin=Me_pin.png",
+      "filename" : "LocationShareBackButton.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "Pin=Me_pin@2x.png",
+      "filename" : "LocationShareBackButton@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "Pin=Me_pin@3x.png",
+      "filename" : "LocationShareBackButton@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
