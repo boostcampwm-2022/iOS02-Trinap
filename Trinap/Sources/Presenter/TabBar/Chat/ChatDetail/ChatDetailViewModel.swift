@@ -27,7 +27,7 @@ final class ChatDetailViewModel: ViewModelType {
     let disposeBag = DisposeBag()
     private var chats: [Chat] = []
     
-    private weak var coordinator: ChatCoordinator?
+    private weak var coordinator: ChatDetailCoordinator?
     private let chatroomId: String
     private let observeChatUseCase: ObserveChatUseCase
     private let sendChatUseCase: SendChatUseCase
@@ -36,7 +36,7 @@ final class ChatDetailViewModel: ViewModelType {
     
     // MARK: - Initializer
     init(
-        coordinator: ChatCoordinator,
+        coordinator: ChatDetailCoordinator,
         chatroomId: String,
         nickname: String,
         observeChatUseCase: ObserveChatUseCase,
