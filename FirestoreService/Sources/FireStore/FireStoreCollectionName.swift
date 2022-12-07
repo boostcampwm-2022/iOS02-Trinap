@@ -9,7 +9,7 @@
 import Foundation
 
 public enum FireStoreCollection: String {
-    case blocks, chatrooms, photographers, reservations, reviews, users, chats, locations, contact
+    case blocks, chatrooms, photographers, reservations, reviews, users, chats, locations, contact, sue
     
     var name: String {
         return self.rawValue
