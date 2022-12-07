@@ -135,4 +135,19 @@ final class DefaultUserRepository: UserRepository {
         return self.firestoreService.createDocument(collection: .contact, document: contactId, values: values)
             .asObservable()
     }
+    
+    func updatePhotographerExposure(value: Bool) -> Observable<Void> {
+        guard let userId = tokenManager.getToken(with: .userId) else {
+            return .error(TokenManagerError.notFound)
+        }
+        
+        let value = ["isPhotographer": value]
+        
+        return firestoreService.updateDocument(
+            collection: .users,
+            document: userId,
+            values: value
+        )
+        .asObservable()
+    }
 }
