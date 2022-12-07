@@ -15,10 +15,13 @@ typealias MyPageDataSource = [MyPageSection: [MyPageCellType]]
 
 final class MyPageViewModel: ViewModelType {
     
+    // MARK: - Properties
     var disposeBag = DisposeBag()
     
     private let fetchUserUseCase: FetchUserUseCase
+    private let editUserUseCase: EditUserUseCase
     private let signOutUseCase: SignOutUseCase
+    
     weak var coordinator: MyPageCoordinator?
     
     struct Input {
@@ -30,16 +33,20 @@ final class MyPageViewModel: ViewModelType {
         let dataSource: Driver<[MyPageDataSource]>
     }
     
+    // MARK: - Initialize
     init(
         fetchUserUseCase: FetchUserUseCase,
+        editUserUseCase: EditUserUseCase,
         signOutUseCase: SignOutUseCase,
         coordinator: MyPageCoordinator?
     ) {
         self.fetchUserUseCase = fetchUserUseCase
+        self.editUserUseCase = editUserUseCase
         self.signOutUseCase = signOutUseCase
         self.coordinator = coordinator
     }
     
+    // MARK: - Methods
     func transform(input: Input) -> Output {
         input.cellDidSelect
             .withUnretained(self)
@@ -62,6 +69,14 @@ final class MyPageViewModel: ViewModelType {
         
         return Output(dataSource: dataSource)
     }
+    
+    func updatePhotographerExposure(_ isOn: Bool) {
+        self.editUserUseCase.updatePhotographerExposure(isOn)
+            .subscribe(onNext: { [weak self] _ in
+                self?.saveIsPhotograhperValue(isOn)
+            })
+            .disposed(by: disposeBag)
+    }
 }
 
 extension MyPageViewModel {
@@ -82,16 +97,22 @@ extension MyPageViewModel {
     private func generateProfile() -> Observable<MyPageDataSource> {
         
         return fetchUserUseCase.fetchUserInfo()
-            .map { user -> MyPageDataSource in
-                [.profile: [MyPageCellType.profile(user: user)]]
+            .withUnretained(self)
+            .map { owner, user -> MyPageDataSource in
+                
+                owner.saveIsPhotograhperValue(user.isPhotographer)
+                Logger.print(user.isPhotographer)
+                return [.profile: [MyPageCellType.profile(user: user)]]
             }
     }
     
     private func generatePhotograhperSettings() -> MyPageDataSource {
+        let isPhotographer = UserDefaults.standard.bool(forKey: UserDefaultKey.isPhotographer)
+        
         let data: [MyPageCellType] = [
             MyPageCellType.phohographerProfile,
             MyPageCellType.photographerDate,
-            MyPageCellType.photographerExposure(isExposure: true)
+            MyPageCellType.photographerExposure(isExposure: isPhotographer)
         ]
         
         return [.photograhper: data]
@@ -139,5 +160,9 @@ extension MyPageViewModel {
                 }
             })
             .disposed(by: disposeBag)
+    }
+    
+    private func saveIsPhotograhperValue(_ isOn: Bool) {
+        UserDefaults.standard.set(isOn, forKey: UserDefaultKey.isPhotographer)
     }
 }

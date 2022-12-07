@@ -97,6 +97,13 @@ extension MyPageViewController: UITableViewDelegate {
                     return UITableViewCell()
                 }
                 cell.type = itemIdentifier
+                cell.exposureSwitch.rx.controlEvent(.valueChanged)
+                    .withUnretained(self)
+                    .subscribe(onNext: { owner, _ in
+                        owner.viewModel.updatePhotographerExposure(cell.exposureSwitch.isOn)
+                    })
+                    .disposed(by: cell.disposeBag)
+                
                 cell.selectionStyle = .none
                 return cell
             }
