@@ -44,12 +44,21 @@ final class ChatPreviewsViewController: BaseViewController {
     
     override func configureConstraints() {
         chatPreviewsTableView.snp.makeConstraints { make in
-            make.leading.trailing.top.bottom.equalToSuperview()
+            make.edges.equalTo(self.view.safeAreaLayoutGuide)
         }
     }
     
     override func configureAttributes() {
         self.dataSource = self.configureDataSource()
+        
+        self.dataSource?.defaultRowAnimation = .fade
+        
+        self.navigationController?.navigationBar.setBackgroundImage(
+            UIImage().withTintColor(TrinapAsset.white.color),
+            for: .default
+        )
+        self.navigationItem.titleView = LargeNavigationTitleView(title: "채팅")
+        self.navigationController?.setLeftArrowBackButton()
     }
     
     override func bind() {
@@ -60,7 +69,7 @@ final class ChatPreviewsViewController: BaseViewController {
                 return self?.generateSnapshot(chatPreviews)
             }
             .drive { [weak self] snapshot in
-                self?.dataSource?.apply(snapshot, animatingDifferences: false)
+                self?.dataSource?.apply(snapshot, animatingDifferences: true)
             }
             .disposed(by: disposeBag)
         
@@ -87,6 +96,29 @@ private extension ChatPreviewsViewController {
     }
     
     func generateSnapshot(_ after: [ChatPreview]) -> NSDiffableDataSourceSnapshot<Section, ChatPreview> {
+        guard
+            let dataSource,
+            let target = after.first,
+            let before = dataSource.snapshot().itemIdentifiers.first(where: { $0.chatroomId == target.chatroomId })
+        else {
+            return defaultSnapshot(after)
+        }
+        
+        var snapshot = dataSource.snapshot()
+        
+        if snapshot.sectionIdentifiers.isEmpty {
+            snapshot.appendSections([.main])
+        }
+        
+        snapshot.deleteItems([before])
+        
+        guard let firstItem = snapshot.itemIdentifiers.first else { return defaultSnapshot(after) }
+        
+        snapshot.insertItems([target], beforeItem: firstItem)
+        return snapshot
+    }
+    
+    func defaultSnapshot(_ after: [ChatPreview]) -> NSDiffableDataSourceSnapshot<Section, ChatPreview> {
         var snapshot = NSDiffableDataSourceSnapshot<Section, ChatPreview>()
         
         snapshot.appendSections([.main])

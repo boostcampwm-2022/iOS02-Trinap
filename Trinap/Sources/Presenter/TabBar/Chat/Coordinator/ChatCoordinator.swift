@@ -62,7 +62,7 @@ extension ChatCoordinator {
         self.navigationController.pushViewController(viewController, animated: true)
     }
     
-    func showChatDetailViewController(chatroomId: String) {
+    func showChatDetailViewController(chatroomId: String, nickname: String) {
         let uploadImageRepository = DefaultUploadImageRepository()
         
         let sendChatUseCase = DefaultSendChatUseCase(chatRepository: chatRepository)
@@ -72,6 +72,7 @@ extension ChatCoordinator {
         let chatDetailViewModel = ChatDetailViewModel(
             coordinator: self,
             chatroomId: chatroomId,
+            nickname: nickname,
             observeChatUseCase: observeChatUseCase,
             sendChatUseCase: sendChatUseCase,
             uploadImageUseCase: uploadImageUseCase,

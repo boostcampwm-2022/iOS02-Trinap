@@ -48,7 +48,7 @@ final class ChatPreviewsViewModel: ViewModelType {
     }
     
     func showChatDetail(of chatPreview: ChatPreview) {
-        coordinator?.showChatDetailViewController(chatroomId: chatPreview.chatroomId)
+        coordinator?.showChatDetailViewController(chatroomId: chatPreview.chatroomId, nickname: chatPreview.nickname)
     }
 }
 

@@ -21,4 +21,17 @@ extension UINavigationController {
         self.pushViewController(rootViewController, animated: animated)
         self.viewControllers.first?.hidesBottomBarWhenPushed = false
     }
+    
+    func setLeftArrowBackButton() {
+        let backButtonImage = UIImage(systemName: "arrow.left")?
+            .withTintColor(TrinapAsset.black.color, renderingMode: .alwaysOriginal)
+        
+        self.navigationBar.backIndicatorImage = backButtonImage
+        self.navigationBar.backIndicatorTransitionMaskImage = backButtonImage
+        self.navigationBar.topItem?.backButtonTitle = ""
+    }
+    
+    func setShadowImage() {
+        self.navigationBar.shadowImage = nil
+    }
 }
