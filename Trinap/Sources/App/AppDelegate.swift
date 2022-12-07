@@ -45,6 +45,7 @@ extension AppDelegate : MessagingDelegate {
             return
         }
         tokenManager.save(token: fcmToken, with: .fcmToken)
+        Logger.print(fcmToken)
     }
 }
 
