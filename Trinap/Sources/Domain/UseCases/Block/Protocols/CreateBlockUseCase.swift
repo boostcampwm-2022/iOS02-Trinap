@@ -14,4 +14,5 @@ protocol CreateBlockUseCase {
 
     // MARK: Methods
     func create(blockedUserId: String) -> Single<Void>
+    func create(blockedUserId: String, blockId: String) -> Single<Void>
 }
