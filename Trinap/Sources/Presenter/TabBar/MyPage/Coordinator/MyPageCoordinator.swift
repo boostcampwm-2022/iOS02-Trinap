@@ -69,7 +69,8 @@ extension MyPageCoordinator {
     private func showEditPhotographerProfile() {
         let viewController = dependencies.makeEditPhotographerViewController()
         viewController.coordinator = self
-        self.navigationController.pushViewControllerHideBottomBar(rootViewController: viewController, animated: true)
+        viewController.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(viewController, animated: true)
     }
     
     func showUpdatePhotographerViewController() {
@@ -99,7 +100,8 @@ extension MyPageCoordinator {
     
     private func showEditPossibleDateViewController() {
         let viewController = dependencies.makeEditPossibleDateViewController()
-        self.navigationController.pushViewControllerHideBottomBar(rootViewController: viewController, animated: true)
+        viewController.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(viewController, animated: true)
     }
     
     func showDropOutViewController() {
@@ -129,12 +131,14 @@ extension MyPageCoordinator {
     
     func showContactListViewController() {
         let viewController = dependencies.makeContactListViewController()
-        self.navigationController.pushViewControllerHideBottomBar(rootViewController: viewController, animated: false)
+        viewController.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(viewController, animated: true)
     }
     
     func showDetailContactViewController(contactId: String) {
         let viewController = dependencies.makeDetailContactViewController(contactId: contactId)
-        self.navigationController.pushViewControllerHideBottomBar(rootViewController: viewController, animated: false)
+        viewController.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(viewController, animated: true)
     }
     
     func showCreateContactViewController() {
