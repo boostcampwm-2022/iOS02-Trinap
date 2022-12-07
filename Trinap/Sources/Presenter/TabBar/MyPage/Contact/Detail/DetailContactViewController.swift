@@ -42,10 +42,6 @@ final class DetailContactViewController: BaseViewController {
         super.viewDidLoad()
     }
     
-    override func viewWillLayoutSubviews() {
-        contentsLabel.sizeToFit()
-    }
-    
     override func configureHierarchy() {
         self.view.addSubviews([titleLabel, contentsLabel])
     }

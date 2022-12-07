@@ -18,7 +18,7 @@ protocol FetchContactUseCase {
 final class DefaultFetchContactUseCase: FetchContactUseCase {
     
     private let userRepository: UserRepository
-    var disposeBag = DisposeBag()
+    
     init(userRepository: UserRepository) {
         self.userRepository = userRepository
     }

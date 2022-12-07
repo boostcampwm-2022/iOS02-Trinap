@@ -20,7 +20,6 @@ final class ContactListViewController: BaseViewController {
     }
     
     private var dataSource: DataSource?
-    private let addTrigger = PublishSubject<Void>()
     
     private lazy var tableView = UITableView(frame: self.view.bounds, style: .plain)
     
@@ -59,11 +58,6 @@ final class ContactListViewController: BaseViewController {
     }
     
     override func bind() {
-        
-        self.rx.viewWillAppear.subscribe(onNext: { _ in
-            print("viewWillAppear")
-        })
-        .disposed(by: disposeBag)
         let input = ContactListViewModel.Input(
             viewWillAppear: self.rx.viewWillAppear.map { _ in }.asObservable(),
             cellDidSelect: tableView.rx.itemSelected.compactMap {
