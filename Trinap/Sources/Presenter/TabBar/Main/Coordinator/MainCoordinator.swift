@@ -95,3 +95,19 @@ extension MainCoordinator {
         self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
     }
 }
+
+// MARK: - ChatDetail
+extension MainCoordinator {
+    
+    func showChatDetailViewController(chatroomId: String, nickname: String) {
+        let chatDetailCoordinator = ChatDetailCoordinator(
+            self.navigationController,
+            chatroomId: chatroomId,
+            nickname: nickname
+        )
+        
+        self.childCoordinators.append(chatDetailCoordinator)
+        
+        chatDetailCoordinator.start()
+    }
+}
