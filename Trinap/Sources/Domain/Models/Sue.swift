@@ -41,3 +41,24 @@ struct Sue {
     }
 }
 
+extension Sue {
+    enum SueContents {
+        case blame
+        case hateSpeech
+        case annoyance
+        case etc(String)
+        
+        var contents: String {
+            switch self {
+            case .blame:
+                return "욕설, 비방"
+            case .hateSpeech:
+                return  "혐오 발언"
+            case .annoyance:
+                return "불쾌감을 주거나 부적절한 이름 사용"
+            case .etc(let comment):
+                return comment
+            }
+        }
+    }
+}
