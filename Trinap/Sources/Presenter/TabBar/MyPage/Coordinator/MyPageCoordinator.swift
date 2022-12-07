@@ -35,6 +35,7 @@ extension MyPageCoordinator {
     
     func showMyPageViewController() {
         let viewController = dependencies.makeMyPageViewController()
+        self.navigationController.navigationBar.isHidden = true
         self.navigationController.pushViewController(viewController, animated: true)
     }
     

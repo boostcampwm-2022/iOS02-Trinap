@@ -24,13 +24,6 @@ final class MyPageViewController: BaseViewController {
         super.init()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        self.navigationController?.navigationBar.isHidden = true
-        self.tabBarController?.tabBar.isHidden = false
-    }
-    
     // MARK: - Methods
     override func configureHierarchy() {
         self.view.addSubview(tableView)
