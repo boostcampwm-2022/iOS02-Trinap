@@ -126,6 +126,7 @@ extension TrinapButton {
         case secondary
         case error
         case black
+        case background
         case disabled
         
         var color: UIColor {
@@ -138,6 +139,8 @@ extension TrinapButton {
                 return TrinapAsset.error.color
             case .black:
                 return TrinapAsset.black.color
+            case .background:
+                return TrinapAsset.background.color
             case .disabled:
                 return TrinapAsset.disabled.color
             }
