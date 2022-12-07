@@ -17,6 +17,7 @@ final class EditPossibleDateViewModel: ViewModelType {
     struct Input {
         let calendarDateTap: Observable<[Date]>
         let possibleDateEditDone: Observable<[Date]>
+        let backButtonTap: Signal<Void>
     }
     
     struct Output {
@@ -47,6 +48,12 @@ final class EditPossibleDateViewModel: ViewModelType {
     
     // MARK: - Methods
     func transform(input: Input) -> Output {
+        input.backButtonTap
+            .emit(onNext: { [weak self] _ in
+                self?.coordinator?.popViewController()
+            })
+            .disposed(by: disposeBag)
+        
         let editResult = input.possibleDateEditDone
             .withUnretained(self)
             .flatMap { owner, possibleDate -> Observable<Void> in

@@ -74,7 +74,8 @@ extension MyPageCoordinator {
     
     func showUpdatePhotographerViewController() {
         let viewController = dependencies.makeRegisterPhotographerInfoViewController()
-        self.navigationController.pushViewControllerHideBottomBar(rootViewController: viewController, animated: true)
+        viewController.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(viewController, animated: true)
     }
     
     func showSearchViewController(
