@@ -62,7 +62,8 @@ extension MyPageCoordinator {
     
     private func showEditProfileViewController() {
         let viewController = dependencies.makeEditProfileViewController()
-        self.navigationController.pushViewControllerHideBottomBar(rootViewController: viewController, animated: true)
+        viewController.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(viewController, animated: true)
     }
     
     private func showEditPhotographerProfile() {
