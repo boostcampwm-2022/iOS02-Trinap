@@ -43,7 +43,7 @@ final class LargeNavigationTitleView: BaseView {
         super.configureConstraints()
         
         titleView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(16)
+            make.leading.equalToSuperview().offset(8)
             make.top.bottom.equalToSuperview().inset(12)
         }
     }
