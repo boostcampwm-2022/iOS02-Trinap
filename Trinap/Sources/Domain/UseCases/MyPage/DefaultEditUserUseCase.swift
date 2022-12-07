@@ -25,4 +25,8 @@ final class DefaultEditUserUseCase: EditUserUseCase {
     func fetchRandomNickName() -> Observable<String> {
         return userRepository.createRandomNickname()
     }
+    
+    func updatePhotographerExposure(_ isOn: Bool) -> Observable<Void> {
+        return userRepository.updatePhotographerExposure(value: isOn)
+    }
 }
