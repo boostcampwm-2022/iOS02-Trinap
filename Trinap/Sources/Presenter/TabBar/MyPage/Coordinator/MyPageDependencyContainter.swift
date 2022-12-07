@@ -88,8 +88,9 @@ private extension MyPageDependencyContainter {
     func makeMyPageViewModel() -> MyPageViewModel {
         return MyPageViewModel(
             fetchUserUseCase: makeFetchUserUseCase(),
+            editUserUseCase: makeEditUseUseCase(),
             signOutUseCase: makeSignOutUseCase(),
-            coordinator: self.mypageCoordinator
+            coordinator: mypageCoordinator
         )
     }
     
