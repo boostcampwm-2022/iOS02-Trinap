@@ -8,6 +8,6 @@
 
 import Foundation
 
-struct UserDefaultKey {
+enum UserDefaultKey {
     static let isPhotographer = "isPhotographer"
 }
