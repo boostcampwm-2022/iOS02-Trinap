@@ -99,7 +99,7 @@ extension MainCoordinator {
 // MARK: - ChatDetail
 extension MainCoordinator {
     
-    func showChatDetailViewController(chatroomId: String, nickname: String) {
+    func connectChatDetailCoordinator(chatroomId: String, nickname: String) {
         let chatDetailCoordinator = ChatDetailCoordinator(
             self.navigationController,
             chatroomId: chatroomId,

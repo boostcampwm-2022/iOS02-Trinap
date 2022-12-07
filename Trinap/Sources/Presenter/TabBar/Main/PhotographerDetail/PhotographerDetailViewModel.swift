@@ -147,7 +147,7 @@ final class PhotographerDetailViewModel: ViewModelType {
                     .map { _ in return chatroomId }
             }
             .subscribe(onNext: { [weak self] chatroomId in
-                self?.coordiantor?.showChatDetailViewController(chatroomId: chatroomId, nickname: "이게 된다고?")
+                self?.coordiantor?.connectChatDetailCoordinator(chatroomId: chatroomId, nickname: "이게 된다고?")
             })
             .disposed(by: disposeBag)
         
