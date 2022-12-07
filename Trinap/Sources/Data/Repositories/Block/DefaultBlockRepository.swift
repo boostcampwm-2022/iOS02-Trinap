@@ -48,6 +48,26 @@ final class DefaultBlockRepository: BlockRepository {
         )
     }
     
+    func blockUser(blockedUserId: String, blockId: String) -> Single<Void> {
+        guard let userId = keychainManager.getToken(with: .userId) else {
+            return .error(TokenManagerError.notFound)
+        }
+
+        let dto = BlockDTO(
+            blockId: blockId,
+            blockedUserId: blockedUserId,
+            userId: userId,
+            status: Block.BlockStatus.active.rawValue
+        )
+        
+        guard let values = dto.asDictionary else { return Single.just(()) }
+        
+        return firebase.createDocument(
+            collection: .blocks,
+            document: dto.blockId,
+            values: values
+        )
+    }
     
     func removeBlockUser(blockId: String) -> Single<Void> {
         return firebase.deleteDocument(
