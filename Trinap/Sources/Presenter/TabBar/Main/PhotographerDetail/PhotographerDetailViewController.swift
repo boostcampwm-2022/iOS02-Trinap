@@ -305,7 +305,7 @@ extension PhotographerDetailViewController {
             layoutSize:
                 NSCollectionLayoutSize(
                     widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .estimated(trinapOffset * 19)
+                    heightDimension: .estimated(trinapOffset * 22)
                 ),
             subitems: [item]
         )
