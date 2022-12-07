@@ -9,6 +9,11 @@
 import Foundation
 
 struct Reservation {
+    
+    enum UserType: String {
+        case photographer = "작가님"
+        case customer = "고객님"
+    }
 
     enum Status: String, Codable {
         case request
@@ -24,7 +29,9 @@ struct Reservation {
     let reservationStartDate: Date
     let reservationEndDate: Date
     let location: String
-    let status: Status
+    let latitude: Double
+    let longitude: Double
+    var status: Status
 }
 
 extension Reservation: Hashable {

@@ -18,11 +18,11 @@ final class DefaultFetchReviewUseCase: FetchReviewUseCase {
     private let photographerRepository: PhotographerRepository
     
     init(
-        reviewRepositry: ReviewRepository,
+        reviewRepository: ReviewRepository,
         userRepository: UserRepository,
         photographerRepository: PhotographerRepository
     ) {
-        self.reviewRepository = reviewRepositry
+        self.reviewRepository = reviewRepository
         self.userRepository = userRepository
         self.photographerRepository = photographerRepository
     }
@@ -47,13 +47,13 @@ final class DefaultFetchReviewUseCase: FetchReviewUseCase {
     }
     
     /// 유저가 작성한 리뷰 확인
-//    func fetchReviews(userId: String) -> Observable<[UserReview]> {
-//        return reviewRepository.fetchReviews(id: userId, target: .customer)
-//            .withUnretained(self)
-//            .flatMap { owner, reviews in
-//                return owner.mappingReviewWithUser(reviews: reviews)
-//            }
-//    }
+    func fetchReviews(userId: String) -> Observable<[UserReview]> {
+        return reviewRepository.fetchReviews(id: userId, target: .customer)
+            .withUnretained(self)
+            .flatMap { owner, reviews in
+                return owner.mappingReviewWithUser(reviews: reviews)
+            }
+    }
     
     /// 작가에게 작성된 리뷰 확인
     func fetchReviews(photographerUserId: String?) -> Observable<[UserReview]> {
@@ -73,53 +73,42 @@ final class DefaultFetchReviewUseCase: FetchReviewUseCase {
 
 extension DefaultFetchReviewUseCase {
 
-//    private func mappingReviewWithUser(reviews: [Review]) -> Observable<[UserReview]> {
-//
-//        /// 중복된 id제거
-//        let photographerIds = reviews.map { $0.photographerUserId }.removingDuplicates()
-//
-//        return photographerIds.isEmpty ? .just([]) : photographerRepository.fetchPhotographers(ids: photographerIds)
-//            .map { photographers in
-//                var userReviews: [UserReview] = []
-//
-//                for photographer in photographers {
-//                    for review in reviews where review.photographerUserId == photographer.photographerUserId {
-//
-//                        let userReview = UserReview(
-//                            photorgrapher: photographer,
-//                            contents: review.contents,
-//                            rating: review.rating
-//                        )
-//                        userReviews.append(userReview)
-//                    }
-//                }
-//
-//                return userReviews
-//            }
-//    }
+    private func mappingReviewWithUser(reviews: [Review]) -> Observable<[UserReview]> {
+        let userIds = reviews.map { $0.creatorUserId }.removingDuplicates()
+        
+        return userRepository.fetchUsersWithMine(userIds: userIds)
+            .withUnretained(self) { owner, users in
+                return owner.configureUserReview(reviews: reviews, users: users)
+            }
+    }
     
     private func mappingReviewOfPhotographer(reviews: [Review]) -> Observable<[UserReview]> {
         /// 중복된 id제거
         let userIds = reviews.map { $0.creatorUserId }.removingDuplicates()
         
         return userIds.isEmpty ? .just([]) : userRepository.fetchUsers(userIds: userIds)
-            .map { users in
-                
-                var userReviews: [UserReview] = []
-                
-                for user in users {
-                    for review in reviews where review.creatorUserId == user.userId {
-                        let userReview = UserReview(
-                            user: user,
-                            contents: review.contents,
-                            rating: review.rating)
-                        
-                        userReviews.append(userReview)
-                    }
-                }
-                
-                return userReviews
+            .withUnretained(self) { owner, users in
+                return owner.configureUserReview(reviews: reviews, users: users)
             }
+    }
+    
+    private func configureUserReview(reviews: [Review], users: [User]) -> [UserReview] {
+        var userReviews: [UserReview] = []
+        
+        for user in users {
+            for review in reviews where review.creatorUserId == user.userId {
+                let userReview = UserReview(
+                    user: user,
+                    contents: review.contents,
+                    rating: review.rating,
+                    createdAt: review.createdAt
+                )
+                
+                userReviews.append(userReview)
+            }
+        }
+        
+        return userReviews
     }
     
     private func mappingReviewSummary(_ reivew: [Review]) -> ReviewSummary {

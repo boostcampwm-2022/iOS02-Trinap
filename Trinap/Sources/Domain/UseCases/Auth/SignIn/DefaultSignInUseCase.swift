@@ -22,22 +22,27 @@ final class DefaultSignInUseCase: SignInUseCase {
     }
     
     // MARK: - Methods
-    func signIn(with credential: OAuthCredential) -> Observable<SignInResult> {
-        return self.authRepository.signIn(with: credential)
-            .asObservable()
-            .withUnretained(self)
-            .flatMap { owner, _ in
-                return owner.authRepository.checkUser()
-                    .map { $0 ? SignInResult.signIn : SignInResult.signUp }
-            }
-            .asObservable()
-            .catchAndReturn(SignInResult.failure)
+    func signIn(with credential: (OAuthCredential, String)) -> Observable<SignInResult> {
+        let (credential, authorizationCode) = credential
+        return Observable.zip(
+            self.authRepository.fetchRefreshToken(with: authorizationCode),
+            self.authRepository.signIn(with: credential)
+                .asObservable()
+        )
+        .withUnretained(self)
+        .flatMap { owner, _ in
+            return owner.authRepository.checkUser()
+                .map { $0 ? SignInResult.signIn : SignInResult.signUp }
+        }
+        .asObservable()
+        .catchAndReturn(SignInResult.failure)
     }
     
     func autoSignIn() -> Observable<Bool> {
         if Auth.auth().currentUser != nil {
             return self.authRepository.checkUser()
                 .asObservable()
+                .catchAndReturn(false)
         } else {
             return Observable.just(false)
         }

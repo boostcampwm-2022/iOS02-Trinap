@@ -40,6 +40,11 @@ final class EditPossibleDateViewController: BaseViewController {
         super.init()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        configureNavigationBar()
+    }
+    
     // MARK: - Methods
     override func configureHierarchy() {
         self.view.addSubviews([
@@ -60,11 +65,7 @@ final class EditPossibleDateViewController: BaseViewController {
             make.leading.centerX.equalTo(titleLabel)
         }
     }
-    
-    override func configureAttributes() {
-        configureNavigationBar()
-    }
-    
+
     override func bind() {
         let input = EditPossibleDateViewModel.Input(
             calendarDateTap: self.trinapCalenderView.possibleDate.asObservable(),
@@ -86,10 +87,9 @@ final class EditPossibleDateViewController: BaseViewController {
             .disposed(by: disposeBag)
         
         output.editDoneButtonEnable
-            .asObservable()
-            .withUnretained(self)
-            .subscribe(onNext: { owner, isEnabled in
-                owner.updateEditDoneButtonEnabled(isEnabled)
+            .drive(onNext: { [weak self] isEnabled in
+                guard let self else { return }
+                self.editDoneButton.isEnabled = isEnabled
             })
             .disposed(by: disposeBag)
         
@@ -100,10 +100,6 @@ final class EditPossibleDateViewController: BaseViewController {
             })
             .disposed(by: disposeBag)
     }
-    
-    func updateEditDoneButtonEnabled(_ isEnabled: Bool) {
-        self.editDoneButton.isEnabled = isEnabled
-    }
 }
 
 private extension EditPossibleDateViewController {
@@ -111,10 +107,8 @@ private extension EditPossibleDateViewController {
     func configureNavigationBar() {
         self.navigationItem.title = "작가 영업일 설정"
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: self.editDoneButton)
-        self.navigationController?.navigationBar.isHidden = false
         self.navigationController?.hidesBarsOnSwipe = true
-        self.navigationController?.navigationBar.backgroundColor = TrinapAsset.white.color
-        self.navigationController?.navigationBar.barTintColor = TrinapAsset.white.color
+        self.navigationController?.navigationBar.tintColor = TrinapAsset.black.color
         self.navigationController?.navigationBar.shadowImage = UIImage()
     }
 }

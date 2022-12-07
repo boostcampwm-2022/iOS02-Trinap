@@ -94,4 +94,45 @@ final class DefaultUserRepository: UserRepository {
             .decode(type: NicknameDTO.self, decoder: JSONDecoder())
             .compactMap { $0.words.first }
     }
+    
+    func fetchContact() -> Observable<[Contact]> {
+        guard let userId = tokenManager.getToken(with: .userId) else {
+            return .error(TokenManagerError.notFound)
+        }
+        return self.firestoreService.getDocument(collection: .contact, field: "userId", in: [userId])
+            .map { $0.compactMap { $0.toObject(ContactDTO.self)?.toModel() } }
+            .asObservable()
+    }
+    
+    func fetchDetailContact(contactId: String) -> Observable<Contact> {
+        return self.firestoreService.getDocument(
+            collection: .contact,
+            document: contactId)
+        .compactMap { $0.toObject(ContactDTO.self)?.toModel() }
+        .asObservable()
+    }
+    
+    func createContact(title: String, contents: String) -> Observable<Void> {
+        
+        guard let userId = tokenManager.getToken(with: .userId) else {
+            return .error(TokenManagerError.notFound)
+        }
+        
+        let contactId = UUID().uuidString
+        
+        let dto = ContactDTO(
+            contactId: contactId,
+            userId: userId,
+            title: title,
+            description: contents,
+            createAt: Date().toString(type: .timeStamp),
+            status: .activate)
+        
+        guard let values = dto.asDictionary else {
+            return .error(LocalError.structToDictionaryError)
+        }
+        
+        return self.firestoreService.createDocument(collection: .contact, document: contactId, values: values)
+            .asObservable()
+    }
 }

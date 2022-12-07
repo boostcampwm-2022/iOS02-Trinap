@@ -116,13 +116,21 @@ final class ReservationDetailViewController: BaseViewController {
         
         let backButtonTap = backButton.rx.tap.asSignal()
         
-        let input = ReservationDetailViewModel.Input(backButtonTap: backButtonTap)
+        let input = ReservationDetailViewModel.Input(
+            backButtonTap: backButtonTap,
+            customerUserViewTap: customerUserView.tap,
+            photographerUserViewTap: photographerUserView.tap,
+            primaryButtonTap: reservationButtonView.primaryButtonTap.asObservable(),
+            secondaryButtonTap: reservationButtonView.secondaryButtonTap.asObservable()
+        )
         let output = viewModel.transform(input: input)
         
         output.reservation
-            .bind(onNext: { [weak self] reservation in
-                self?.configureUI(reservation)
-            })
+            .bind(onNext: { [weak self] reservation in self?.configureUI(reservation) })
+            .disposed(by: disposeBag)
+        
+        output.reservationStatus
+            .bind(onNext: { [weak self] reservationStatus in self?.configureStatus(reservationStatus) })
             .disposed(by: disposeBag)
     }
 }
@@ -139,11 +147,37 @@ private extension ReservationDetailViewController {
         
         photographerUserView.setUser(reservation.photographerUser)
         customerUserView.setUser(reservation.customerUser)
-        
-        
     }
     
-    func configureStatus(_ status: Reservation.Status) {
+    func configureStatus(_ status: ReservationStatusConvertible) {
+        configureReservationStatusConfigurations(status)
+    }
+    
+    func configureReservationStatusConfigurations(_ statusConvertible: ReservationStatusConvertible) {
+        let configurations = statusConvertible.convert()
         
+        statusButton.setTitle(configurations.status.title, for: .normal)
+        statusButton.fill = configurations.status.fillType
+        statusButton.style = configurations.status.style
+        
+        if let primaryContent = configurations.primary {
+            reservationButtonView.setPrimaryContent(
+                title: primaryContent.title,
+                fillType: primaryContent.fillType,
+                style: primaryContent.style
+            )
+        } else {
+            reservationButtonView.removePrimaryButton()
+        }
+        
+        if let secondaryContent = configurations.secondary {
+            reservationButtonView.setSecondaryContent(
+                title: secondaryContent.title,
+                fillType: secondaryContent.fillType,
+                style: secondaryContent.style
+            )
+        } else {
+            reservationButtonView.removeSecondaryButton()
+        }
     }
 }

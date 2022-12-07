@@ -38,7 +38,7 @@ final class EditPossibleDateViewModel: ViewModelType {
     init(
         editPhotographerUseCase: EditPhotographerUseCase,
         fetchPhotographerUseCase: FetchPhotographerUseCase,
-        coordinator: MyPageCoordinator
+        coordinator: MyPageCoordinator?
     ) {
         self.editPhotographerUseCase = editPhotographerUseCase
         self.fetchPhotographerUseCase = fetchPhotographerUseCase

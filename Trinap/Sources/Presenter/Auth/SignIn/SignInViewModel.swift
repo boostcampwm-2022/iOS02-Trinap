@@ -17,7 +17,7 @@ final class SignInViewModel: ViewModelType {
     
     struct Input {
         let signInButtonTap: Observable<Void>
-        let credential: Observable<OAuthCredential>
+        let credential: Observable<(OAuthCredential, String)>
     }
     
     struct Output {
@@ -44,8 +44,8 @@ final class SignInViewModel: ViewModelType {
     func transform(input: Input) -> Output {
         input.credential
             .withUnretained(self)
-            .flatMap { owner, credentail in
-                owner.signInUseCase.signIn(with: credentail)
+            .flatMap { owner, credential in
+                owner.signInUseCase.signIn(with: credential)
             }
             .subscribe(onNext: { [weak self] reuslt in
                 guard let self else { return }

@@ -108,7 +108,6 @@ extension DefaultMapRepository: CLLocationManagerDelegate {
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         self.curCoordinate.accept(Coordinate(lat: 0.0, lng: 0.0))
-        Logger.print(error)
     }
 }
 
@@ -120,7 +119,7 @@ extension DefaultMapRepository: MKLocalSearchCompleterDelegate {
         })
         .map { locations -> [Space] in
             let filtered = locations.filter { $0 != nil }
-            return filtered.compactMap{ $0 }
+            return filtered.compactMap { $0 }
         }
         .bind(to: results)
         .disposed(by: disposebag)

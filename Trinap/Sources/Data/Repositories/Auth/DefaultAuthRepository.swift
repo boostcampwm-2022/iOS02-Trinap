@@ -12,19 +12,26 @@ import FirebaseAuth
 import FirestoreService
 import RxSwift
 
+import FirebaseCore
+import FirebaseFirestore
+import FirebaseStorage
+
 final class DefaultAuthRepository: AuthRepository {
     
     // MARK: - Properties
     private let firebaseStoreService: FireStoreService
+    private let networkService: NetworkService
     private let tokenManager: TokenManager
     
     // MARK: Initializer
     init(
         firebaseStoreService: FireStoreService = DefaultFireStoreService(),
-        tokenManager: TokenManager = KeychainTokenManager()
+        tokenManager: TokenManager = KeychainTokenManager(),
+        networkService: NetworkService = DefaultNetworkService()
     ) {
         self.firebaseStoreService = firebaseStoreService
         self.tokenManager = tokenManager
+        self.networkService = networkService
     }
     
     // MARK: - Methods
@@ -69,19 +76,6 @@ final class DefaultAuthRepository: AuthRepository {
         .asObservable()
     }
     
-    func removeUser() -> Observable<Void> {
-        guard let userId = tokenManager.getToken(with: .userId) else {
-            return .error(TokenManagerError.notFound)
-        }
-        self.tokenManager.deleteToken(with: .userId)
-        self.tokenManager.deleteToken(with: .fcmToken)
-        return firebaseStoreService.deleteDocument(
-            collection: .users,
-            document: userId
-        )
-        .asObservable()
-    }
-    
     func updateFcmToken() -> Observable<Void> {
         guard
             let userId = tokenManager.getToken(with: .userId),
@@ -119,7 +113,7 @@ final class DefaultAuthRepository: AuthRepository {
     
     func signIn(with cretencial: OAuthCredential) -> Single<String> {
         return Single.create { single in
-                        
+            
             Auth.auth().signIn(with: cretencial) { [weak self] authResult, error in
                 if let error = error {
                     single(.failure(error))
@@ -144,7 +138,6 @@ final class DefaultAuthRepository: AuthRepository {
             do {
                 try Auth.auth().signOut()
                 self.tokenManager.deleteToken(with: .userId)
-                self.tokenManager.deleteToken(with: .fcmToken)
                 single(.success(()))
             } catch let error {
                 single(.failure(error))
@@ -153,22 +146,64 @@ final class DefaultAuthRepository: AuthRepository {
             return Disposables.create()
         }
     }
-
+    
     func dropOut() -> Single<Void> {
         guard let user = Auth.auth().currentUser else {
             return .error(FireStoreError.unknown)
         }
         
         return Single.create { [weak self] single in
+            guard let self else { return Disposables.create() }
+            
             user.delete { error in
                 if let error = error {
                     single(.failure(error))
                     return
                 }
-                single(.success(()))
+                
+                if self.tokenManager.deleteToken(with: .userId),
+                   self.tokenManager.deleteToken(with: .fcmToken) {
+                    single(.success(()))
+                } else {
+                    single(.failure(FireStoreError.unknown))
+                }
             }
             
             return Disposables.create()
         }
+    }
+    
+    func removeUserInfo(photographerId: String) -> Single<Void> {
+        guard let userId = tokenManager.getToken(with: .userId) else {
+            return .error(TokenManagerError.notFound)
+        }
+        
+        return self.firebaseStoreService.deleteDocuments(
+            collections: [
+                (.users, userId),
+                (.photographers, photographerId)
+            ]
+        )
+    }
+    
+    func fetchRefreshToken(with authorizationCode: String) -> Observable<Void> {
+        let endpoint = TokenEndpoint.refresh(authorizationCode: authorizationCode)
+        
+        return self.networkService.request(endpoint)
+            .withUnretained(self)
+            .map { owner, data -> Void in
+                let refreshToken = String(data: data, encoding: .utf8) ?? ""
+                owner.tokenManager.save(token: refreshToken, with: .refreshToken)
+            }
+    }
+    
+    func revokeToken() -> Observable<Void> {
+        guard let token = self.tokenManager.getToken(with: .refreshToken) else {
+            return .error(TokenManagerError.notFound)
+        }
+        let endpoint = TokenEndpoint.revoke(refreshToken: token)
+        
+        return self.networkService.request(endpoint)
+            .map { _ in }
     }
 }

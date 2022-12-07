@@ -13,12 +13,10 @@ import RxSwift
 final class MyPageViewController: BaseViewController {
     
     // MARK: - Properties
-    weak var coordinator: MyPageCoordinator?
-    
     private let viewModel: MyPageViewModel
     private lazy var tableView = UITableView(frame: .zero, style: .plain)
     
-    private lazy var dataSource: UITableViewDiffableDataSource<MyPageSection, MyPageCellType> = generateDataSource()
+    private var dataSource: UITableViewDiffableDataSource<MyPageSection, MyPageCellType>?
     // MARK: - Initializers
     init(viewModel: MyPageViewModel) {
         self.viewModel = viewModel
@@ -50,7 +48,15 @@ final class MyPageViewController: BaseViewController {
     }
     
     override func bind() {
-        let input = MyPageViewModel.Input(viewWillAppear: self.rx.viewWillAppear.asObservable())
+        let input = MyPageViewModel.Input(
+            viewWillAppear: self.rx.viewWillAppear.asObservable(),
+            cellDidSelect: self.tableView.rx.itemSelected.asObservable()
+                .withUnretained(self)
+                .map { owner, indexPath -> MyPageCellType? in
+                    return owner.dataSource?.itemIdentifier(for: indexPath)
+                }
+                .compactMap { $0 }
+        )
         let output = viewModel.transform(input: input)
         
         output.dataSource
@@ -58,21 +64,12 @@ final class MyPageViewController: BaseViewController {
                 self?.generateSnapshot(dataSource)
             }
             .drive { [weak self] snapshot in
-                self?.dataSource.apply(snapshot)
+                self?.dataSource?.apply(snapshot, animatingDifferences: false)
             }
             .disposed(by: disposeBag)
         
         tableView.rx
             .setDelegate(self)
-            .disposed(by: disposeBag)
-        
-        tableView.rx
-            .itemSelected
-            .throttle(.microseconds(500), scheduler: MainScheduler.instance)
-            .withUnretained(self)
-            .subscribe { owner, indexPath in
-                owner.showNextViewController(indexPath: indexPath)
-            }
             .disposed(by: disposeBag)
     }
 }
@@ -93,11 +90,6 @@ extension MyPageViewController: UITableViewDelegate {
                     return UITableViewCell()
                 }
                 cell.user = user
-                cell.rx.rxShowViewController
-                    .subscribe(onNext: { [weak self] _ in
-                        self?.showNextViewController(indexPath: IndexPath(row: 0, section: 0))
-                    })
-                    .disposed(by: self.disposeBag)
                 cell.selectionStyle = .none
                 return cell
             } else {
@@ -150,11 +142,5 @@ extension MyPageViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return indexPath.section == 0 ? 185 : self.trinapOffset * 6
-    }
-    
-    private func showNextViewController(indexPath: IndexPath) {
-        guard let type = dataSource.itemIdentifier(for: indexPath) else { return }
-        
-        self.coordinator?.showNextView(state: type)
     }
 }

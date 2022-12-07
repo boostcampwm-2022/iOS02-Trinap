@@ -23,7 +23,8 @@ protocol Coordinator: AnyObject {
 
     func start()
     func finish()
-    func pop()
+    func popViewController()
+    func dismissViewController()
 }
 
 extension Coordinator {
@@ -33,7 +34,11 @@ extension Coordinator {
         delegate?.didFinish(childCoordinator: self)
     }
     
-    func pop() {
+    func popViewController() {
         self.navigationController.popViewController(animated: true)
+    }
+    
+    func dismissViewController() {
+        navigationController.dismiss(animated: true)
     }
 }

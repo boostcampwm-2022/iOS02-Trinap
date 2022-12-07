@@ -239,6 +239,32 @@ public final class DefaultFireStoreService: FireStoreService {
             return Disposables.create()
         }
     }
+    
+    // [(collection, document)]
+    public func deleteDocuments(
+        collections: [(FireStoreCollection, String)]
+    ) -> Single<Void> {
+        let batch = self.database.batch()
+        collections.forEach { collection, document in
+            let document = self.database
+                .collection(collection.name)
+                .document(document)
+            batch.deleteDocument(document)
+        }
+        
+        return Single.create { single in
+            
+            batch.commit() { error in
+                if let error = error {
+                    single(.failure(error))
+                }
+                
+                single(.success(()))
+            }
+            
+            return Disposables.create()
+        }
+    }
 }
 
 // MARK: - Observe

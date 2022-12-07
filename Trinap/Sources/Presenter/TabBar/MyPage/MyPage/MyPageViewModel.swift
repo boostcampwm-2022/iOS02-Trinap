@@ -18,20 +18,40 @@ final class MyPageViewModel: ViewModelType {
     var disposeBag = DisposeBag()
     
     private let fetchUserUseCase: FetchUserUseCase
+    private let signOutUseCase: SignOutUseCase
+    weak var coordinator: MyPageCoordinator?
     
     struct Input {
         let viewWillAppear: Observable<Bool>
+        let cellDidSelect: Observable<MyPageCellType>
     }
     
     struct Output {
         let dataSource: Driver<[MyPageDataSource]>
     }
     
-    init(fetchUserUseCase: FetchUserUseCase) {
+    init(
+        fetchUserUseCase: FetchUserUseCase,
+        signOutUseCase: SignOutUseCase,
+        coordinator: MyPageCoordinator?
+    ) {
         self.fetchUserUseCase = fetchUserUseCase
+        self.signOutUseCase = signOutUseCase
+        self.coordinator = coordinator
     }
     
     func transform(input: Input) -> Output {
+        input.cellDidSelect
+            .withUnretained(self)
+            .subscribe(onNext: { owner, type in
+                switch type {
+                case .signOut:
+                    owner.coordinator?.showSignOutAlert(completion: owner.signOut)
+                default:
+                    owner.coordinator?.showNextView(state: type)
+                }
+            })
+            .disposed(by: disposeBag)
         
         let dataSource = input.viewWillAppear
             .withUnretained(self)
@@ -95,7 +115,7 @@ extension MyPageViewModel {
             .contact,
             .version(version: version),
             .opensource,
-            .logout,
+            .signOut,
             .dropout
         ]
         
@@ -108,5 +128,16 @@ extension MyPageViewModel {
             return nil
         }
         return version
+    }
+    
+    private func signOut() {
+        return self.signOutUseCase.signOut()
+            .withUnretained(self)
+            .subscribe(onNext: { owner, isSignOut in
+                if isSignOut {
+                    owner.coordinator?.finish()
+                }
+            })
+            .disposed(by: disposeBag)
     }
 }

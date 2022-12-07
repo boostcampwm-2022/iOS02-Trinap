@@ -8,14 +8,13 @@
 
 import UIKit
 
+import RxGesture
+import RxSwift
 import SnapKit
 
 final class ReservationUserView: BaseView {
     
-    enum UserType: String {
-        case photographer = "작가님"
-        case customer = "고객님"
-    }
+    typealias UserType = Reservation.UserType
     
     // MARK: - UI
     private lazy var userTypeLabel = UILabel().than {
@@ -34,6 +33,13 @@ final class ReservationUserView: BaseView {
     
     // MARK: - Properties
     private let userType: UserType
+    
+    var tap: Observable<Void> {
+        return self.rx.tapGesture()
+            .when(.recognized)
+            .asObservable()
+            .map { _ in return }
+    }
     
     // MARK: - Initializers
     init(userType: UserType) {

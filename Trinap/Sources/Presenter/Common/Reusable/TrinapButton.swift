@@ -10,9 +10,13 @@ import UIKit
 
 import RxCocoa
 import RxSwift
+import SnapKit
 
 /// 자주 사용되는 버튼에 대한 커스텀 버튼입니다.
 final class TrinapButton: UIButton {
+    
+    // MARK: - UI
+    private lazy var indicator = UIActivityIndicatorView()
     
     // MARK: - Properties
     var cornerRadius: CGFloat {
@@ -68,6 +72,24 @@ final class TrinapButton: UIButton {
             let cornerRadius = self.frame.height / 2
             self.layer.cornerRadius = cornerRadius
         }
+    }
+    
+    func startIndicator() {
+        indicator.backgroundColor = colorSet.fillColor
+        indicator.layer.borderColor = colorSet.borderColor.cgColor
+        indicator.color = colorSet.textColor
+        
+        self.addSubview(indicator)
+        indicator.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
+        indicator.startAnimating()
+    }
+    
+    func stopIndicator() {
+        indicator.stopAnimating()
+        indicator.removeFromSuperview()
     }
 }
 

@@ -17,8 +17,11 @@ final class DefaultPhotographerRepository: PhotographerRepository {
     private let fireStoreService: FireStoreService
     private let tokenManager: TokenManager
     
-    init(tokenManager: TokenManager = KeychainTokenManager()) {
-        self.fireStoreService = DefaultFireStoreService()
+    init(
+        firestoreService: FireStoreService = DefaultFireStoreService(),
+        tokenManager: TokenManager = KeychainTokenManager()
+    ) {
+        self.fireStoreService = firestoreService
         self.tokenManager = tokenManager
     }
     
@@ -67,7 +70,7 @@ final class DefaultPhotographerRepository: PhotographerRepository {
     }
     
     func fetchDetailPhotographer() -> Observable<Photographer> {
-        guard let userId = tokenManager.getToken(with: .userId) else {
+        guard let userId = self.tokenManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
         }
         

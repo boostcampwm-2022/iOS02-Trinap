@@ -24,7 +24,7 @@ final class FetchReviewUseCaseTests: XCTestCase {
     
     override func setUpWithError() throws {
         self.fetchReviewUseCase = DefaultFetchReviewUseCase(
-            reviewRepositry: MockReviewRepository(),
+            reviewRepositry: MockReviewRepository(tokenManager: KeychainTokenManager()),
             userRepository: MockUserRepository(),
             photographerRepository: DefaultPhotographerRepository()
         )
@@ -54,7 +54,7 @@ final class FetchReviewUseCaseTests: XCTestCase {
             ])
             .withUnretained(self)
             .flatMap { onwer, id in
-                return onwer.fetchReviewUseCase.fetchReviews(photographerId: id)
+                return onwer.fetchReviewUseCase.fetchReviews(photographerUserId: id)
                     .map { _ in true }
                     .catchAndReturn(false)
             }

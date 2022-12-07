@@ -73,6 +73,8 @@ final class InformationStackView: BaseView {
     }
     
     func configureInformations(_ informations: [Information]) {
+        removeInformations()
+        
         informations.forEach { information in
             self.addInformation(information)
         }
@@ -113,6 +115,16 @@ private extension InformationStackView {
             $0.textColor = TrinapAsset.black.color
             $0.font = TrinapFontFamily.Pretendard.regular.font(size: 16)
             $0.textAlignment = self.descriptionAlignment.nsTextAlignment
+        }
+    }
+    
+    func removeInformations() {
+        for keyLabel in keyStackView.subviews {
+            keyLabel.removeFromSuperview()
+        }
+        
+        for valueLabel in valueStackView.subviews {
+            valueLabel.removeFromSuperview()
         }
     }
 }
