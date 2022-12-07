@@ -53,6 +53,8 @@ private extension DefaultFetchReservationUseCase {
                 reservationStartDate: mapper.reservationStartDate,
                 reservationEndDate: mapper.reservationEndDate,
                 location: location,
+                latitude: mapper.latitude,
+                longitude: mapper.longitude,
                 status: mapper.status
             )
         }

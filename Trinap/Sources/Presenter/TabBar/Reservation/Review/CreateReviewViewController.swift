@@ -40,6 +40,7 @@ final class CreateReviewViewController: BaseViewController {
     private lazy var ratingView = RatingView(style: .create).than {
         $0.layer.cornerRadius = 8
         $0.layer.masksToBounds = true
+        $0.backgroundColor = TrinapAsset.background.color
     }
     
     private lazy var reviewTextView = UITextView().than {
@@ -53,7 +54,7 @@ final class CreateReviewViewController: BaseViewController {
         $0.textContainerInset = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
     }
     
-    private lazy var submitButton = TrinapButton(style: .disabled).than {
+    private lazy var submitButton = TrinapButton(style: .primary).than {
         $0.setTitle("작성 완료", for: .normal)
         $0.isEnabled = false
     }
@@ -89,7 +90,7 @@ final class CreateReviewViewController: BaseViewController {
             make.leading.equalToSuperview().offset(offset * 2)
             make.trailing.equalToSuperview().offset(-(offset * 2))
             make.top.equalTo(ratingLabel.snp.bottom).offset(offset)
-            make.height.equalTo(90)
+            make.height.equalTo(88)
         }
         
         reviewLabel.snp.makeConstraints { make in
@@ -112,6 +113,12 @@ final class CreateReviewViewController: BaseViewController {
     }
     
     override func configureAttributes() {
+        [titleLabel, ratingLabel, ratingView, reviewLabel, reviewTextView, submitButton]
+            .forEach {
+                $0.followKeyboardObserver()
+                .disposed(by: disposeBag)
+            }
+        
         self.hideKeyboardWhenTapped()
     }
     

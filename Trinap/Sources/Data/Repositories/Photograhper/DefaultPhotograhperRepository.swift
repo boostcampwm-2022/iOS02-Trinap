@@ -17,8 +17,11 @@ final class DefaultPhotographerRepository: PhotographerRepository {
     private let fireStoreService: FireStoreService
     private let tokenManager: TokenManager
     
-    init(tokenManager: TokenManager = KeychainTokenManager()) {
-        self.fireStoreService = DefaultFireStoreService()
+    init(
+        firestoreService: FireStoreService = DefaultFireStoreService(),
+        tokenManager: TokenManager = KeychainTokenManager()
+    ) {
+        self.fireStoreService = firestoreService
         self.tokenManager = tokenManager
     }
     

@@ -160,7 +160,7 @@ private extension MyPageDependencyContainter {
     
     func makeFetchReviewUseCase() -> FetchReviewUseCase {
         return DefaultFetchReviewUseCase(
-            reviewRepositry: reviewRepository,
+            reviewRepository: reviewRepository,
             userRepository: userRepository,
             photographerRepository: photographerRepository
         )

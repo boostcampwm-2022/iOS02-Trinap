@@ -52,6 +52,7 @@ final class DefaultReviewRepository: ReviewRepository {
             reviewId: reviewId,
             contents: contents,
             status: "activate",
+            createdAt: Date().toString(type: .timeStamp),
             rating: rating
         )
         
