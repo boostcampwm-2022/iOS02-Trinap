@@ -12,6 +12,7 @@ final class MainDependencyContainer {
     
     // MARK: Properties
     let firestoreService: FireStoreService
+    let tokenManager: TokenManager
     let photographerRepository: PhotographerRepository
     let mapRepository: MapRepository
     let reviewRepository: ReviewRepository
@@ -26,6 +27,7 @@ final class MainDependencyContainer {
     // MARK: Initializers
     init(mainCoordinator: MainCoordinator?) {
         self.firestoreService = DefaultFireStoreService()
+        self.tokenManager = KeychainTokenManager()
         self.mainCoordinator = mainCoordinator
         self.photographerRepository = DefaultPhotographerRepository()
         self.mapRepository = DefaultMapRepository()
@@ -64,66 +66,4 @@ final class MainDependencyContainer {
         return DefaultFetchCurrentLocationUseCase(mapRepository: mapRepository)
     }
     
-    // MARK: PhotographerDetail
-    func makePhotographerDetailViewController(
-        userId: String,
-        searchCoordinate: Coordinate
-    ) -> PhotographerDetailViewController {
-        let viewModel = makePhotographerDetailViewModel(
-            userId: userId,
-            searchCoordinate: searchCoordinate
-        )
-        return PhotographerDetailViewController(viewModel: viewModel)
-    }
-    
-    private func makePhotographerDetailViewModel(
-        userId: String,
-        searchCoordinate: Coordinate
-    ) -> PhotographerDetailViewModel {
-        return PhotographerDetailViewModel(
-            fetchUserUseCase: makeFetchUserUseCase(),
-            fetchPhotographerUseCase: makeFetchPhotographerUseCase(),
-            fetchReviewUseCase: makeFetchReviewUseCase(),
-            createReservationUseCase: makeCreateReservationUseCase(),
-            createBlockUseCase: makeCreateBlockUseCase(),
-            createChatroomUseCase: makeCreateChatRoomUseCase(),
-            sendFirstChatUseCase: makeSendFirstChatUseCase(),
-            mapRepository: mapRepository,
-            userId: userId,
-            searchCoordinate: searchCoordinate,
-            coordinator: mainCoordinator
-        )
-    }
-    
-    private func makeFetchUserUseCase() -> FetchUserUseCase {
-        return DefaultFetchUserUseCase(userRepository: userRepository)
-    }
-    
-    private func makeFetchPhotographerUseCase() -> FetchPhotographerUseCase {
-        return DefaultFetchPhotographerUseCase(photographerRespository: photographerRepository)
-    }
-    
-    private func makeFetchReviewUseCase() -> FetchReviewUseCase {
-        return DefaultFetchReviewUseCase(
-            reviewRepository: reviewRepository,
-            userRepository: userRepository,
-            photographerRepository: photographerRepository
-        )
-    }
-    
-    private func makeCreateReservationUseCase() -> CreateReservationUseCase {
-        return DefaultCreateReservationUseCase(reservationRepository: reservationRepository)
-    }
-    
-    private func makeCreateBlockUseCase() -> CreateBlockUseCase {
-        return DefaultCreateBlockUseCase(blockRepository: blockRepository)
-    }
-    
-    private func makeCreateChatRoomUseCase() -> CreateChatroomUseCase {
-        return DefaultCreateChatroomUseCase(chatroomRepository: chatroomRepository)
-    }
-    
-    private func makeSendFirstChatUseCase() -> SendFirstChatUseCase {
-        return DefaultSendFirstChatUseCase(chatRepository: chatRepository)
-    }
 }

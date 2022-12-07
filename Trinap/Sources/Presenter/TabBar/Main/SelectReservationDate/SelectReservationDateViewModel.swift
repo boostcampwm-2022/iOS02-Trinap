@@ -37,7 +37,7 @@ final class SelectReservationDateViewModel: ViewModelType {
     let disposeBag = DisposeBag()
     private let selectedStartDate = BehaviorRelay<ReservationDate?>(value: nil)
     private let selectedEndDate = BehaviorRelay<ReservationDate?>(value: nil)
-    weak var coordinator: MainCoordinator?
+    weak var coordinator: PhotographerDetailCoordinator?
     weak var delegate: SelectReservationDateViewModelDelegate?
     private let createReservationDateUseCase: CreateReservationDateUseCase
     private let possibleDate: BehaviorRelay<[Date]>
@@ -45,7 +45,7 @@ final class SelectReservationDateViewModel: ViewModelType {
     // MARK: - Initializers
     init(
         createReservationDateUseCase: CreateReservationDateUseCase,
-        coordinator: MainCoordinator,
+        coordinator: PhotographerDetailCoordinator,
         with possibleDate: [Date]
     ) {
         self.createReservationDateUseCase = createReservationDateUseCase
@@ -68,16 +68,6 @@ final class SelectReservationDateViewModel: ViewModelType {
                 owner.delegate?.selectedReservationDate(startDate: startDate, endDate: endDate)
                 return true
             }
-        //            .subscribe(onNext: { owner, _ in
-        //                guard
-        //                    let startDate = owner.selectedStartDate.value?.date,
-        //                    let endDate = owner.selectedEndDate.value?.date
-        //                else {
-        //                    return
-        //                }
-        //                owner.delegate?.selectedReservationDate(startDate: startDate, endDate: endDate)
-        //            })
-        //            .disposed(by: disposeBag)
         
         input.deselectedDate
             .withUnretained(self)

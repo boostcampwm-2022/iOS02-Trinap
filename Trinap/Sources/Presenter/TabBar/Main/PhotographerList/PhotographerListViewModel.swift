@@ -89,6 +89,6 @@ extension PhotographerListViewModel {
     
     func showDetailPhotographer(userId: String) {
         guard let coordinate = coordinate.value else { return }
-        coordinator?.showDetailPhotographerViewController(userId: userId, searchCoordinate: coordinate)
+        coordinator?.connectDetailPhotographerFlow(userId: userId, searchCoordinate: coordinate)
     }
 }

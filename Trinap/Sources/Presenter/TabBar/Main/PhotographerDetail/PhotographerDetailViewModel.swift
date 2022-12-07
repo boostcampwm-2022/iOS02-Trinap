@@ -45,7 +45,7 @@ final class PhotographerDetailViewModel: ViewModelType {
     //TODO: 델리게이트로 넘어오는 값 여기에 넣기
     private var reservationDate = BehaviorRelay<[Date]>(value: [])
     
-    private weak var coordiantor: MainCoordinator?
+    private weak var coordiantor: PhotographerDetailCoordinator?
     
     // MARK: - Initializer
     init(
@@ -59,7 +59,7 @@ final class PhotographerDetailViewModel: ViewModelType {
         mapRepository: MapRepository,
         userId: String,
         searchCoordinate: Coordinate,
-        coordinator: MainCoordinator?
+        coordinator: PhotographerDetailCoordinator?
     ) {
         self.fetchUserUseCase = fetchUserUseCase
         self.fetchPhotographerUseCase = fetchPhotographerUseCase
@@ -152,8 +152,7 @@ final class PhotographerDetailViewModel: ViewModelType {
             .withUnretained(self)
             .subscribe(onNext: { owner, value in
                 let photographerUser = value.1
-//                owner.coordiantor?.showSelectReservationDateViewController(with: photographerUser.possibleDate, detailViewModel: self)
-                owner.coordiantor?.showSelectReservationDateViewController(with: [Date()], detailViewModel: self)
+                owner.coordiantor?.showSelectReservationDateViewController(with: photographerUser.possibleDate, detailViewModel: self)
             })
             .disposed(by: disposeBag)
         
@@ -203,6 +202,14 @@ final class PhotographerDetailViewModel: ViewModelType {
             alert.showAlert(navigationController: self?.coordiantor?.navigationController)
             return Disposables.create()
         }
+    }
+    
+    func showDetailImage(urlString: String?) {
+        coordiantor?.showDetailImageView(urlString: urlString)
+    }
+    
+    func showSueController() {
+        coordiantor?.showSueController(suedUserId: self.userId)
     }
 }
 
