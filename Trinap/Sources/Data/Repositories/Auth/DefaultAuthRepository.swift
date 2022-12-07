@@ -204,8 +204,6 @@ final class DefaultAuthRepository: AuthRepository {
         let endpoint = TokenEndpoint.revoke(refreshToken: token)
         
         return self.networkService.request(endpoint)
-            .map { _ -> Void in
-                return ()
-            }
+            .map { _ in }
     }
 }
