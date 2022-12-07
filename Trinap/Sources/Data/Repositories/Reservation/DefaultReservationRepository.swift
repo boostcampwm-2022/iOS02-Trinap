@@ -81,7 +81,7 @@ final class DefaultReservationRepository: ReservationRepository {
         startDate: Date,
         endDate: Date,
         coordinate: Coordinate
-    ) -> Observable<Void> {
+    ) -> Observable<String> {
         guard let userId = keychainManager.getToken(with: .userId) else {
             return .error(LocalError.tokenError)
         }
@@ -106,6 +106,7 @@ final class DefaultReservationRepository: ReservationRepository {
             values: values
         )
         .asObservable()
+        .map { dto.reservationId }
     }
     
     func fetchReservation(reservationId: String) -> Observable<Reservation.Mapper> {

@@ -18,6 +18,8 @@ final class MainDependencyContainer {
     let userRepository: UserRepository
     let reservationRepository: ReservationRepository
     let blockRepository: BlockRepository
+    let chatroomRepository: ChatroomRepository
+    let chatRepository: ChatRepository
     
     weak var mainCoordinator: MainCoordinator?
     
@@ -31,6 +33,8 @@ final class MainDependencyContainer {
         self.userRepository = DefaultUserRepository()
         self.reservationRepository = DefaultReservationRepository(firebaseStoreService: firestoreService)
         self.blockRepository = DefaultBlockRepository(fireStoreService: firestoreService, keychainManager: KeychainTokenManager())
+        self.chatroomRepository = DefaultChatroomRepository(firebaseStoreService: firestoreService)
+        self.chatRepository = DefaultChatRepository(firestoreService: firestoreService)
     }
     
     // MARK: PhotographerPreviewList
@@ -82,6 +86,8 @@ final class MainDependencyContainer {
             fetchReviewUseCase: makeFetchReviewUseCase(),
             createReservationUseCase: makeCreateReservationUseCase(),
             createBlockUseCase: makeCreateBlockUseCase(),
+            createChatroomUseCase: makeCreateChatRoomUseCase(),
+            sendFirstChatUseCase: makeSendFirstChatUseCase(),
             mapRepository: mapRepository,
             userId: userId,
             searchCoordinate: searchCoordinate,
@@ -111,5 +117,13 @@ final class MainDependencyContainer {
     
     private func makeCreateBlockUseCase() -> CreateBlockUseCase {
         return DefaultCreateBlockUseCase(blockRepository: blockRepository)
+    }
+    
+    private func makeCreateChatRoomUseCase() -> CreateChatroomUseCase {
+        return DefaultCreateChatroomUseCase(chatroomRepository: chatroomRepository)
+    }
+    
+    private func makeSendFirstChatUseCase() -> SendFirstChatUseCase {
+        return DefaultSendFirstChatUseCase(chatRepository: chatRepository)
     }
 }

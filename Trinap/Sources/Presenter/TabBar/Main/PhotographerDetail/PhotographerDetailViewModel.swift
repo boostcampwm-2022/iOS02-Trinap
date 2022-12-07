@@ -34,6 +34,8 @@ final class PhotographerDetailViewModel: ViewModelType {
     private let fetchReviewUseCase: FetchReviewUseCase
     private let createReservationUseCase: CreateReservationUseCase
     private let createBlockUseCase: CreateBlockUseCase
+    private let createChatroomUseCase: CreateChatroomUseCase
+    private let sendFirstChatUseCase: SendFirstChatUseCase
     private let mapRepository: MapRepository
     
     private let reloadTrigger = BehaviorSubject<Void>(value: ())
@@ -52,6 +54,8 @@ final class PhotographerDetailViewModel: ViewModelType {
         fetchReviewUseCase: FetchReviewUseCase,
         createReservationUseCase: CreateReservationUseCase,
         createBlockUseCase: CreateBlockUseCase,
+        createChatroomUseCase: CreateChatroomUseCase,
+        sendFirstChatUseCase: SendFirstChatUseCase,
         mapRepository: MapRepository,
         userId: String,
         searchCoordinate: Coordinate,
@@ -63,6 +67,8 @@ final class PhotographerDetailViewModel: ViewModelType {
         self.createReservationUseCase = createReservationUseCase
         self.createBlockUseCase = createBlockUseCase
         self.mapRepository = mapRepository
+        self.createChatroomUseCase = createChatroomUseCase
+        self.sendFirstChatUseCase = sendFirstChatUseCase
         self.coordiantor = coordinator
         self.searchCoordinate = searchCoordinate
         self.userId = userId
@@ -97,20 +103,28 @@ final class PhotographerDetailViewModel: ViewModelType {
                 return date.count == 2
             }
         
-        //TODO: 같은 일자면 못 보내도록 서버에서 받아와서 확인하고 처리
-        Observable
-            .combineLatest(input.confirmTrigger, self.reservationDate.asObservable())
-            .map { _, dates -> [Date] in
-                dates
-            }
-            .distinctUntilChanged()
+        // 1. 얼럿 띄워주기
+        // 2. 얼럿에서 false 나오면 종료. true 나오면 계속.
+        // 3. reservation만들어주기
+        // 4. 채팅방 만들기
+        // 5. 채팅 보내기
+        // 6. 채팅방으로 이동하는 coordinator 함수 실행
+        // TODO: chatroom 중복되는 부분 있으면 만들지 않고 해당 chatroomId만 반환하도록 createChatroomUseCase 수정
+        // TODO: 채팅방으로 이동하는 coordinator 함수 만들어서 연결
+        input.confirmTrigger
             .withUnretained(self)
-            .flatMap { owner, dates -> Observable<Void> in
+            .flatMap { $0.0.showAlert() }
+            .filter { $0 }
+            .distinctUntilChanged()
+            .withLatestFrom(reservationDate.asObservable())
+            .withUnretained(self)
+            .flatMap { owner, dates -> Observable<String> in
+                Logger.print(111)
                 guard
                     let start = dates[safe: 0],
                     let end = dates[safe: 1]
-                else { return Observable.just(()) }
-              
+                else { return Observable.just("") }
+                
                 return owner.createReservationUseCase.create(
                     photographerUserId: owner.userId,
                     startDate: start,
@@ -118,9 +132,51 @@ final class PhotographerDetailViewModel: ViewModelType {
                     coordinate: owner.searchCoordinate
                 )
             }
-            //TODO: 채팅 전달
+            .withUnretained(self)
+            .flatMap { owner, reservationId -> Observable<(String, String)> in
+                Logger.print(222)
+                return owner.createChatroomUseCase.create(photographerUserId: owner.userId)
+                    .map { ($0, reservationId) }
+            }
+            .withUnretained(self)
+            .flatMap { owner, value in
+                Logger.print(333)
+                let (chatroomId, reservationId) = value
+                return owner.sendFirstChatUseCase.send(chatroomId: chatroomId, reservationId: reservationId)
+            }
             .subscribe()
             .disposed(by: disposeBag)
+        
+//        //TODO: 같은 일자면 못 보내도록 서버에서 받아와서 확인하고 처리
+//        Observable
+//            .combineLatest(input.confirmTrigger, self.reservationDate.asObservable())
+//            .map { _, dates -> [Date] in
+//                dates
+//            }
+//        //어떤 값 누르는지에 따라 바뀌게
+//            .flatMap { dates in
+//                showAlert(), dates
+//            }
+//            .filter { $0 }
+//            .distinctUntilChanged()
+//            .withUnretained(self)
+//            .flatMap { owner, dates -> Observable<Void> in
+//                guard
+//                    let start = dates[safe: 0],
+//                    let end = dates[safe: 1]
+//                else { return Observable.just(()) }
+//
+//                return owner.createReservationUseCase.create(
+//                    photographerUserId: owner.userId,
+//                    startDate: start,
+//                    endDate: end,
+//                    coordinate: owner.searchCoordinate
+//                )
+//            }
+////            .do(onNext: { self.showAlert()})
+//            //TODO: 채팅 전달
+//            .subscribe()
+//            .disposed(by: disposeBag)
                 
         Observable.combineLatest(input.calendarTrigger, photographer)
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
@@ -147,6 +203,37 @@ final class PhotographerDetailViewModel: ViewModelType {
             resevationDates: reservationDates,
             dataSource: dataSource.asDriver(onErrorJustReturn: [])
         )
+    }
+    
+    private func showAlert() -> Observable<Bool> {
+        return Observable.create { [weak self] observable in
+            guard
+                let dates = self?.reservationDate.value,
+                let startDate = dates[safe: 0],
+                let endDate = dates[safe: 1]
+            else {
+                observable.onNext(false)
+                return Disposables.create()
+            }
+            
+            let alert = TrinapAlert(
+                title: "예약을 확인해주세요",
+                timeText: self?.formattingCalendarButtonText(
+                    startDate: startDate,
+                    endDate: endDate
+                ),
+                subtitle: "선택한 날짜로 예약 신청하시겠어요?"
+            )
+            alert.addAction(title: "확인", style: .primary) {
+                observable.onNext(true)
+            }
+            alert.addAction(title: "취소", style: .disabled) {
+                Logger.print("취소")
+                observable.onNext(false)
+            }
+            alert.showAlert(navigationController: self?.coordiantor?.navigationController)
+            return Disposables.create()
+        }
     }
 }
 
@@ -249,4 +336,39 @@ extension PhotographerDetailViewModel {
     func reportPhotographer() {
         
     }
+}
+
+
+extension PhotographerDetailViewModel {
+    private func formattingCalendarButtonText(startDate: Date, endDate: Date) -> String? {
+        let startSeperated = startDate.toString(type: .yearToSecond).components(separatedBy: " ")
+        let endSeperated = endDate.toString(type: .yearToSecond).components(separatedBy: " ")
+        
+        guard let date = startSeperated[safe: 0] else { return nil }
+        let dateSeperated = date.components(separatedBy: "-")
+        guard
+            let month = dateSeperated[safe: 1],
+            let day = dateSeperated[safe: 2]
+        else { return nil }
+        
+        guard
+            let startTime = startSeperated.last,
+            let endTime = endSeperated.last
+        else { return nil }
+        let startHourToSec = startTime.components(separatedBy: ":")
+        let endHourToSec = endTime.components(separatedBy: ":")
+        guard
+            let startHour = startHourToSec[safe: 0],
+            let startMin = startHourToSec[safe: 1],
+            let endHour = endHourToSec[safe: 0],
+            let endMin = endHourToSec[safe: 1]
+        else { return nil }
+
+        let reservationDate = "\(month)/\(day)"
+        let reservationStart = "\(startHour):\(startMin)"
+        let reservationEnd = "\(endHour):\(endMin)"
+        let dateInfo = "\(reservationDate) \(reservationStart)-\(reservationEnd)\n"
+        return dateInfo
+    }
+
 }

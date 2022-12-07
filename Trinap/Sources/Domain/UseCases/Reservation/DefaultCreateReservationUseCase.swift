@@ -26,7 +26,7 @@ final class DefaultCreateReservationUseCase: CreateReservationUseCase {
         startDate: Date,
         endDate: Date,
         coordinate: Coordinate
-    ) -> Observable<Void> {
+    ) -> Observable<String> {
         
         reservationRepository.create(
             photographerUserId: photographerUserId,
