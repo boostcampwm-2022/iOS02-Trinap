@@ -23,4 +23,6 @@ protocol AuthRepository {
     func signOut() -> Single<Void>
     func dropOut() -> Single<Void>
     func removeUserInfo(photographerId: String) -> Single<Void>
+    func fetchRefreshToken(with authorizationCode: String) -> Observable<Void>
+    func revokeToken() -> Observable<Void>
 }

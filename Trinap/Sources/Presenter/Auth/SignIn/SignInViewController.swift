@@ -35,7 +35,7 @@ final class SignInViewController: BaseViewController {
     // MARK: - Properties
     private var currentNonce: String?
     private let viewModel: SignInViewModel
-    private let credentialSub = PublishSubject<OAuthCredential>()
+    private let credentialSub = PublishSubject<(OAuthCredential, String)>()
     
     // MARK: - Initializers
     init(viewModel: SignInViewModel) {
@@ -66,9 +66,7 @@ final class SignInViewController: BaseViewController {
             make.top.equalTo(logoImageView.snp.centerY).multipliedBy(1.9)
         }
     }
-    
-    //    override func configureAttributes() { }
-    
+        
     override func bind() {
         let input = SignInViewModel.Input(
             signInButtonTap: appleSignInButton.rx.tap.asObservable(),
@@ -102,8 +100,15 @@ extension SignInViewController: ASAuthorizationControllerDelegate {
                 return
             }
             
+            guard let authorizationCode = appleIDCredential.authorizationCode,
+                  let codeString = String(data: authorizationCode, encoding: .utf8)
+            else {
+                Logger.print("Unable to serialize token string from authorizationCode")
+                return
+            }
+            
             let credential = OAuthProvider.credential(withProviderID: "apple.com", idToken: idTokenString, rawNonce: nonce)
-            credentialSub.onNext(credential)
+            credentialSub.onNext((credential, codeString))
         }
     }
 }

@@ -14,7 +14,7 @@ import FirebaseAuth
 protocol SignInUseCase {
     
     // MARK: - Methods
-    func signIn(with credential: OAuthCredential) -> Observable<SignInResult>
+    func signIn(with credential: (OAuthCredential, String)) -> Observable<SignInResult>
     func autoSignIn() -> Observable<Bool>
     func updateFcmToken() -> Observable<Void>
 }
