@@ -14,9 +14,7 @@ import SnapKit
 
 final class CreateContactViewController: BaseViewController {
     
-    // MARK: - Properties
-    private let viewModel: CreateContactViewModel
-    
+    // MARK: - UI
     private lazy var titleTextField = UITextField().than {
         $0.layer.cornerRadius = 8
         $0.layer.borderColor = TrinapAsset.subtext2.color.cgColor
@@ -31,8 +29,8 @@ final class CreateContactViewController: BaseViewController {
     }
     
     private lazy var contentsTextView = UITextView().than {
-        
         let offset = trinapOffset * 1.5
+        
         $0.textContainerInset = UIEdgeInsets(top: offset, left: offset, bottom: offset, right: offset)
         $0.layer.cornerRadius = 8
         $0.layer.borderColor = TrinapAsset.subtext2.color.cgColor
@@ -50,6 +48,9 @@ final class CreateContactViewController: BaseViewController {
         $0.style = .disabled
         $0.isEnabled = false
     }
+    
+    // MARK: - Properties
+    private let viewModel: CreateContactViewModel
     
     // MARK: - Initializers
     init(viewModel: CreateContactViewModel) {

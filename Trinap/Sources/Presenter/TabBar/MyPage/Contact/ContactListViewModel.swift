@@ -44,7 +44,11 @@ final class ContactListViewModel: ViewModelType {
             })
             .disposed(by: disposeBag)
         
-        let dataSource = self.fetchContactUsUseCase.fetchContacts()
+        let dataSource = input.viewWillAppear
+            .withUnretained(self)
+            .flatMap { owner, _ in
+                owner.fetchContactUsUseCase.fetchContacts()
+            }
         
         return Output(dataSource: dataSource.asDriver(onErrorJustReturn: []))
     }

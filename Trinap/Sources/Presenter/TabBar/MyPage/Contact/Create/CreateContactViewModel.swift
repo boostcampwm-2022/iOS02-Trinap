@@ -43,18 +43,20 @@ final class CreateContactViewModel: ViewModelType {
     // MARK: - Methods
     func transform(input: Input) -> Output {
         
-        let parameter = Observable.combineLatest(input.title, input.contents)
+        let contactParameter = Observable.combineLatest(input.title, input.contents)
             .share()
         
-        let isValid = parameter
+        let isValid = contactParameter
             .map { title, contents in
                 false == title.isEmpty && false == contents.isEmpty
             }
         
         input.buttonTrigger
-            .withLatestFrom(parameter)
-            .flatMap { title, contents in
-                self.createContactUseCase.create(title: title, contents: contents)
+            .withLatestFrom(contactParameter)
+            .withUnretained(self)
+            .flatMap { owner, arguments in
+                let (title, contents) = arguments
+                return owner.createContactUseCase.create(title: title, contents: contents)
             }
             .subscribe { [weak self] _ in
                 self?.coordinator?.dismissViewController()

@@ -46,7 +46,7 @@ extension MyPageCoordinator {
             showAuthorizationSetting(state: state)
         case .profile:
             showEditProfileViewController()
-        case.contact:
+        case .contact:
             showContactListViewController()
         case .photographerDate:
             showEditPossibleDateViewController()
