@@ -48,6 +48,14 @@ final class DefaultBlockRepository: BlockRepository {
         )
     }
     
+    
+    func removeBlockUser(blockId: String) -> Single<Void> {
+        return firebase.deleteDocument(
+            collection: .blocks,
+            document: blockId
+        )
+    }
+    
     func fetchBlockedUser() -> Single<[Block]> {
         guard let userId = keychainManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)

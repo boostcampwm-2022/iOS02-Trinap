@@ -14,5 +14,6 @@ protocol BlockRepository {
     
     // MARK: Methods
     func blockUser(blockedUserId: String) -> Single<Void>
+    func removeBlockUser(blockId: String) -> Single<Void>
     func fetchBlockedUser() -> Single<[Block]>
 }
