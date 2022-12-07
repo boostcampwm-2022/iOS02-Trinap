@@ -58,6 +58,7 @@ final class ChatPreviewsViewController: BaseViewController {
             for: .default
         )
         self.navigationItem.titleView = LargeNavigationTitleView(title: "채팅")
+        self.navigationController?.setLeftArrowBackButton()
     }
     
     override func bind() {
