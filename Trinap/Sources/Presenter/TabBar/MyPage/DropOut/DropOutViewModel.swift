@@ -15,10 +15,10 @@ final class DropOutViewModel: ViewModelType {
     struct Input {
         let dropOutButtonTap: Observable<Void>
         let cancelButtonTap: Observable<Void>
+        let backButtonTap: Signal<Void>
     }
     
-    struct Output {
-    }
+    struct Output { }
     
     // MARK: - Properties
     weak var coordinator: MyPageCoordinator?
@@ -43,6 +43,7 @@ final class DropOutViewModel: ViewModelType {
                 owner.coordinator?.popViewController()
             })
             .disposed(by: disposeBag)
+        
         input.dropOutButtonTap
             .withUnretained(self)
             .flatMap { owner, _ in
@@ -57,6 +58,13 @@ final class DropOutViewModel: ViewModelType {
                 }
             })
             .disposed(by: disposeBag)
+        
+        input.backButtonTap
+            .emit(onNext: { [weak self] _ in
+                self?.coordinator?.popViewController()
+            })
+            .disposed(by: disposeBag)
+        
         return Output()
     }
 }

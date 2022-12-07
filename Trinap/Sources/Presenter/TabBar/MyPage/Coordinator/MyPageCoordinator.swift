@@ -104,7 +104,8 @@ extension MyPageCoordinator {
     
     func showDropOutViewController() {
         let viewController = dependencies.makeDropOutViewController()
-        self.navigationController.pushViewControllerHideBottomBar(rootViewController: viewController, animated: true)
+        viewController.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(viewController, animated: true)
     }
     
     func showSignOutAlert(completion: @escaping () -> Void) {
