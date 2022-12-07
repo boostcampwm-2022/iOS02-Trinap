@@ -50,12 +50,6 @@ final class ChatDetailViewController: BaseViewController {
     }
     
     // MARK: - Methods
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        self.view.backgroundColor = TrinapAsset.white.color
-    }
-    
     override func configureHierarchy() {
         self.view.addSubview(chatInputView)
         self.view.addSubview(chatTableView)
@@ -69,17 +63,15 @@ final class ChatDetailViewController: BaseViewController {
         }
         
         chatTableView.snp.makeConstraints { make in
-            make.top.leading.trailing.equalToSuperview()
+            make.top.leading.trailing.equalTo(self.view.safeAreaLayoutGuide)
             make.bottom.equalTo(self.chatInputView.snp.top)
         }
     }
     
     override func configureAttributes() {
-        chatInputView.followKeyboardObserver()
-            .disposed(by: disposeBag)
-        
-        chatTableView.followKeyboardObserver()
-            .disposed(by: disposeBag)
+        self.view.backgroundColor = TrinapAsset.white.color
+        self.title = viewModel.nickname
+        self.navigationController?.setShadowImage()
         
         self.dataSource = self.configureDataSource()
         
@@ -87,6 +79,12 @@ final class ChatDetailViewController: BaseViewController {
     }
     
     override func bind() {
+        chatInputView.followKeyboardObserver()
+            .disposed(by: disposeBag)
+        
+        chatTableView.followKeyboardObserver()
+            .disposed(by: disposeBag)
+        
         let input = ChatDetailViewModel.Input(
             didSendWithContent: chatInputView.didTapSendWithText
         )

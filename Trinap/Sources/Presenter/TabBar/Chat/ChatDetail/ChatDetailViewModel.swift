@@ -23,6 +23,7 @@ final class ChatDetailViewModel: ViewModelType {
     }
     
     // MARK: - Properties
+    let nickname: String
     let disposeBag = DisposeBag()
     private var chats: [Chat] = []
     
@@ -37,6 +38,7 @@ final class ChatDetailViewModel: ViewModelType {
     init(
         coordinator: ChatCoordinator,
         chatroomId: String,
+        nickname: String,
         observeChatUseCase: ObserveChatUseCase,
         sendChatUseCase: SendChatUseCase,
         uploadImageUseCase: UploadImageUseCase,
@@ -44,6 +46,7 @@ final class ChatDetailViewModel: ViewModelType {
     ) {
         self.coordinator = coordinator
         self.chatroomId = chatroomId
+        self.nickname = nickname
         self.observeChatUseCase = observeChatUseCase
         self.sendChatUseCase = sendChatUseCase
         self.uploadImageUseCase = uploadImageUseCase
