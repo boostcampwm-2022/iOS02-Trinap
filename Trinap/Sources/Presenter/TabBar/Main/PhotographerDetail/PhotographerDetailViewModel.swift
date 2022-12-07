@@ -142,9 +142,13 @@ final class PhotographerDetailViewModel: ViewModelType {
             .flatMap { owner, value in
                 Logger.print(333)
                 let (chatroomId, reservationId) = value
-                return owner.sendFirstChatUseCase.send(chatroomId: chatroomId, reservationId: reservationId)
+                return owner.sendFirstChatUseCase
+                    .send(chatroomId: chatroomId, reservationId: reservationId)
+                    .map { _ in return chatroomId }
             }
-            .subscribe()
+            .subscribe(onNext: { [weak self] chatroomId in
+                self?.coordiantor?.showChatDetailViewController(chatroomId: chatroomId, nickname: "이게 된다고?")
+            })
             .disposed(by: disposeBag)
         
 //        //TODO: 같은 일자면 못 보내도록 서버에서 받아와서 확인하고 처리
