@@ -21,7 +21,6 @@ final class PhotographerDetailCoordinator: Coordinator {
     private var userId: String?
     
     // MARK: Initializers
-    //TODO: 이거 가리려면 어떻게...?
     init(_ navigationController: UINavigationController) {
         self.navigationController = navigationController
         self.childCoordinators = []
@@ -93,5 +92,15 @@ final class PhotographerDetailCoordinator: Coordinator {
         Logger.print("sueController 만들어서 띄워주기")
         let viewController = dependencies.makeSueViewController(userId: suedUserId)
         self.navigationController.pushViewController(viewController, animated: false)
+    }
+    
+    func connectChatDetailCoordinator(chatroomId: String, photographerNickname: String) {
+        let chatDetailCoordinator = ChatDetailCoordinator(
+            self.navigationController,
+            chatroomId: chatroomId,
+            nickname: photographerNickname
+        )
+        chatDetailCoordinator.start()
+        self.childCoordinators.append(chatDetailCoordinator)
     }
 }
