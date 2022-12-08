@@ -40,7 +40,7 @@ final class EditProfileViewController: BaseViewController {
     private lazy var nickNameInputView = NicknameTextFieldView()
     
     // MARK: - Properties
-    private let imagePicker = ImagePickerController()
+    private lazy var imagePicker = ImagePickerController()
     private let viewModel: EditProfileViewModel
     
     // MARK: - Initialize
