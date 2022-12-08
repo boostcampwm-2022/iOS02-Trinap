@@ -11,11 +11,12 @@ import Foundation
 struct Photographer {
     
     // MARK: - Properties
-    let photographerId, photographerUserId, introduction: String
+    let photographerId, photographerUserId: String
+    let introduction: String?
     let latitude, longitude: Double
     let tags: [TagType]
     let pictures: [String]
-    let pricePerHalfHour: Int
+    let pricePerHalfHour: Int?
     var possibleDate: [Date]
     
     // MARK: - Methods
@@ -23,12 +24,12 @@ struct Photographer {
         return Photographer(
             photographerId: UUID().uuidString,
             photographerUserId: "",
-            introduction: "",
+            introduction: nil,
             latitude: 37.7,
             longitude: 127,
             tags: [],
             pictures: [],
-            pricePerHalfHour: 0,
+            pricePerHalfHour: nil,
             possibleDate: []
         )
     }

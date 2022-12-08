@@ -91,7 +91,7 @@ final class RegisterPhotographerInfoViewModel: ViewModelType {
                 }
             }
         
-        let introduction = photographer.map { $0.introduction }
+        let introduction = photographer.compactMap { $0.introduction }
         
         let paramters = Observable.combineLatest(self.coordinate, input.tags, price, input.introduction)
         
@@ -134,7 +134,7 @@ final class RegisterPhotographerInfoViewModel: ViewModelType {
             isValid: isValid,
             location: locationText.asObservable(),
             tagItems: tagItems,
-            price: photographer.map { $0.pricePerHalfHour },
+            price: photographer.compactMap { $0.pricePerHalfHour },
             introduction: introduction
         )
     }

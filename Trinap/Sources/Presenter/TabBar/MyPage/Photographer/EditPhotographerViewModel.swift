@@ -125,7 +125,6 @@ final class EditPhotographerViewModel: ViewModelType {
     }
     
     private func updatePortfolioImage(photographer: PhotographerUser, image: Data) -> Observable<Void> {
-        print(photographer, image)
         return self.editPortfolioPictureUseCase.add(
             photographerId: photographer.photographerId,
             currentPictures: photographer.pictures.compactMap { $0?.picture },
@@ -147,7 +146,13 @@ extension EditPhotographerViewModel {
                             using: Coordinate(lat: photographer.latitude, lng: photographer.longitude)
                         )
                         .map { location in
-                            PhotographerUser(user: user, photographer: photographer, location: location)
+                            var photographerUser = PhotographerUser(user: user, photographer: photographer, location: location)
+                            
+                            if !photographer.pictures.isEmpty {
+                                photographerUser.pictures.insert(nil, at: 0)
+                            }
+                            
+                            return photographerUser
                         }
                     }
             }
@@ -201,14 +206,24 @@ private extension EditPhotographerViewModel {
     }
     
     func mappingPictureDataSource(isEditable: Bool, photographer: PhotographerUser) -> PhotographerDataSource {
+        if photographer.pictures.isEmpty {
+            return [PhotographerSection.photo: []]
+        }
+        
         return [PhotographerSection.photo: updatePictureState(isEditable: isEditable, pictures: photographer.pictures).map { PhotographerSection.Item.photo($0) } ]
     }
     
     func mappingDetailDataSource(photographer: PhotographerUser) -> PhotographerDataSource {
+        guard photographer.introduction != nil else {
+            return [PhotographerSection.detail: []]
+        }
         return [PhotographerSection.detail: [PhotographerSection.Item.detail(photographer)]]
     }
     
     func mappingReviewDataSource(review: ReviewInformation) -> [PhotographerDataSource] {
+        if review.reviews.isEmpty {
+            return [[PhotographerSection.review: []]]
+        }
         return [ [.detail: [.summaryReview(review.summary)]] ] +
         [ [.review: review.reviews.map { PhotographerSection.Item.review($0) } ] ]
     }

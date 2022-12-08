@@ -39,6 +39,8 @@ final class EditPhotographerViewController: BaseViewController {
         collectionViewLayout: configureCollectionViewLayout(.picture)
     )
     
+    private lazy var defaultPhotographerView = DefaultEditPhotographerView()
+    
     private var dataSource: DataSource?
     
     // MARK: - Initializers
@@ -56,12 +58,20 @@ final class EditPhotographerViewController: BaseViewController {
     
     // MARK: - Configuration
     override func configureHierarchy() {
-        self.view.addSubview(collectionView)
+        self.view.addSubviews([collectionView, defaultPhotographerView])
     }
     
     override func configureConstraints() {
         collectionView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
+        }
+        
+        UIView.animate(withDuration: 1.5, delay: 1.0) {
+            self.defaultPhotographerView.snp.makeConstraints { make in
+                make.leading.trailing.equalToSuperview()
+                make.centerY.equalToSuperview()
+                make.height.equalTo(self.trinapOffset * 18)
+            }
         }
     }
     
@@ -81,6 +91,24 @@ final class EditPhotographerViewController: BaseViewController {
                     .compactMap { $0.jpegData(compressionQuality: 0.7) }
             }
             .share()
+        
+        defaultPhotographerView.applyButton.rx.tap
+            .withUnretained(self)
+            .map { owner, _ in
+                owner.defaultPhotographerView.type.rawValue
+            }
+            .withUnretained(self)
+            .subscribe(onNext: { owner, state in
+                switch state {
+                case 0:
+                    owner.portfolioUpdateTigger.onNext(())
+                case 1:
+                    owner.coordinator?.showUpdatePhotographerViewController()
+                default:
+                    return
+                }
+            })
+            .disposed(by: disposeBag)
         
         let input = EditPhotographerViewModel.Input(
             viewWillAppear: self.rx.viewWillAppear.asObservable(),
@@ -104,6 +132,9 @@ final class EditPhotographerViewController: BaseViewController {
                     self.isEditable.accept(false)
                 }
             })
+            .disposed(by: disposeBag)
+        self.tabState
+            .bind(to: defaultPhotographerView.rx.setState)
             .disposed(by: disposeBag)
         
         output.dataSource
@@ -164,6 +195,7 @@ final class EditPhotographerViewController: BaseViewController {
         configureDataSource()
         configureCollectionView()
         imagePicker.delegate = self
+        self.defaultPhotographerView.isHidden = true
     }
     
     private func configureNavigation() {
@@ -188,11 +220,14 @@ extension EditPhotographerViewController {
     
     private func generateSnapShot(_ data: [PhotographerDataSource]) -> Snapshot {
         var snapshot = Snapshot()
-        
         data.forEach { items in
             items.forEach { section, values in
-                snapshot.appendSections([section])
-                snapshot.appendItems(values, toSection: section)
+                if !values.isEmpty {
+                    snapshot.appendSections([section])
+                    snapshot.appendItems(values, toSection: section)
+                } else {
+                    self.defaultPhotographerView.isHidden = false
+                }
             }
         }
         
@@ -229,6 +264,7 @@ extension EditPhotographerViewController {
                     return UICollectionViewCell()
                 }
                 cell.configure(picture: picture)
+                self.defaultPhotographerView.isHidden = true
                 return cell
             case .detail(let information):
                 guard let cell = collectionView.dequeueCell(PhotographerDetailIntroductionCell.self, for: indexPath) else {
@@ -236,12 +272,14 @@ extension EditPhotographerViewController {
                 }
                 cell.configure(with: information)
                 cell.isUserInteractionEnabled = false
+                self.defaultPhotographerView.isHidden = true
                 return cell
             case .review(let review):
                 guard let cell = collectionView.dequeueCell(PhotographerReivewCell.self, for: indexPath) else {
                     return UICollectionViewCell()
                 }
                 cell.configure(with: review)
+                self.defaultPhotographerView.isHidden = true
                 cell.isUserInteractionEnabled = false
                 return cell
             case .summaryReview(let review):

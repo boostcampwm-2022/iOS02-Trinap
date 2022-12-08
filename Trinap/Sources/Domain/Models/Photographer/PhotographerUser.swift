@@ -11,11 +11,12 @@ import Foundation
 struct PhotographerUser: Hashable {
     let nickname: String
     let profileImage: URL?
-    let photographerId, photographerUserId, introduction: String
+    let photographerId, photographerUserId: String
+    let introduction: String?
     let latitude, longitude: Double
     let location: String
     let tags: [TagType]
-    let pricePerHalfHour: Int
+    let pricePerHalfHour: Int?
     let possibleDate: [Date]
     var pictures: [Picture?]
     
@@ -35,7 +36,7 @@ struct PhotographerUser: Hashable {
         self.tags = photographer.tags
         self.pricePerHalfHour = photographer.pricePerHalfHour
         self.possibleDate = photographer.possibleDate
-        self.pictures = [nil] + photographer.pictures.map { url in
+        self.pictures = photographer.pictures.map { url in
             Picture(isEditable: false, picture: url)
         }
     }

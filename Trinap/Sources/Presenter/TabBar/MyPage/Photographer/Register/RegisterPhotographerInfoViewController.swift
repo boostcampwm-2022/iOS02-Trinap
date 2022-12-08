@@ -274,20 +274,7 @@ extension RegisterPhotographerInfoViewController {
             .disposed(by: disposeBag)
     }
     
-    private func collectionViewBinding() {
-//        tagCollectionView.rx.willDisplayCell
-//            .subscribe(onNext: { cell, indexPath in
-//                guard let item = self.dataSource?.itemIdentifier(for: indexPath) else {
-//                    return
-//                }
-                
-//                if item.isSelected {
-//                    self.tagCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: .top)
-//                }
-//                cell.isSelected = item.isSelected
-//            })
-//            .disposed(by: disposeBag)
-        
+    private func collectionViewBinding() {        
         tagCollectionView.rx.itemSelected
             .withUnretained(self)
             .compactMap { owner, indexPath in

@@ -16,7 +16,7 @@ final class PhotographerDetailIntroductionCell: BaseCollectionViewCell {
     }
     
     private lazy var timeUnitLabel = UILabel().than {
-        $0.text = "1시간"
+        $0.text = "30분"
         $0.font = TrinapFontFamily.Pretendard.bold.font(size: 16)
     }
     
@@ -120,6 +120,6 @@ final class PhotographerDetailIntroductionCell: BaseCollectionViewCell {
     
     func configure(with information: PhotographerUser) {
         self.introduceLabel.text = information.introduction
-        self.priceLabel.text = "\(information.pricePerHalfHour)원"
+        self.priceLabel.text = "\(information.pricePerHalfHour ?? 0)원"
     }
 }
