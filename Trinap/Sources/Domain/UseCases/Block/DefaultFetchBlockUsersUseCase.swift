@@ -35,8 +35,8 @@ final class DefaultFetchBlockUsersUseCase: FetchBlockUsersUseCase {
             }
             .withUnretained(self)
             .flatMap { owner, blockedInfo -> Observable<[Block.BlockedUser]> in
-                let (blocks, bloeckedUserIds) = blockedInfo
-                return owner.userRepository.fetchUsers(userIds: bloeckedUserIds)
+                let (blocks, blockedUserIds) = blockedInfo
+                return owner.userRepository.fetchUsers(userIds: blockedUserIds)
                     .map { owner.makeBlockedUser(users: $0, blocks: blocks) }
             }
     }
@@ -44,15 +44,8 @@ final class DefaultFetchBlockUsersUseCase: FetchBlockUsersUseCase {
     private func makeBlockedUser(users: [User], blocks: [Block]) -> [Block.BlockedUser] {
         var blockedUsers: [Block.BlockedUser] = []
         for user in users {
-            for block in blocks {
-                if user.userId == block.blockedUserId {
-                    blockedUsers.append(
-                        Block.BlockedUser(
-                            blockId: block.blockId,
-                            blockedUser: user
-                        )
-                    )
-                }
+            for block in blocks where user.userId == block.blockedUserId {
+                blockedUsers.append(Block.BlockedUser(blockId: block.blockId, blockedUser: user))
             }
         }
         
