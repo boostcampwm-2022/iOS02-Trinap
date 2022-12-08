@@ -45,7 +45,7 @@ final class PhotographerDetailViewModel: ViewModelType {
     //TODO: 델리게이트로 넘어오는 값 여기에 넣기
     private var reservationDate = BehaviorRelay<[Date]>(value: [])
     
-    private weak var coordiantor: MainCoordinator?
+    private weak var coordiantor: PhotographerDetailCoordinator?
     
     // MARK: - Initializer
     init(
@@ -59,7 +59,7 @@ final class PhotographerDetailViewModel: ViewModelType {
         mapRepository: MapRepository,
         userId: String,
         searchCoordinate: Coordinate,
-        coordinator: MainCoordinator?
+        coordinator: PhotographerDetailCoordinator?
     ) {
         self.fetchUserUseCase = fetchUserUseCase
         self.fetchPhotographerUseCase = fetchPhotographerUseCase
@@ -150,45 +150,13 @@ final class PhotographerDetailViewModel: ViewModelType {
                 self?.coordiantor?.connectChatDetailCoordinator(chatroomId: chatroomId, nickname: "이게 된다고?")
             })
             .disposed(by: disposeBag)
-        
-//        //TODO: 같은 일자면 못 보내도록 서버에서 받아와서 확인하고 처리
-//        Observable
-//            .combineLatest(input.confirmTrigger, self.reservationDate.asObservable())
-//            .map { _, dates -> [Date] in
-//                dates
-//            }
-//        //어떤 값 누르는지에 따라 바뀌게
-//            .flatMap { dates in
-//                showAlert(), dates
-//            }
-//            .filter { $0 }
-//            .distinctUntilChanged()
-//            .withUnretained(self)
-//            .flatMap { owner, dates -> Observable<Void> in
-//                guard
-//                    let start = dates[safe: 0],
-//                    let end = dates[safe: 1]
-//                else { return Observable.just(()) }
-//
-//                return owner.createReservationUseCase.create(
-//                    photographerUserId: owner.userId,
-//                    startDate: start,
-//                    endDate: end,
-//                    coordinate: owner.searchCoordinate
-//                )
-//            }
-////            .do(onNext: { self.showAlert()})
-//            //TODO: 채팅 전달
-//            .subscribe()
-//            .disposed(by: disposeBag)
-                
+                        
         Observable.combineLatest(input.calendarTrigger, photographer)
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .withUnretained(self)
             .subscribe(onNext: { owner, value in
                 let photographerUser = value.1
-//                owner.coordiantor?.showSelectReservationDateViewController(with: photographerUser.possibleDate, detailViewModel: self)
-                owner.coordiantor?.showSelectReservationDateViewController(with: [Date()], detailViewModel: self)
+                owner.coordiantor?.showSelectReservationDateViewController(with: photographerUser.possibleDate, detailViewModel: self)
             })
             .disposed(by: disposeBag)
         
@@ -238,6 +206,14 @@ final class PhotographerDetailViewModel: ViewModelType {
             alert.showAlert(navigationController: self?.coordiantor?.navigationController)
             return Disposables.create()
         }
+    }
+    
+    func showDetailImage(urlString: String?) {
+        coordiantor?.showDetailImageView(urlString: urlString)
+    }
+    
+    func showSueController() {
+        coordiantor?.showSueController(suedUserId: self.userId)
     }
 }
 

@@ -39,24 +39,7 @@ extension MainCoordinator {
         self.navigationController.setNavigationBarHidden(true, animated: false)
         self.navigationController.pushViewController(viewController, animated: true)
     }
-    
-    // TODO: - ViewModel Delegate Setting
-    func showSelectReservationDateViewController(with possibleDate: [Date], detailViewModel: PhotographerDetailViewModel) {
-        let viewModel = SelectReservationDateViewModel(
-            createReservationDateUseCase: DefaultCreateReservationDateUseCase(),
-            coordinator: self,
-            with: possibleDate
-        )
         
-        viewModel.delegate = detailViewModel
-        
-        let viewController = SelectReservationDateViewController(
-            viewModel: viewModel
-        )
-                
-        self.navigationController.present(viewController, animated: true)
-    }
-    
     func showSearchViewController(
         searchText: BehaviorRelay<String>,
         coordinate: BehaviorRelay<Coordinate?>
@@ -82,17 +65,28 @@ extension MainCoordinator {
         self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
     }
     
-    func showDetailPhotographerViewController(userId: String, searchCoordinate: Coordinate) {
-
-        let viewController = dependencies.makePhotographerDetailViewController(
+    func connectDetailPhotographerFlow(userId: String, searchCoordinate: Coordinate) {
+        let photographerDetailCoordinator = PhotographerDetailCoordinator(
             userId: userId,
-            searchCoordinate: searchCoordinate
+            searchCoordinate: searchCoordinate,
+            navigationController: self.navigationController
         )
+        photographerDetailCoordinator.delegate = self
+        photographerDetailCoordinator.start()
+        self.childCoordinators.append(photographerDetailCoordinator)
+    }
+}
 
-        self.navigationController.isNavigationBarHidden = false
-        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
-        self.navigationController.pushViewController(viewController, animated: true)
-        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
+// MARK: - Coodinator Delegate
+extension MainCoordinator: CoordinatorDelegate {
+    
+    //TODO: 프록시로 하고싶은데....
+    func didFinish(childCoordinator: Coordinator) {
+        // PhotographerDetailCoordinator 끝났을 때
+        // 근데 네비바에서 뒤로 가기 하면 이거 해줄 필요가 있을까?????????
+        if childCoordinator is PhotographerDetailCoordinator {
+            self.navigationController.popViewController(animated: false)
+        }
     }
 }
 

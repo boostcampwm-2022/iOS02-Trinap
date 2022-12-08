@@ -41,7 +41,8 @@ final class TrinapAlert: BaseViewController {
     }
     
     // MARK: Properties
-
+    private var dismissCompletion: (() -> Void)?
+    
     // MARK: Initializers
     init(title: String, timeText: String?, subtitle: String) {
         super.init()
@@ -55,16 +56,20 @@ final class TrinapAlert: BaseViewController {
     }
     
     // MARK: Methods
-    func showAlert(navigationController: UINavigationController?) {
+    func showAlert(
+        navigationController: UINavigationController?,
+        completion: (() -> Void)? = nil
+    ) {
         guard let navigationController else { return }
         self.modalPresentationStyle = .overCurrentContext
         navigationController.present(self, animated: false, completion: nil)
+        dismissCompletion = completion
     }
     
     func addAction(
         title: String,
         style: TrinapButton.ColorType,
-        completion: @escaping () -> ()
+        completion: (() -> Void)? = nil
     ) {
         let button = TrinapButton(style: style, fillType: .fill)
         button.setTitle(title, for: .normal)
@@ -72,9 +77,11 @@ final class TrinapAlert: BaseViewController {
         buttonStack.addArrangedSubview(button)
         
         button.rx.tap
-            .subscribe { _ in
+            .withUnretained(self)
+            .subscribe { owner, _ in
                 self.dismiss(animated: false)
-                completion()
+                completion?()
+                owner.dismissCompletion?()
             }
             .disposed(by: disposeBag)
     }

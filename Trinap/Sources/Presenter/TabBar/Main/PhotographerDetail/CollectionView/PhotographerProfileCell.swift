@@ -26,13 +26,24 @@ final class PhotographerProfileCell: BaseCollectionViewCell {
         $0.font = TrinapFontFamily.Pretendard.regular.font(size: 14)
     }
     
+    private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: TagCollectionViewLeftAlignFlowLayout(offset: trinapOffset, direction: .horizontal))
+    
     // MARK: Properties
+    private var dataSource: DataSource?
     
     // MARK: Initializers
     
     // MARK: Methods
     override func configureHierarchy() {
-        self.contentView.addSubviews([profileImage, nickNameLabel, locationLabel, filterView])
+        self.contentView.addSubviews(
+            [
+                profileImage,
+                nickNameLabel,
+                locationLabel,
+                collectionView,
+                filterView
+            ]
+        )
     }
     
     override func configureConstraints() {
@@ -52,16 +63,81 @@ final class PhotographerProfileCell: BaseCollectionViewCell {
             make.top.equalTo(nickNameLabel.snp.bottom).offset(trinapOffset / 2)
         }
         
+        collectionView.snp.makeConstraints { make in
+            make.leading.equalToSuperview().inset(trinapOffset * 2)
+            make.trailing.equalToSuperview()
+            make.top.equalTo(profileImage.snp.bottom).offset(trinapOffset)
+            make.height.equalTo(trinapOffset * 3)
+        }
+        
         filterView.snp.makeConstraints { make in
-            make.leading.trailing.equalToSuperview()
-            make.top.equalTo(profileImage.snp.bottom).offset(trinapOffset * 2)
+            make.leading.trailing.bottom.equalToSuperview()
+            make.top.equalTo(collectionView.snp.bottom)
             make.height.equalTo(trinapOffset * 6)
         }
+    }
+    
+    override func configureAttributes() {
+        self.configureCollectionView()
+        self.generateDataSource()
     }
     
     func configure(with profile: PhotographerUser) {
         nickNameLabel.text = profile.nickname
         locationLabel.text = profile.location
         profileImage.setImage(at: profile.profileImage)
+        
+        let snapshot = generateSnapshot(tags: profile.tags)
+        
+        self.dataSource?.apply(snapshot, animatingDifferences: true)
+    }
+}
+
+//MARK: profileCell
+extension PhotographerProfileCell:
+    UICollectionViewDelegateFlowLayout {
+    enum Section {
+        case main
+    }
+    
+    typealias DataSource = UICollectionViewDiffableDataSource<Section, TagType>
+    
+    private func configureCollectionView() {
+        self.collectionView.register(TagCell.self)
+        self.collectionView.allowsSelection = false
+        self.collectionView.showsHorizontalScrollIndicator = false
+        self.collectionView.delegate = self
+    }
+    
+    private func generateDataSource() {
+        self.dataSource = DataSource(collectionView: self.collectionView) { collectionView, indexPath, itemIdentifier in
+            guard let cell = collectionView.dequeueCell(TagCell.self, for: indexPath) else {
+                return UICollectionViewCell()
+            }
+            
+            cell.configure(
+                tag: itemIdentifier,
+                backgroundColor: TrinapAsset.sub2.color,
+                textColor: TrinapAsset.secondary.color,
+                fontSize: 12
+            )
+            return cell
+        }
+    }
+    
+    private func generateSnapshot(tags: [TagType]) -> NSDiffableDataSourceSnapshot<Section, TagType> {
+        var snapShot = NSDiffableDataSourceSnapshot<Section, TagType>()
+        snapShot.appendSections([.main])
+        snapShot.appendItems(tags, toSection: .main)
+        return snapShot
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        guard let text = dataSource?.itemIdentifier(for: indexPath)?.title else {
+            return .zero
+        }
+        let width = "#\(text)".size(withAttributes: [NSAttributedString.Key.font: TrinapFontFamily.Pretendard.regular.font(size: 12)]).width + trinapOffset * 2
+        
+        return CGSize(width: width, height: trinapOffset * 3)
     }
 }

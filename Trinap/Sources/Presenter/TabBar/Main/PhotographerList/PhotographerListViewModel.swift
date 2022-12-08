@@ -75,7 +75,7 @@ final class PhotographerListViewModel: ViewModelType {
 //                .debounce(.seconds(1), scheduler: MainScheduler.instance)
         )
             .withUnretained(self)
-            .flatMap { (owner, val) -> Observable<[PhotographerPreview]> in
+            .flatMap { owner, val -> Observable<[PhotographerPreview]> in
                 let (coordinate, type) = val
                 return owner.previewsUseCase.fetch(coordinate: coordinate, type: type)
             }
@@ -89,6 +89,6 @@ extension PhotographerListViewModel {
     
     func showDetailPhotographer(userId: String) {
         guard let coordinate = coordinate.value else { return }
-        coordinator?.showDetailPhotographerViewController(userId: userId, searchCoordinate: coordinate)
+        coordinator?.connectDetailPhotographerFlow(userId: userId, searchCoordinate: coordinate)
     }
 }
