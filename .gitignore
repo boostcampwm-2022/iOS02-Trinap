@@ -6,6 +6,13 @@
 Signing/
 GoogleService-Info.plist
 
+# Fastlane
+*.cer
+*.mobileprovision
+*.ipa
+*.app.dSYM.zip
+.env.default
+
 # Icon must end with two
 Icon
 
