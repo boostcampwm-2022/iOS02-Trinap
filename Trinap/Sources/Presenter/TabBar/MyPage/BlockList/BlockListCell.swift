@@ -33,7 +33,7 @@ final class BlockListCell: BaseTableViewCell {
     // MARK: - Properties
     var isBlockStatusButtonSelected = false {
         didSet {
-            self.blockStatusButton.isSelected.toggle()
+            self.blockStatusButton.isSelected = self.isBlockStatusButtonSelected
             configureBlockStatusButton(isBlockStatusButtonSelected)
         }
     }
