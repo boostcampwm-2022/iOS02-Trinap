@@ -12,14 +12,19 @@ import RxSwift
 
 final class LocationShareViewModel: ViewModelType {
     
+    enum UserType {
+        case mine, other
+    }
+    
     struct Input {
-        var didTapCurrentLocation: Signal<Void>
+        var didTapTrackingMe: Signal<Void>
+        var didTapTrackingOther: Signal<Void>
         var willChangeRegionWithScroll: Signal<Void>
         var myCoordinate: Observable<Coordinate>
     }
     
     struct Output {
-        var isFollowCurrentLocation: Observable<Bool>
+        var userTypeBeingTracked: Observable<UserType?>
         var myCoordinate: Observable<Coordinate?>
         var otherCoordinate: Observable<Coordinate?>
     }
@@ -30,13 +35,8 @@ final class LocationShareViewModel: ViewModelType {
     private let observeLocationUseCase: ObserveLocationUseCase
     private let updateLocationUseCase: UpdateLocationUseCase
     private let endLocationShareUseCase: EndLocationShareUseCase
-    private var isFollowCurrentLocation = true
     
-    #if targetEnvironment(simulator)
-    let changeRegionSkipCount = 2
-    #else
-    let changeRegionSkipCount = 1
-    #endif
+    private let changeRegionSkipCount = 1
     
     // MARK: - Initializer
     init(
@@ -53,25 +53,20 @@ final class LocationShareViewModel: ViewModelType {
     
     // MARK: - Methods
     func transform(input: Input) -> Output {
-        let isFollowCurrentLocation = isFollowCurrentLocation(
-            didTapCurrentLocation: input.didTapCurrentLocation,
-            willChangeRegionWithScroll: input.willChangeRegionWithScroll
-        )
-        
         let coordinates = observeLocationUseCase.execute(chatroomId: chatroomId).share()
         let myCoordinate = coordinate(in: coordinates, ofUser: .mine)
         let otherCoordinate = coordinate(in: coordinates, ofUser: .other)
         
-        input.myCoordinate
-            .withUnretained(self)
-            .flatMap { owner, coordinate in
-                return owner.updateLocationUseCase.execute(chatroomId: owner.chatroomId, location: coordinate)
-            }
-            .subscribe()
-            .disposed(by: disposeBag)
+        updateMyCoordinate(input.myCoordinate)
+        
+        let userTypeBeingTracked = determineUserTypeBeingTracked(
+            didTapTrackingMe: input.didTapTrackingMe,
+            didTapTrackingOther: input.didTapTrackingOther,
+            willChangeRegionWithScroll: input.willChangeRegionWithScroll.skip(changeRegionSkipCount)
+        )
         
         return Output(
-            isFollowCurrentLocation: isFollowCurrentLocation,
+            userTypeBeingTracked: userTypeBeingTracked,
             myCoordinate: myCoordinate,
             otherCoordinate: otherCoordinate
         )
@@ -87,38 +82,28 @@ final class LocationShareViewModel: ViewModelType {
 // MARK: - Privates
 private extension LocationShareViewModel {
     
-    enum UserType {
-        case mine, other
+    func updateMyCoordinate(_ coordinate: Observable<Coordinate>) {
+        coordinate
+            .withUnretained(self)
+            .flatMap { owner, coordinate in
+                return owner.updateLocationUseCase.execute(chatroomId: owner.chatroomId, location: coordinate)
+            }
+            .subscribe()
+            .disposed(by: disposeBag)
     }
     
-    func isFollowCurrentLocation(
-        didTapCurrentLocation: Signal<Void>,
+    func determineUserTypeBeingTracked(
+        didTapTrackingMe: Signal<Void>,
+        didTapTrackingOther: Signal<Void>,
         willChangeRegionWithScroll: Signal<Void>
-    ) -> Observable<Bool> {
-        let followingCurrentLocation = didTapCurrentLocation
-            .map { [weak self] _ in
-                return self?.followingCurrentLocation() ?? true
-            }
-        
-        let unfollowingCurrentLocation = willChangeRegionWithScroll
-            .skip(changeRegionSkipCount)
-            .map { [weak self] _ in
-                return self?.unfollowingCurrentLocation() ?? true
-            }
-        
-        let followingSource = Observable.of(followingCurrentLocation, unfollowingCurrentLocation)
-        
-        return followingSource.merge().startWith(true)
-    }
-    
-    func followingCurrentLocation() -> Bool {
-        self.isFollowCurrentLocation = true
-        return self.isFollowCurrentLocation
-    }
-    
-    func unfollowingCurrentLocation() -> Bool {
-        self.isFollowCurrentLocation = false
-        return self.isFollowCurrentLocation
+    ) -> Observable<UserType?> {
+        return Observable.of(
+            didTapTrackingMe.map { return .mine },
+            didTapTrackingOther.map { return .other },
+            willChangeRegionWithScroll.map { return nil }
+        )
+        .merge()
+        .distinctUntilChanged()
     }
     
     func coordinate(in coordinates: Observable<[SharedLocation]>, ofUser user: UserType) -> Observable<Coordinate?> {

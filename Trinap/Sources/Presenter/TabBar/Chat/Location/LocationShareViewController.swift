@@ -36,10 +36,8 @@ final class LocationShareViewController: BaseViewController {
         $0.startUpdatingLocation()
     }
     
-    private lazy var currentLocationButton = TrinapButton(style: .primary, isCircle: true).than {
-        $0.setImage(UIImage(systemName: "location.fill"), for: .normal)
-        $0.tintColor = TrinapAsset.white.color
-    }
+    private lazy var trackingMeButton = LocationTrackButton(userType: .mine)
+    private lazy var trackingOtherButton = LocationTrackButton(userType: .other)
     
     // MARK: - Properties
     private let viewModel: LocationShareViewModel
@@ -58,16 +56,9 @@ final class LocationShareViewController: BaseViewController {
         viewModel.endLocationShare()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        let currentLocation = mapView.userLocation.coordinate
-        self.moveCameraToCoordinate(currentLocation, animated: true)
-    }
-    
     override func configureHierarchy() {
         self.view
-            .addSubviews([mapView, currentLocationButton])
+            .addSubviews([mapView, trackingMeButton, trackingOtherButton])
     }
     
     override func configureConstraints() {
@@ -75,10 +66,16 @@ final class LocationShareViewController: BaseViewController {
             make.edges.equalToSuperview()
         }
         
-        currentLocationButton.snp.makeConstraints { make in
-            make.trailing.equalTo(self.view.safeAreaLayoutGuide).inset(30)
-            make.bottom.equalTo(self.view.safeAreaLayoutGuide).inset(50)
-            make.width.height.equalTo(50)
+        trackingOtherButton.snp.makeConstraints { make in
+            make.width.height.equalTo(64)
+            make.trailing.equalToSuperview().offset(-24)
+            make.bottom.equalToSuperview().offset(-64)
+        }
+        
+        trackingMeButton.snp.makeConstraints { make in
+            make.width.height.equalTo(64)
+            make.trailing.equalToSuperview().offset(-24)
+            make.bottom.equalTo(trackingOtherButton.snp.top).offset(-16)
         }
     }
     
@@ -97,63 +94,43 @@ final class LocationShareViewController: BaseViewController {
     }
     
     override func bind() {
-        let willChangeRegionWithScroll = mapView.rx
-            .regionWillChange
-            .filter { !$0 }
-            .map { _ in return }
-        
         let myCoordinate = locationManager.rx
             .didUpdateLocations
             .compactMap(\.last)
             .map { Coordinate(lat: $0.coordinate.latitude, lng: $0.coordinate.longitude) }
         
         let input = LocationShareViewModel.Input(
-            didTapCurrentLocation: currentLocationButton.rx.tap.asSignal(),
-            willChangeRegionWithScroll: willChangeRegionWithScroll.asSignal(onErrorJustReturn: ()),
+            didTapTrackingMe: trackingMeButton.rx.tap.asSignal(),
+            didTapTrackingOther: trackingOtherButton.rx.tap.asSignal(),
+            willChangeRegionWithScroll: willChangeRegionWithScroll(),
             myCoordinate: myCoordinate
         )
         
         let output = viewModel.transform(input: input)
         
-        let isFollowCurrentLocation = output.isFollowCurrentLocation.share()
+        let userTypeBeingTracked = output.userTypeBeingTracked
         
-        locationManager.rx.didUpdateLocations
-            .compactMap(\.last)
-            .withLatestFrom(isFollowCurrentLocation) { (location: $0, isFollow: $1) }
-            .filter { $0.isFollow }
-            .bind(onNext: { [weak self] location, _ in self?.moveCameraToCoordinate(location.coordinate) })
-            .disposed(by: disposeBag)
-        
-        isFollowCurrentLocation
-            .map { $0 ? TrinapButton.ColorType.primary : .black }
-            .bind(to: currentLocationButton.rx.style)
-            .disposed(by: disposeBag)
-        
-        currentLocationButton.rx.tap
-            .bind(onNext: { [weak self] _ in
-                guard
-                    let self = self,
-                    let currentLocation = self.locationManager.location
-                else { return }
-                
-                self.moveCameraToCoordinate(currentLocation.coordinate)
-            })
-            .disposed(by: disposeBag)
-        
-        output.myCoordinate
-            .compactMap { $0 }
-            .bind(onNext: { [weak self] coordinate in self?.updateMyAnnotation(to: coordinate) })
-            .disposed(by: disposeBag)
-        
-        output.otherCoordinate
-            .compactMap { $0 }
-            .bind(onNext: { [weak self] coordinate in self?.updateOtherAnnotation(to: coordinate) })
-            .disposed(by: disposeBag)
+        updateMyAnnotation(to: output.myCoordinate)
+        updateOtherAnnotation(to: output.otherCoordinate)
+        handleLocationTrackButtonStatus(userTypeBeingTracked)
+        moveCamera(
+            myCoordinate: output.myCoordinate,
+            otherCoordinate: output.otherCoordinate,
+            userTypeBeingTracked: userTypeBeingTracked
+        )
     }
 }
 
 // MARK: - Privates
 private extension LocationShareViewController {
+    
+    func willChangeRegionWithScroll() -> Signal<Void> {
+        return mapView.rx
+            .regionWillChange
+            .filter { !$0 }
+            .map { _ in return }
+            .asSignal(onErrorJustReturn: ())
+    }
     
     func moveCameraToCoordinate(_ coordinate: CLLocationCoordinate2D, animated: Bool = true) {
         guard !(coordinate.latitude == .zero) else { return }
@@ -164,16 +141,72 @@ private extension LocationShareViewController {
         mapView.setRegion(region, animated: animated)
     }
     
-    func updateMyAnnotation(to coordinate: Coordinate) {
-        updateAnnotation(to: coordinate, annotationView: myAnnotationView)
+    func updateMyAnnotation(to coordinate: Observable<Coordinate?>) {
+        coordinate
+            .compactMap { $0 }
+            .withUnretained(self)
+            .bind(onNext: { owner, coordinate in
+                owner.updateAnnotation(to: coordinate, annotationView: owner.myAnnotationView)
+            })
+            .disposed(by: disposeBag)
     }
     
-    func updateOtherAnnotation(to coordinate: Coordinate) {
-        updateAnnotation(to: coordinate, annotationView: otherAnnotationView)
+    func updateOtherAnnotation(to coordinate: Observable<Coordinate?>) {
+        coordinate
+            .compactMap { $0 }
+            .withUnretained(self)
+            .bind(onNext: { owner, coordinate in
+                owner.updateAnnotation(to: coordinate, annotationView: owner.otherAnnotationView)
+            })
+            .disposed(by: disposeBag)
     }
     
     func updateAnnotation(to coordinate: Coordinate, annotationView: TrinapAnnotationView) {
         annotationView.coordinate = CLLocationCoordinate2D(latitude: coordinate.lat, longitude: coordinate.lng)
+    }
+    
+    func handleLocationTrackButtonStatus(_ userTypeBeingTracked: Observable<LocationShareViewModel.UserType?>) {
+        userTypeBeingTracked
+            .bind(onNext: { [weak self] userType in
+                self?.trackingMeButton.setImage(isTracking: false)
+                self?.trackingOtherButton.setImage(isTracking: false)
+                
+                guard let userType else { return }
+                
+                switch userType {
+                case .mine:
+                    self?.trackingMeButton.setImage(isTracking: true)
+                case .other:
+                    self?.trackingOtherButton.setImage(isTracking: true)
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    func moveCamera(
+        myCoordinate: Observable<Coordinate?>,
+        otherCoordinate: Observable<Coordinate?>,
+        userTypeBeingTracked: Observable<LocationShareViewModel.UserType?>
+    ) {
+        Observable.combineLatest(myCoordinate, otherCoordinate)
+            .withLatestFrom(userTypeBeingTracked) { coordinates, userType in
+                let (mine, other) = coordinates
+                
+                switch userType {
+                case .mine:
+                    return mine
+                case .other:
+                    return other
+                default:
+                    return nil
+                }
+            }
+            .compactMap { $0 }
+            .map { CLLocationCoordinate2D(latitude: $0.lat, longitude: $0.lng) }
+            .bind(onNext: { [weak self] coordinate in
+                self?.moveCameraToCoordinate(coordinate)
+            })
+            .disposed(by: disposeBag)
     }
 }
 
