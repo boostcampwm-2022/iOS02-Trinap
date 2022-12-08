@@ -86,7 +86,7 @@ final class BlockListViewController: BaseViewController {
         
         let input = BlockListViewModel.Input(
             viewWillappear: self.rx.viewWillAppear.map { _ in },
-            updateBlockStatus: self.blockCancel.asObservable().share(),
+            updateBlockStatus: self.blockCancel.asObservable(),
             backButtonTap: self.navigationBarView.backButton.rx.tap.asSignal()
         )
         

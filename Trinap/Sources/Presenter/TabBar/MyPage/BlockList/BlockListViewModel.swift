@@ -45,37 +45,13 @@ final class BlockListViewModel: ViewModelType {
     // MARK: - Methods
     func transform(input: Input) -> Output {
         input.updateBlockStatus
-            .filter { isBlock, _ in
-                return isBlock
-            }
-            .map { _, blockUser in
-                return blockUser
-            }
             .withUnretained(self)
-            .flatMap { owner, blockUser in
-                return owner.removeBlockUseCase.removeBlockUser(blockId: blockUser.blockId)
+            .flatMap { owner, blockInfo -> Single<Void> in
+                let (isBlocked, block) = blockInfo
+                return isBlocked ? owner.removeBlockUseCase.removeBlockUser(blockId: block.blockId) : owner.createBlockUseCase.create(blockedUserId: block.blockedUser.userId, blockId: block.blockId)
             }
             .subscribe(onNext: {
-                Logger.print("삭제 성공!")
-            })
-            .disposed(by: disposeBag)
-        
-        input.updateBlockStatus
-            .filter { isBlock, _ in
-                return !isBlock
-            }
-            .map { _, blockUser in
-                return blockUser
-            }
-            .withUnretained(self)
-            .flatMap { owner, blockUser in
-                return owner.createBlockUseCase.create(
-                    blockedUserId: blockUser.blockedUser.userId,
-                    blockId: blockUser.blockId
-                )
-            }
-            .subscribe(onNext: {
-                Logger.print("삭제 취소!")
+                Logger.print("업데이트 성공!")
             })
             .disposed(by: disposeBag)
         
