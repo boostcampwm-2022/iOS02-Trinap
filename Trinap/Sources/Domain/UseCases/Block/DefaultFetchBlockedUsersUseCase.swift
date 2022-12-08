@@ -1,5 +1,5 @@
 //
-//  DefaultFetchBlockUsersUseCase.swift
+//  DefaultFetchBlockedUsersUseCase.swift
 //  Trinap
 //
 //  Created by kimchansoo on 2022/12/04.
@@ -10,7 +10,7 @@ import Foundation
 
 import RxSwift
 
-final class DefaultFetchBlockUsersUseCase: FetchBlockUsersUseCase {
+final class DefaultFetchBlockedUsersUseCase: FetchBlockedUsersUseCase {
     
     // MARK: Properties
     private let blockRepository: BlockRepository
@@ -26,7 +26,7 @@ final class DefaultFetchBlockUsersUseCase: FetchBlockUsersUseCase {
     }
     
     // MARK: Methods
-    func fetchBlockUsers() -> Observable<[Block.BlockedUser]> {
+    func fetchBlockedUsers() -> Observable<[Block.BlockedUser]> {
         return blockRepository.fetchBlockedUser()
             .asObservable()
             .map { blocks -> ([Block], [String]) in

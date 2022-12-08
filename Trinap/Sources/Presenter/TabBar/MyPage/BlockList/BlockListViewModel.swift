@@ -23,7 +23,7 @@ final class BlockListViewModel: ViewModelType {
     }
     
     // MARK: - Properties
-    private let fetchBlockUsersUseCase: FetchBlockUsersUseCase
+    private let fetchBlockUsersUseCase: FetchBlockedUsersUseCase
     private let createBlockUseCase: CreateBlockUseCase
     private let removeBlockUseCase: RemoveBlockUseCase
     weak var coordinator: MyPageCoordinator?
@@ -32,7 +32,7 @@ final class BlockListViewModel: ViewModelType {
     // MARK: - Initializer
     init(
         coordinator: MyPageCoordinator?,
-        fetchBlockUsersUseCase: FetchBlockUsersUseCase,
+        fetchBlockUsersUseCase: FetchBlockedUsersUseCase,
         createBlockUseCase: CreateBlockUseCase,
         removeBlockUseCase: RemoveBlockUseCase
     ) {
@@ -64,7 +64,7 @@ final class BlockListViewModel: ViewModelType {
         let blockUsers = input.viewWillappear
             .withUnretained(self)
             .flatMap { owner, _ in
-                return owner.fetchBlockUsersUseCase.fetchBlockUsers()
+                return owner.fetchBlockUsersUseCase.fetchBlockedUsers()
             }
             .asDriver(onErrorJustReturn: [])
         return Output(blockUsers: blockUsers)

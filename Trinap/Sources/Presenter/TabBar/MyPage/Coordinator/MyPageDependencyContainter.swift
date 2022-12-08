@@ -248,8 +248,8 @@ private extension MyPageDependencyContainter {
         return DefaultFetchContactUseCase(userRepository: userRepository)
     }
     
-    func makeFetchBlockUsersUseCase() -> FetchBlockUsersUseCase {
-        return DefaultFetchBlockUsersUseCase(
+    func makeFetchBlockUsersUseCase() -> FetchBlockedUsersUseCase {
+        return DefaultFetchBlockedUsersUseCase(
             blockRepository: blockRepository,
             userRepository: userRepository
         )

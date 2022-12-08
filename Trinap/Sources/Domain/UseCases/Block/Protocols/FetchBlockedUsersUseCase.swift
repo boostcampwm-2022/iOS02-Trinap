@@ -1,5 +1,5 @@
 //
-//  FetchBlockUsersUseCase.swift
+//  FetchBlockedUsersUseCase.swift
 //  Trinap
 //
 //  Created by kimchansoo on 2022/12/03.
@@ -10,8 +10,8 @@ import Foundation
 
 import RxSwift
 
-protocol FetchBlockUsersUseCase {
+protocol FetchBlockedUsersUseCase {
 
     // MARK: Methods
-    func fetchBlockUsers() -> Observable<[Block.BlockedUser]>
+    func fetchBlockedUsers() -> Observable<[Block.BlockedUser]>
 }
