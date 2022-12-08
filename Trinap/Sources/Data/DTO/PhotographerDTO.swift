@@ -17,10 +17,10 @@ struct PhotographerDTO: Codable {
     // MARK: - Properties
     let photographerId: String
     var photographerUserId: String
-    let introduction: String
+    let introduction: String?
     let latitude, longitude: Double
     let tags, pictures: [String]
-    let pricePerHalfHour: Int
+    let pricePerHalfHour: Int?
     let possibleDate: [String]
     let status: Status
     
