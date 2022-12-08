@@ -8,6 +8,7 @@
 
 import Foundation
 
+import RxCocoa
 import RxSwift
 
 final class EditProfileViewModel: ViewModelType {
@@ -17,12 +18,14 @@ final class EditProfileViewModel: ViewModelType {
     private let fetchUserUseCase: FetchUserUseCase
     private let editUserUseCase: EditUserUseCase
     private let uploadImageUseCase: UploadImageUseCase
+    weak var coordinator: MyPageCoordinator?
     
     struct Input {
         let nickname: Observable<String>
         let nicknameTrigger: Observable<Void>
         let profileImage: Observable<Data?>
         let buttonTrigger: Observable<Void>
+        let backButtonTap: Signal<Void>
     }
     
     struct Output {
@@ -37,8 +40,10 @@ final class EditProfileViewModel: ViewModelType {
     init(
         fetchUserUseCase: FetchUserUseCase,
         editUserUseCase: EditUserUseCase,
-        uploadImageUseCase: UploadImageUseCase
+        uploadImageUseCase: UploadImageUseCase,
+        coordinator: MyPageCoordinator?
     ) {
+        self.coordinator = coordinator
         self.fetchUserUseCase = fetchUserUseCase
         self.editUserUseCase = editUserUseCase
         self.uploadImageUseCase = uploadImageUseCase
@@ -69,6 +74,12 @@ final class EditProfileViewModel: ViewModelType {
         
         input.profileImage
             .bind(to: imageData)
+            .disposed(by: disposeBag)
+        
+        input.backButtonTap
+            .emit(onNext: { [weak self] _ in
+                self?.coordinator?.popViewController()
+            })
             .disposed(by: disposeBag)
         
         let result = input.buttonTrigger

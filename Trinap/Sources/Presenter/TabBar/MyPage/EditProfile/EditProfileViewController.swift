@@ -13,9 +13,16 @@ import RxGesture
 
 final class EditProfileViewController: BaseViewController {
     
-    // MARK: - Properties
-    private let imagePicker = ImagePickerController()
-    private let viewModel: EditProfileViewModel
+    // MARK: - UI
+    private lazy var doneButton = UIButton().than {
+        $0.setTitle("확인", for: .normal)
+        $0.setTitleColor(TrinapAsset.primary.color, for: .normal)
+    }
+    
+    private lazy var navigationBarView = TrinapNavigationBarView().than {
+        $0.setTitleText("정보 수정")
+        $0.addRightButton(doneButton)
+    }
     
     private lazy var profileImageView = ProfileImageView()
     
@@ -32,10 +39,9 @@ final class EditProfileViewController: BaseViewController {
     
     private lazy var nickNameInputView = NicknameTextFieldView()
     
-    private lazy var doneButton = UIButton().than {
-        $0.setTitle("확인", for: .normal)
-        $0.setTitleColor(TrinapAsset.primary.color, for: .normal)
-    }
+    // MARK: - Properties
+    private lazy var imagePicker = ImagePickerController()
+    private let viewModel: EditProfileViewModel
     
     // MARK: - Initialize
     init(viewModel: EditProfileViewModel) {
@@ -44,19 +50,31 @@ final class EditProfileViewController: BaseViewController {
         super.init()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-    }
-    
     // MARK: - Configure
     override func configureHierarchy() {
-        self.view.addSubviews([profileImageView, editIconView, nickNameLabel, nickNameInputView])
+        super.configureHierarchy()
+        
+        self.view.addSubviews([
+            navigationBarView,
+            profileImageView,
+            editIconView,
+            nickNameLabel,
+            nickNameInputView
+        ])
     }
     
     override func configureConstraints() {
+        super.configureConstraints()
+        
+        navigationBarView.snp.makeConstraints { make in
+            make.horizontalEdges.equalToSuperview()
+            make.top.equalTo(view.safeAreaLayoutGuide)
+            make.height.equalTo(trinapOffset * 6)
+        }
+        
         profileImageView.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.top.equalTo(view.safeAreaLayoutGuide).offset(trinapOffset * 3)
+            make.top.equalTo(navigationBarView.snp.bottom).offset(trinapOffset * 3)
             make.width.height.equalTo(trinapOffset * 8)
         }
         
@@ -73,15 +91,15 @@ final class EditProfileViewController: BaseViewController {
     }
     
     override func configureAttributes() {
+        super.configureAttributes()
+        
         self.hideKeyboardWhenTapped()
         imagePicker.delegate = self
-        
-        self.navigationController?.navigationBar.isHidden = false
-        self.navigationController?.navigationBar.tintColor = .black
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: doneButton)
     }
     
     override func bind() {
+        super.bind()
+        
         let imageData = self.profileImageView.rx.tapGesture()
             .when(.recognized)
             .withUnretained(self)
@@ -97,7 +115,9 @@ final class EditProfileViewController: BaseViewController {
             nickname: nickNameInputView.textField.rx.text.orEmpty.asObservable(),
             nicknameTrigger: nickNameInputView.generateButton.rx.tap.asObservable(),
             profileImage: imageData.map { $0.jpegData(compressionQuality: 1.0) },
-            buttonTrigger: doneButton.rx.tap.asObservable())
+            buttonTrigger: doneButton.rx.tap.asObservable(),
+            backButtonTap: navigationBarView.backButton.rx.tap.asSignal()
+        )
         
         let output = viewModel.transform(input: input)
         

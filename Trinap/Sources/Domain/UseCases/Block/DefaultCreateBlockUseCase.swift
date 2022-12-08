@@ -13,7 +13,7 @@ import RxSwift
 final class DefaultCreateBlockUseCase: CreateBlockUseCase {
     
     // MARK: Properties
-    let blockRepository: BlockRepository
+    private let blockRepository: BlockRepository
     
     // MARK: Initializers
     init(blockRepository: BlockRepository) {
@@ -23,5 +23,12 @@ final class DefaultCreateBlockUseCase: CreateBlockUseCase {
     // MARK: Methods
     func create(blockedUserId: String) -> Single<Void> {
         return blockRepository.blockUser(blockedUserId: blockedUserId)
+    }
+    
+    func create(blockedUserId: String, blockId: String) -> Single<Void> {
+        return self.blockRepository.blockUser(
+            blockedUserId: blockedUserId,
+            blockId: blockId
+        )
     }
 }

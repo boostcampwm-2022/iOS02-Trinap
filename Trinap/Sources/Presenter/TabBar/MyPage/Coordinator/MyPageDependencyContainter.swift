@@ -8,6 +8,7 @@
 
 import UIKit
 
+import FirestoreService
 import RxCocoa
 import RxSwift
 
@@ -15,6 +16,8 @@ final class MyPageDependencyContainter {
     
     // MARK: Properties
     weak var mypageCoordinator: MyPageCoordinator?
+    private let fireStoreService: FireStoreService = DefaultFireStoreService()
+    private let keychainManger: TokenManager = KeychainTokenManager()
     
     // MARK: - Repository
     private let mapRepository: MapRepository
@@ -23,6 +26,7 @@ final class MyPageDependencyContainter {
     private let userRepository: UserRepository
     private let authRepository: AuthRepository
     private let uploadImageRepository: UploadImageRepository
+    private let blockRepository: BlockRepository
     
     // MARK: Initializers
     init(mypageCoordinator: MyPageCoordinator?) {
@@ -33,6 +37,10 @@ final class MyPageDependencyContainter {
         self.userRepository = DefaultUserRepository()
         self.authRepository = DefaultAuthRepository()
         self.uploadImageRepository = DefaultUploadImageRepository()
+        self.blockRepository = DefaultBlockRepository(
+            fireStoreService: fireStoreService,
+            keychainManager: keychainManger
+        )
     }
     
     func makeMyPageViewController() -> MyPageViewController {
@@ -82,9 +90,14 @@ final class MyPageDependencyContainter {
     func makeCreateContactViewController() -> CreateContactViewController {
         return CreateContactViewController(viewModel: makeCreateContactViewModel())
     }
+    
+    func makeBlockListViewController() -> BlockListViewController {
+        return BlockListViewController(viewModel: makeBlockListViewModel())
+    }
 }
 
 private extension MyPageDependencyContainter {
+    
     func makeMyPageViewModel() -> MyPageViewModel {
         return MyPageViewModel(
             fetchUserUseCase: makeFetchUserUseCase(),
@@ -98,7 +111,8 @@ private extension MyPageDependencyContainter {
         return EditProfileViewModel(
             fetchUserUseCase: makeFetchUserUseCase(),
             editUserUseCase: makeEditUseUseCase(),
-            uploadImageUseCase: makeUploadImageUseCase()
+            uploadImageUseCase: makeUploadImageUseCase(),
+            coordinator: self.mypageCoordinator
         )
     }
     
@@ -165,10 +179,20 @@ private extension MyPageDependencyContainter {
             createContactUseCase: DefaultCreateContactUseCase(userRepository: userRepository)
         )
     }
+    
+    func makeBlockListViewModel() -> BlockListViewModel {
+        return BlockListViewModel(
+            coordinator: self.mypageCoordinator,
+            fetchBlockUsersUseCase: self.makeFetchBlockUsersUseCase(),
+            createBlockUseCase: self.makeCreateBlockUseCase(),
+            removeBlockUseCase: self.makeRemoveBlockUseCase()
+        )
+    }
 }
 
 // MARK: - UseCase
 private extension MyPageDependencyContainter {
+    
     // MARK: - UseCase
     func makeFetchUserUseCase() -> FetchUserUseCase {
         return DefaultFetchUserUseCase(userRepository: userRepository)
@@ -223,5 +247,24 @@ private extension MyPageDependencyContainter {
     
     func makeFetchContactUseCase() -> FetchContactUseCase {
         return DefaultFetchContactUseCase(userRepository: userRepository)
+    }
+    
+    func makeFetchBlockUsersUseCase() -> FetchBlockedUsersUseCase {
+        return DefaultFetchBlockedUsersUseCase(
+            blockRepository: blockRepository,
+            userRepository: userRepository
+        )
+    }
+    
+    func makeCreateBlockUseCase() -> CreateBlockUseCase {
+        return DefaultCreateBlockUseCase(
+            blockRepository: blockRepository
+        )
+    }
+    
+    func makeRemoveBlockUseCase() -> RemoveBlockUseCase {
+        return DefaultRemoveBlockUseCase(
+            blockRepository: blockRepository
+        )
     }
 }

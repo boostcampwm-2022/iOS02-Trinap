@@ -20,3 +20,12 @@ struct Block {
     let blockedUserId: String
     let userId: String
 }
+
+// MARK: - Mapper struct
+extension Block {
+    
+    struct BlockedUser: Hashable {
+        let blockId: String
+        let blockedUser: User
+    }
+}

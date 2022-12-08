@@ -35,6 +35,7 @@ extension MyPageCoordinator {
     
     func showMyPageViewController() {
         let viewController = dependencies.makeMyPageViewController()
+        self.navigationController.navigationBar.isHidden = true
         self.navigationController.pushViewController(viewController, animated: true)
     }
     
@@ -50,6 +51,8 @@ extension MyPageCoordinator {
             showContactListViewController()
         case .photographerDate:
             showEditPossibleDateViewController()
+        case .userBlock:
+            showBlockListViewController()
         case .dropout:
             showDropOutViewController()
         default:
@@ -59,18 +62,21 @@ extension MyPageCoordinator {
     
     private func showEditProfileViewController() {
         let viewController = dependencies.makeEditProfileViewController()
-        self.navigationController.pushViewControllerHideBottomBar(rootViewController: viewController, animated: true)
+        viewController.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(viewController, animated: true)
     }
     
     private func showEditPhotographerProfile() {
         let viewController = dependencies.makeEditPhotographerViewController()
         viewController.coordinator = self
-        self.navigationController.pushViewControllerHideBottomBar(rootViewController: viewController, animated: true)
+        viewController.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(viewController, animated: true)
     }
     
     func showUpdatePhotographerViewController() {
         let viewController = dependencies.makeRegisterPhotographerInfoViewController()
-        self.navigationController.pushViewControllerHideBottomBar(rootViewController: viewController, animated: true)
+        viewController.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(viewController, animated: true)
     }
     
     func showSearchViewController(
@@ -94,12 +100,14 @@ extension MyPageCoordinator {
     
     private func showEditPossibleDateViewController() {
         let viewController = dependencies.makeEditPossibleDateViewController()
-        self.navigationController.pushViewControllerHideBottomBar(rootViewController: viewController, animated: true)
+        viewController.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(viewController, animated: true)
     }
     
     func showDropOutViewController() {
         let viewController = dependencies.makeDropOutViewController()
-        self.navigationController.pushViewControllerHideBottomBar(rootViewController: viewController, animated: true)
+        viewController.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(viewController, animated: true)
     }
     
     func showSignOutAlert(completion: @escaping () -> Void) {
@@ -123,17 +131,25 @@ extension MyPageCoordinator {
     
     func showContactListViewController() {
         let viewController = dependencies.makeContactListViewController()
-        self.navigationController.pushViewControllerHideBottomBar(rootViewController: viewController, animated: false)
+        viewController.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(viewController, animated: true)
     }
     
     func showDetailContactViewController(contactId: String) {
         let viewController = dependencies.makeDetailContactViewController(contactId: contactId)
-        self.navigationController.pushViewControllerHideBottomBar(rootViewController: viewController, animated: false)
+        viewController.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(viewController, animated: true)
     }
     
     func showCreateContactViewController() {
         let viewController = dependencies.makeCreateContactViewController()
         self.navigationController.present(viewController, animated: true)
+    }
+    
+    func showBlockListViewController() {
+        let viewController = dependencies.makeBlockListViewController()
+        viewController.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(viewController, animated: true)
     }
 }
 

@@ -28,6 +28,11 @@ final class EditPossibleDateViewController: BaseViewController {
         $0.titleLabel?.font = TrinapFontFamily.Pretendard.semiBold.font(size: 16)
     }
     
+    private lazy var navigationBarView = TrinapNavigationBarView().than {
+        $0.setTitleText("작가 영업일 설정")
+        $0.addRightButton(self.editDoneButton)
+    }
+    
     private lazy var trinapCalenderView = TrinapMultiSelectionCalendarView()
     
     // MARK: - Properties
@@ -42,20 +47,31 @@ final class EditPossibleDateViewController: BaseViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        configureNavigationBar()
+//        configureNavigationBar()
     }
     
     // MARK: - Methods
     override func configureHierarchy() {
+        super.configureHierarchy()
+        
         self.view.addSubviews([
+            navigationBarView,
             titleLabel,
             trinapCalenderView
         ])
     }
     
     override func configureConstraints() {
+        super.configureConstraints()
+        
+        self.navigationBarView.snp.makeConstraints { make in
+            make.horizontalEdges.equalToSuperview()
+            make.top.equalTo(view.safeAreaLayoutGuide)
+            make.height.equalTo(trinapOffset * 6)
+        }
+        
         self.titleLabel.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide).offset(trinapOffset * 3)
+            make.top.equalTo(navigationBarView.snp.bottom).offset(trinapOffset * 3)
             make.centerX.equalToSuperview()
             make.leading.equalToSuperview().offset(trinapOffset * 2)
         }
@@ -67,6 +83,8 @@ final class EditPossibleDateViewController: BaseViewController {
     }
 
     override func bind() {
+        super.bind()
+        
         let input = EditPossibleDateViewModel.Input(
             calendarDateTap: self.trinapCalenderView.possibleDate.asObservable(),
             possibleDateEditDone: self.editDoneButton.rx.tap
@@ -74,7 +92,8 @@ final class EditPossibleDateViewController: BaseViewController {
                 .withUnretained(self)
                 .map { owner, _ in
                     return owner.trinapCalenderView.possibleDate.value
-                }
+                },
+            backButtonTap: self.navigationBarView.backButton.rx.tap.asSignal()
         )
         
         let output = self.viewModel.transform(input: input)

@@ -15,6 +15,10 @@ import SnapKit
 final class DropOutViewController: BaseViewController {
     
     // MARK: - UI
+    private lazy var navigationBarView = TrinapNavigationBarView().than {
+        $0.setTitleText("탈퇴하기")
+    }
+    
     private lazy var titleLabel = UILabel().than {
         $0.text = "고객님과\n좋은 추억을 더 남기지 못해서 아쉬워요.."
         $0.font = TrinapFontFamily.Pretendard.bold.font(size: 16)
@@ -102,7 +106,8 @@ final class DropOutViewController: BaseViewController {
     override func bind() {
         let input = DropOutViewModel.Input(
             dropOutButtonTap: self.dropOutButton.rx.tap.asObservable(),
-            cancelButtonTap: self.cancelButton.rx.tap.asObservable()
+            cancelButtonTap: self.cancelButton.rx.tap.asObservable(),
+            backButtonTap: self.navigationBarView.backButton.rx.tap.asSignal()
         )
         
         _ = self.viewModel.transform(input: input)
@@ -110,6 +115,7 @@ final class DropOutViewController: BaseViewController {
     
     override func configureHierarchy() {
         self.view.addSubviews([
+            navigationBarView,
             titleLabel,
             subTitleLabel,
             warningStackView,
@@ -117,20 +123,21 @@ final class DropOutViewController: BaseViewController {
             buttonStackView
         ])
         
-        [
-            warningStackView1,
-            warningStackView2
-        ].forEach { self.warningStackView.addArrangedSubview($0) }
+        [warningStackView1, warningStackView2].forEach { self.warningStackView.addArrangedSubview($0) }
         
-        [
-            dropOutButton,
-            cancelButton
-        ].forEach { self.buttonStackView.addArrangedSubview($0) }
+        [dropOutButton, cancelButton].forEach { self.buttonStackView.addArrangedSubview($0) }
     }
     
     override func configureConstraints() {
+        
+        navigationBarView.snp.makeConstraints { make in
+            make.horizontalEdges.equalToSuperview()
+            make.top.equalTo(view.safeAreaLayoutGuide)
+            make.height.equalTo(trinapOffset * 6)
+        }
+        
         self.titleLabel.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide).offset(trinapOffset * 3)
+            make.top.equalTo(navigationBarView.snp.bottom).offset(trinapOffset * 3)
             make.centerX.equalToSuperview()
             make.leading.equalToSuperview().offset(trinapOffset * 2)
         }
@@ -158,6 +165,8 @@ final class DropOutViewController: BaseViewController {
     }
     
     override func configureAttributes() {
+        super.configureAttributes()
+        
         self.configureButton()
     }
     
