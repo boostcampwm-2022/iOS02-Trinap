@@ -110,4 +110,9 @@ extension ThumbnailCollectionView: UICollectionViewDelegateFlowLayout {
         let height = self.frame.height
         return CGSize(width: width, height: height)
     }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let page = scrollView.contentOffset.x / scrollView.frame.size.width
+        thumbnailPageControl.currentPage = Int(round(page))
+    }
 }
