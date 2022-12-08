@@ -45,7 +45,7 @@ final class PhotographerDetailViewModel: ViewModelType {
     //TODO: 델리게이트로 넘어오는 값 여기에 넣기
     private var reservationDate = BehaviorRelay<[Date]>(value: [])
     
-    private weak var coordiantor: PhotographerDetailCoordinator?
+    private weak var coordinator: PhotographerDetailCoordinator?
     
     // MARK: - Initializer
     init(
@@ -69,7 +69,7 @@ final class PhotographerDetailViewModel: ViewModelType {
         self.mapRepository = mapRepository
         self.createChatroomUseCase = createChatroomUseCase
         self.sendFirstChatUseCase = sendFirstChatUseCase
-        self.coordiantor = coordinator
+        self.coordinator = coordinator
         self.searchCoordinate = searchCoordinate
         self.userId = userId
     }
@@ -150,7 +150,7 @@ final class PhotographerDetailViewModel: ViewModelType {
                 return (chatroomId, photographer.nickname)
             })
             .subscribe(onNext: { [weak self] chatroomId, nickname in
-                self?.coordiantor?.connectChatDetailCoordinator(
+                self?.coordinator?.connectChatDetailCoordinator(
                     chatroomId: chatroomId,
                     photographerNickname: nickname
                 )
@@ -162,7 +162,7 @@ final class PhotographerDetailViewModel: ViewModelType {
             .withUnretained(self)
             .subscribe(onNext: { owner, value in
                 let photographerUser = value.1
-                owner.coordiantor?.showSelectReservationDateViewController(with: photographerUser.possibleDate, detailViewModel: self)
+                owner.coordinator?.showSelectReservationDateViewController(with: photographerUser.possibleDate, detailViewModel: self)
             })
             .disposed(by: disposeBag)
         
@@ -209,17 +209,17 @@ final class PhotographerDetailViewModel: ViewModelType {
                 Logger.print("취소")
                 observable.onNext(false)
             }
-            alert.showAlert(navigationController: self?.coordiantor?.navigationController)
+            alert.showAlert(navigationController: self?.coordinator?.navigationController)
             return Disposables.create()
         }
     }
     
     func showDetailImage(urlString: String?) {
-        coordiantor?.showDetailImageView(urlString: urlString)
+        coordinator?.showDetailImageView(urlString: urlString)
     }
     
     func showSueController() {
-        coordiantor?.showSueController(suedUserId: self.userId)
+        coordinator?.showSueController(suedUserId: self.userId)
     }
 }
 
