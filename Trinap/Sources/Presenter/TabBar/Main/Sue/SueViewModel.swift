@@ -65,14 +65,7 @@ final class SueViewModel: ViewModelType {
             }
             .withUnretained(self)
             .subscribe(onNext: { owner, _  in
-                Logger.print("신고 완료")
-                let alert = TrinapAlert(title: "신고 완료", timeText: nil, subtitle: "신고가 완료되었습니다.")
-                alert.addAction(title: "확인", style: .primary) { }
-                alert.showAlert(navigationController: owner.coordinator?.navigationController) {
-                    Logger.print(owner.coordinator?.navigationController.children)
-                    owner.coordinator?.popViewController()
-                    Logger.print(owner.coordinator?.navigationController.children)
-                }
+                owner.showCompleteAlert(owner: owner)
             })
             .disposed(by: disposeBag)
         
@@ -92,3 +85,14 @@ final class SueViewModel: ViewModelType {
 }
 
 
+extension SueViewModel {
+    
+    private func showCompleteAlert(owner: SueViewModel) {
+        Logger.print("신고 완료")
+        let alert = TrinapAlert(title: "신고 완료", timeText: nil, subtitle: "신고가 완료되었습니다.")
+        alert.addAction(title: "확인", style: .primary) { }
+        alert.showAlert(navigationController: owner.coordinator?.navigationController) {
+            owner.coordinator?.popViewController()
+        }
+    }
+}
