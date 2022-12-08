@@ -16,6 +16,8 @@ import Than
 final class PhotographerPreviewCell: BaseCollectionViewCell {
     
     // MARK: UI
+//    private lazy var thumbnailImageView = ThumbnailImageView()
+    private lazy var thumbnailImageView = ThumbnailCollectionView()
     
     private lazy var locationLabel = UILabel().than {
         $0.textColor = TrinapAsset.gray40.color
@@ -78,6 +80,7 @@ extension PhotographerPreviewCell {
         nicknameLabel.text = "\(preview.name) 작가"
         locationLabel.text = preview.location
         ratingLabel.configure(rating: preview.rating)
-        thumbnailImageView.configure(imageStrings: preview.pictures)
+//        thumbnailImageView.configure(imageStrings: preview.pictures)
+        thumbnailImageView.configure(urlStrings: preview.pictures)
     }
 }
