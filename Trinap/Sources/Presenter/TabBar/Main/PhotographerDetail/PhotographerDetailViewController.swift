@@ -180,7 +180,7 @@ class PhotographerDetailViewController: BaseViewController {
             .asObservable()
             .subscribe(onNext: { [weak self] in
                 let alert = TrinapAlert(title: "신고 완료", timeText: nil, subtitle: "신고가 완료되었습니다.")
-                alert.addAction(title: "확인", style: .primary) { }
+                alert.addAction(title: "확인", style: .primary)
                 alert.showAlert(navigationController: self?.navigationController)
             })
             .disposed(by: disposeBag)
