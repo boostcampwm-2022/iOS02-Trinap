@@ -22,20 +22,7 @@ final class DefaultCreateSueUseCase: CreateSueUseCase {
     
     // MARK: Methods
     func create(suedUserId: String, contents: Sue.SueContents) -> Observable<Void> {
-        var rawContents = ""
-        
-        switch contents {
-        case .blame:
-            rawContents = contents.contents
-        case .hateSpeech:
-            rawContents = contents.contents
-        case .annoyance:
-            rawContents = contents.contents
-        case .etc(let string):
-            rawContents = string
-        }
-        
-        return sueRepository.sueUser(suedUserId: suedUserId, contents: rawContents)
+        return sueRepository.sueUser(suedUserId: suedUserId, contents: contents.contents)
             .asObservable()
     }
 }
