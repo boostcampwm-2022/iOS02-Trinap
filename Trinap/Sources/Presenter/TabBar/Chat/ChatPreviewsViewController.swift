@@ -38,6 +38,12 @@ final class ChatPreviewsViewController: BaseViewController {
     }
     
     // MARK: - Methods
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        configureNavigationController()
+    }
+    
     override func configureHierarchy() {
         self.view.addSubview(chatPreviewsTableView)
     }
@@ -50,15 +56,9 @@ final class ChatPreviewsViewController: BaseViewController {
     
     override func configureAttributes() {
         self.dataSource = self.configureDataSource()
-        
         self.dataSource?.defaultRowAnimation = .fade
         
-        self.navigationController?.navigationBar.setBackgroundImage(
-            UIImage().withTintColor(TrinapAsset.white.color),
-            for: .default
-        )
-        self.navigationItem.titleView = LargeNavigationTitleView(title: "채팅")
-        self.navigationController?.setLeftArrowBackButton()
+        configureNavigationController()
     }
     
     override func bind() {
@@ -85,6 +85,23 @@ final class ChatPreviewsViewController: BaseViewController {
         }
         
         self.viewModel.showChatDetail(of: chatPreview)
+    }
+}
+
+// MARK: - Privates
+private extension ChatPreviewsViewController {
+    
+    func configureNavigationController() {
+        let appearance = UINavigationBarAppearance()
+        
+        appearance.configureWithDefaultBackground()
+        appearance.backgroundColor = TrinapAsset.white.color
+        
+        self.navigationController?.navigationBar.standardAppearance = appearance
+        self.navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        
+        self.navigationController?.navigationBar.topItem?.titleView = LargeNavigationTitleView(title: "채팅")
+        self.navigationController?.navigationBar.topItem?.backButtonTitle = ""
     }
 }
 

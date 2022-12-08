@@ -52,10 +52,6 @@ final class LocationShareViewController: BaseViewController {
     }
     
     // MARK: - Methods
-    override func viewDidLoad() {
-        super.viewDidLoad()
-    }
-    
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         
@@ -88,6 +84,16 @@ final class LocationShareViewController: BaseViewController {
     
     override func configureAttributes() {
         super.configureAttributes()
+        
+        let appearance = UINavigationBarAppearance()
+        let backButtonImage = UIImage(systemName: "arrow.left.circle.fill")?
+            .withTintColor(.black, renderingMode: .alwaysOriginal)
+
+        appearance.configureWithTransparentBackground()
+        appearance.setBackIndicatorImage(backButtonImage, transitionMaskImage: backButtonImage)
+        
+        self.navigationController?.navigationBar.standardAppearance = appearance
+        self.navigationController?.navigationBar.scrollEdgeAppearance = appearance
     }
     
     override func bind() {

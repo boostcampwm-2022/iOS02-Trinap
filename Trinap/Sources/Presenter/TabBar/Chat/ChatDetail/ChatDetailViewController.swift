@@ -50,6 +50,12 @@ final class ChatDetailViewController: BaseViewController {
     }
     
     // MARK: - Methods
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        configureNavigationController()
+    }
+    
     override func configureHierarchy() {
         self.view.addSubview(chatInputView)
         self.view.addSubview(chatTableView)
@@ -71,9 +77,10 @@ final class ChatDetailViewController: BaseViewController {
     override func configureAttributes() {
         self.view.backgroundColor = TrinapAsset.white.color
         self.title = viewModel.nickname
-        self.navigationController?.setShadowImage()
         
         self.dataSource = self.configureDataSource()
+        
+        configureNavigationController()
         
         bindChatInputAction()
     }
@@ -112,15 +119,30 @@ final class ChatDetailViewController: BaseViewController {
 }
 
 // MARK: - Privates
-extension ChatDetailViewController {
+private extension ChatDetailViewController {
     
-    private func bindChatInputAction() {
+    func configureNavigationController() {
+        let appearance = UINavigationBarAppearance()
+        let backButtonImage = UIImage(systemName: "arrow.left")?
+            .withTintColor(TrinapAsset.black.color, renderingMode: .alwaysOriginal)
+        
+        appearance.configureWithDefaultBackground()
+        appearance.backgroundColor = TrinapAsset.white.color
+        appearance.setBackIndicatorImage(backButtonImage, transitionMaskImage: backButtonImage)
+        
+        self.navigationController?.navigationBar.standardAppearance = appearance
+        self.navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        
+        self.navigationController?.navigationBar.topItem?.backButtonTitle = ""
+    }
+    
+    func bindChatInputAction() {
         chatInputView.didTapAction
             .emit(onNext: { [weak self] _ in self?.presentActionAlert() })
             .disposed(by: disposeBag)
     }
     
-    private func presentActionAlert() {
+    func presentActionAlert() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             .appendingAction(title: "포토 라이브러리") { [weak self] in self?.presentPhotoLibrary() }
             .appendingAction(title: "위치 공유") { [weak self] in self?.sendLocationShareChat() }
@@ -129,7 +151,7 @@ extension ChatDetailViewController {
         self.present(alert, animated: true)
     }
     
-    private func presentPhotoLibrary() {
+    func presentPhotoLibrary() {
         self.imagePicker
             .pickImage()
             .observe(on: MainScheduler.instance)
@@ -137,7 +159,7 @@ extension ChatDetailViewController {
             .disposed(by: disposeBag)
     }
     
-    private func presentUploadImageAlert(_ image: UIImage) {
+    func presentUploadImageAlert(_ image: UIImage) {
         let alert = UIAlertController(title: nil, message: "선택한 사진을 전송합니다.", preferredStyle: .alert)
             .appendingAction(title: "전송") { [weak self] in self?.requestUploadImage(image) }
             .appendingCancel()
@@ -145,7 +167,7 @@ extension ChatDetailViewController {
         self.present(alert, animated: true)
     }
     
-    private func requestUploadImage(_ image: UIImage) {
+    func requestUploadImage(_ image: UIImage) {
         let downsampledImage = downsamplingImageWithSize(image)
         
         guard let imageData = downsampledImage.image.jpegData(compressionQuality: 1) else { return }
@@ -159,7 +181,7 @@ extension ChatDetailViewController {
         .disposed(by: disposeBag)
     }
     
-    private func downsamplingImageWithSize(_ image: UIImage) -> (image: UIImage, size: CGSize) {
+    func downsamplingImageWithSize(_ image: UIImage) -> (image: UIImage, size: CGSize) {
         let widthLimit = 200.0
         var width = image.size.width
         var height = image.size.height
@@ -176,7 +198,7 @@ extension ChatDetailViewController {
         )
     }
     
-    private func sendLocationShareChat() {
+    func sendLocationShareChat() {
         self.viewModel.sendLocationShareChatAndPresent()
             .subscribe()
             .disposed(by: disposeBag)
