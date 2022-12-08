@@ -249,9 +249,7 @@ extension PhotographerDetailViewModel {
                             using: Coordinate(lat: photographer.latitude, lng: photographer.latitude)
                         )
                         .map { location in
-                            var photographer = PhotographerUser(user: user, photographer: photographer, location: location)
-                            photographer.pictures.removeFirst()
-                            return photographer
+                            PhotographerUser(user: user, photographer: photographer, location: location)
                         }
                     }
             }
