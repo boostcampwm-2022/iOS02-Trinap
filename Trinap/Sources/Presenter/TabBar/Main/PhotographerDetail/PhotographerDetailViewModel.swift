@@ -139,15 +139,21 @@ final class PhotographerDetailViewModel: ViewModelType {
                     .map { ($0, reservationId) }
             }
             .withUnretained(self)
-            .flatMap { owner, value in
+            .flatMap { owner, value -> Observable<String> in
                 Logger.print(333)
                 let (chatroomId, reservationId) = value
                 return owner.sendFirstChatUseCase
                     .send(chatroomId: chatroomId, reservationId: reservationId)
                     .map { _ in return chatroomId }
             }
-            .subscribe(onNext: { [weak self] chatroomId in
-                self?.coordiantor?.connectChatDetailCoordinator(chatroomId: chatroomId, nickname: "이게 된다고?")
+            .withLatestFrom(photographer, resultSelector: { chatroomId, photographer in
+                return (chatroomId, photographer.nickname)
+            })
+            .subscribe(onNext: { [weak self] chatroomId, nickname in
+                self?.coordiantor?.connectChatDetailCoordinator(
+                    chatroomId: chatroomId,
+                    photographerNickname: nickname
+                )
             })
             .disposed(by: disposeBag)
                         
