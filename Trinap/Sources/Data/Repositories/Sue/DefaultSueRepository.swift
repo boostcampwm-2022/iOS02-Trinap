@@ -44,7 +44,7 @@ final class DefaultSueRepository: SueRepository {
         return fireStoreService.createDocument(collection: .sue, document: dto.sueId, values: values)
     }
     
-    func fetchSuedUser() -> Single<[Sue]> {
+    func fetchSuedUsers() -> Single<[Sue]> {
         guard let userId = keychainManager.getToken(with: .userId) else {
             return .error(TokenManagerError.notFound)
         }

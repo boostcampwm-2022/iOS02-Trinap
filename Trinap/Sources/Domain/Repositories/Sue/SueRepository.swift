@@ -14,5 +14,5 @@ protocol SueRepository {
 
     // MARK: Methods
     func sueUser(suedUserId: String, contents: String) -> Single<Void>
-    func fetchSuedUser() -> Single<[Sue]>
+    func fetchSuedUsers() -> Single<[Sue]>
 }
