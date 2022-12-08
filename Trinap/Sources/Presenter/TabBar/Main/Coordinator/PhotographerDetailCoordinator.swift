@@ -21,7 +21,6 @@ final class PhotographerDetailCoordinator: Coordinator {
     private var userId: String?
     
     // MARK: Initializers
-    //TODO: 이거 가리려면 어떻게...?
     init(_ navigationController: UINavigationController) {
         self.navigationController = navigationController
         self.childCoordinators = []
@@ -78,11 +77,7 @@ final class PhotographerDetailCoordinator: Coordinator {
     }
     
     func showDetailImageView(urlString: String?) {
-        guard let urlString, let url = URL(string: urlString) else {
-            Logger.print("가드 걸림")
-            return
-        }
-        Logger.print("가드안걸림")
+        guard let urlString, let url = URL(string: urlString) else { return }
         let viewController = DetailImageViewController()
         viewController.configureImageView(url: url)
         viewController.modalPresentationStyle = .overCurrentContext
@@ -90,8 +85,17 @@ final class PhotographerDetailCoordinator: Coordinator {
     }
     
     func showSueController(suedUserId: String) {
-        Logger.print("sueController 만들어서 띄워주기")
         let viewController = dependencies.makeSueViewController(userId: suedUserId)
         self.navigationController.pushViewController(viewController, animated: false)
+    }
+    
+    func connectChatDetailCoordinator(chatroomId: String, photographerNickname: String) {
+        let chatDetailCoordinator = ChatDetailCoordinator(
+            self.navigationController,
+            chatroomId: chatroomId,
+            nickname: photographerNickname
+        )
+        chatDetailCoordinator.start()
+        self.childCoordinators.append(chatDetailCoordinator)
     }
 }

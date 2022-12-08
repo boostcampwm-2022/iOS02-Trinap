@@ -16,8 +16,8 @@ import Than
 final class PhotographerPreviewCell: BaseCollectionViewCell {
     
     // MARK: UI
-    // TODO: 이미지 여러개가 겹쳐서 나온다
-    private lazy var thumbnailImageView = ThumbnailImageView()
+//    private lazy var thumbnailImageView = ThumbnailImageView()
+    private lazy var thumbnailImageView = ThumbnailCollectionView()
     
     private lazy var locationLabel = UILabel().than {
         $0.textColor = TrinapAsset.gray40.color
@@ -31,7 +31,6 @@ final class PhotographerPreviewCell: BaseCollectionViewCell {
     private lazy var ratingLabel = StarView()
     
     // MARK: Properties
-//    var disposeBag = DisposeBag()
     
     // MARK: Methods
     override func prepareForReuse() {
@@ -73,16 +72,6 @@ final class PhotographerPreviewCell: BaseCollectionViewCell {
             make.top.equalTo(locationLabel.snp.bottom).offset(trinapOffset * 0.5)
         }
     }
-    
-//    func bind(photographerPreview: Driver<PhotographerPreview>) {
-//        Logger.print("bind쨔쟈스")
-//        photographerPreview
-//            .drive { [weak self] preview in
-//                guard let self else { return }
-//                self.configureCell(preview)
-//            }
-//            .disposed(by: self.disposeBag)
-//    }
 }
 
 extension PhotographerPreviewCell {
@@ -91,6 +80,7 @@ extension PhotographerPreviewCell {
         nicknameLabel.text = "\(preview.name) 작가"
         locationLabel.text = preview.location
         ratingLabel.configure(rating: preview.rating)
-        thumbnailImageView.configure(imageStrings: preview.pictures)
+//        thumbnailImageView.configure(imageStrings: preview.pictures)
+        thumbnailImageView.configure(urlStrings: preview.pictures)
     }
 }
