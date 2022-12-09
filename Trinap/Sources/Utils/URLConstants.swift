@@ -8,9 +8,9 @@
 
 import Foundation
 
-struct URLConstants {
+enum URLConstants {
     
-    static let notificationAuthorization = "App-prefs:path=NOTIFICATIONS_ID"
-    static let photoAuthorization = "App-prefs:root=Photos"
-    static let locationAuthorization = "App-prefs:root=LOCATION_ID"
+    static let notificationAuthorization = "app-settings:root=LOCATION_SERVICES"
+    static let photoAuthorization = "app-settings:root=Photos"
+    static let locationAuthorization = "app-settings:root=NOTIFICATIONS_ID"
 }
