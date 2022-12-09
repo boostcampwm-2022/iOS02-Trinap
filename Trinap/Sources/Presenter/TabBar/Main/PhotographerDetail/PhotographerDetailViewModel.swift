@@ -103,14 +103,6 @@ final class PhotographerDetailViewModel: ViewModelType {
                 return date.count == 2
             }
         
-        // 1. 얼럿 띄워주기
-        // 2. 얼럿에서 false 나오면 종료. true 나오면 계속.
-        // 3. reservation만들어주기
-        // 4. 채팅방 만들기
-        // 5. 채팅 보내기
-        // 6. 채팅방으로 이동하는 coordinator 함수 실행
-        // TODO: chatroom 중복되는 부분 있으면 만들지 않고 해당 chatroomId만 반환하도록 createChatroomUseCase 수정
-        // TODO: 채팅방으로 이동하는 coordinator 함수 만들어서 연결
         input.confirmTrigger
             .withUnretained(self)
             .flatMap { $0.0.showAlert() }
@@ -119,7 +111,6 @@ final class PhotographerDetailViewModel: ViewModelType {
             .withLatestFrom(reservationDate.asObservable())
             .withUnretained(self)
             .flatMap { owner, dates -> Observable<String> in
-                Logger.print(111)
                 guard
                     let start = dates[safe: 0],
                     let end = dates[safe: 1]
@@ -134,13 +125,11 @@ final class PhotographerDetailViewModel: ViewModelType {
             }
             .withUnretained(self)
             .flatMap { owner, reservationId -> Observable<(String, String)> in
-                Logger.print(222)
                 return owner.createChatroomUseCase.create(photographerUserId: owner.userId)
                     .map { ($0, reservationId) }
             }
             .withUnretained(self)
             .flatMap { owner, value -> Observable<String> in
-                Logger.print(333)
                 let (chatroomId, reservationId) = value
                 return owner.sendFirstChatUseCase
                     .send(chatroomId: chatroomId, reservationId: reservationId)
