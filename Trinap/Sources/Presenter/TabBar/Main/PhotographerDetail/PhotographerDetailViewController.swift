@@ -179,7 +179,12 @@ class PhotographerDetailViewController: BaseViewController {
         self.viewModel.blockPhotographer()
             .asObservable()
             .subscribe(onNext: { [weak self] in
-                let alert = TrinapAlert(title: "신고 완료", timeText: nil, subtitle: "신고가 완료되었습니다.")
+                let alert = TrinapAlert(
+                    title: "차단 완료",
+                    timeText: nil,
+                    subtitle: "차단이 완료되었습니다.",
+                    size: CGSize(width: 300, height: 170)
+                )
                 alert.addAction(title: "확인", style: .primary)
                 alert.showAlert(navigationController: self?.navigationController)
             })
