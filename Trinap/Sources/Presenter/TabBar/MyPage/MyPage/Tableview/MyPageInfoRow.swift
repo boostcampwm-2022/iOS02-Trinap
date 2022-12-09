@@ -28,11 +28,22 @@ final class MyPageInfoCell: BaseTableViewCell {
         addSubview(infoLabel)
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        self.versionLabel.text = nil
+        self.infoLabel.text = nil
+    }
+    
     override func configureConstraints() {
         infoLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(trinapOffset * 2)
             make.centerY.equalToSuperview()
         }
+    }
+    
+    override func configureAttributes() {
+        self.selectionStyle = .none
     }
     
     private func configure() {
