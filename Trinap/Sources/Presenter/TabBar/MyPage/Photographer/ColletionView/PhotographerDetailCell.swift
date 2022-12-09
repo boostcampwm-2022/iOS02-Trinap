@@ -33,6 +33,7 @@ final class PhotographerDetailIntroductionCell: BaseCollectionViewCell {
     private lazy var introduceLabel = UILabel().than {
         $0.text = """
             """
+        $0.lineBreakMode = .byWordWrapping
         $0.numberOfLines = 0
         $0.textColor = TrinapAsset.gray40.color
         $0.font = TrinapFontFamily.Pretendard.regular.font(size: 14)
@@ -44,6 +45,7 @@ final class PhotographerDetailIntroductionCell: BaseCollectionViewCell {
     }
     
     private lazy var precautionsLabel = UILabel().than {
+        $0.lineBreakMode = .byWordWrapping
         $0.text = """
             예약과 관련된 상세한 정보는 채팅으로 정해주세요.
             채팅 시 민감한 정보 교환에 주의해주세요.
@@ -114,6 +116,12 @@ final class PhotographerDetailIntroductionCell: BaseCollectionViewCell {
     
     func configure(with information: PhotographerUser) {
         self.introduceLabel.text = information.introduction
-        self.priceLabel.text = "\(information.pricePerHalfHour ?? 0)원"
+        
+        guard let price = information.pricePerHalfHour else {
+            priceLabel.text = "가격이 책정되지 않았습니다."
+            return
+        }
+        
+        self.priceLabel.text = "\(price)원"
     }
 }
