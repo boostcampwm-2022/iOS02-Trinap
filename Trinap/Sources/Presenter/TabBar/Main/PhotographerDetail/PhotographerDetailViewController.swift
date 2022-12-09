@@ -310,7 +310,7 @@ extension PhotographerDetailViewController {
             layoutSize:
                 NSCollectionLayoutSize(
                     widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .estimated(trinapOffset * 22)
+                    heightDimension: .estimated(trinapOffset * 23)
                 ),
             subitems: [item]
         )
@@ -396,16 +396,17 @@ extension PhotographerDetailViewController {
     
     private func generateReviewLayout() -> NSCollectionLayoutSection {
         let item = NSCollectionLayoutItem(
-            layoutSize: NSCollectionLayoutSize(
+            layoutSize: .init(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .fractionalHeight(1.0)
+                heightDimension: .estimated(trinapOffset * 13)
             )
         )
         
         let group = NSCollectionLayoutGroup.vertical(
-            layoutSize: NSCollectionLayoutSize(
+            layoutSize: .init(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .estimated(trinapOffset * 12)),
+                heightDimension: .estimated(trinapOffset * 13)
+            ),
             subitems: [item]
         )
         
