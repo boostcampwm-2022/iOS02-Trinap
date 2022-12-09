@@ -11,12 +11,6 @@ import UIKit
 import RxCocoa
 import RxSwift
 
-enum PhotographerLayout: Int, CaseIterable {
-    case picture
-    case detail
-    case review
-}
-
 final class EditPhotographerViewController: BaseViewController {
     
     typealias DataSource = UICollectionViewDiffableDataSource<PhotographerSection, PhotographerSection.Item>
@@ -36,7 +30,7 @@ final class EditPhotographerViewController: BaseViewController {
     private let viewModel: EditPhotographerViewModel
     private lazy var collectionView = UICollectionView(
         frame: .zero,
-        collectionViewLayout: configureCollectionViewLayout(.picture)
+        collectionViewLayout: configureCollectionViewLayout(.portfolio, isEditable: self.isEditable.value)
     )
     
     private lazy var defaultPhotographerView = DefaultEditPhotographerView()
@@ -127,8 +121,11 @@ final class EditPhotographerViewController: BaseViewController {
             .compactMap { PhotographerLayout(rawValue: $0) }
             .withUnretained(self)
             .subscribe(onNext: { owner, section in
-                owner.collectionView.setCollectionViewLayout(owner.configureCollectionViewLayout(section), animated: false)
-                if section != .picture && self.isEditable.value {
+                owner.collectionView.setCollectionViewLayout(
+                    owner.configureCollectionViewLayout(section, isEditable: owner.isEditable.value),
+                    animated: false
+                )
+                if section != .portfolio && self.isEditable.value {
                     self.isEditable.accept(false)
                 }
             })
@@ -271,7 +268,6 @@ extension EditPhotographerViewController {
                     return UICollectionViewCell()
                 }
                 cell.configure(with: information)
-                cell.isUserInteractionEnabled = false
                 self.defaultPhotographerView.isHidden = true
                 return cell
             case .review(let review):
@@ -279,15 +275,12 @@ extension EditPhotographerViewController {
                     return UICollectionViewCell()
                 }
                 cell.configure(with: review)
-                self.defaultPhotographerView.isHidden = true
-                cell.isUserInteractionEnabled = false
                 return cell
             case .summaryReview(let review):
                 guard let cell = collectionView.dequeueCell(PhotographerSummaryReviewcell.self, for: indexPath) else {
                     return UICollectionViewCell()
                 }
                 cell.configure(with: review)
-                cell.isUserInteractionEnabled = false
                 return cell
             }
         }
@@ -334,172 +327,10 @@ extension EditPhotographerViewController {
             }
         }
     }
-}
-
-// MARK: - CollectionViewLayout
-extension EditPhotographerViewController {
     
-    private func configureCollectionViewLayout(_ section: PhotographerLayout) -> UICollectionViewLayout {
+    private func configureCollectionViewLayout(_ section: PhotographerLayout, isEditable: Bool) -> UICollectionViewLayout {
         return UICollectionViewCompositionalLayout { index, _ -> NSCollectionLayoutSection? in
-            switch section {
-            case .picture:
-                return self.photoSectionLayout(index: index)
-            case .detail:
-                return self.detailSectionLayout(index: index)
-            case .review:
-                return self.reviewSetionLayout(index: index)
-            }
+            return section.createLayout(index: index, isEditable: isEditable)
         }
-    }
-    
-    private func photoSectionLayout(index: Int) -> NSCollectionLayoutSection {
-        return index == 0 ? self.generateProfileLayout() : self.generatePhotoLayout()
-    }
-    
-    private func detailSectionLayout(index: Int) -> NSCollectionLayoutSection {
-        return index == 0 ? self.generateProfileLayout() : self.generateDetailLayout()
-    }
-    
-    private func reviewSetionLayout(index: Int) -> NSCollectionLayoutSection {
-        let isProfile = index == 0
-        return isProfile ? generateProfileLayout() : index == 1 ? generateReviewRatingLayout() : generateReviewLayout()
-    }
-    
-    /// 작가 프로필 ~ 필터포함
-    private func generateProfileLayout() -> NSCollectionLayoutSection {
-        let item = NSCollectionLayoutItem(
-            layoutSize: NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .fractionalHeight(1.0))
-        )
-        
-        let group = NSCollectionLayoutGroup.horizontal(
-            layoutSize:
-                NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .estimated(trinapOffset * 22)
-                ),
-            subitems: [item]
-        )
-        
-        return NSCollectionLayoutSection(group: group)
-    }
-    
-    /// 사진 레이아웃
-    private func generatePhotoLayout() -> NSCollectionLayoutSection {
-        let itemSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
-            heightDimension: .fractionalHeight(1.0)
-        )
-        let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        
-        let groupSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
-            heightDimension: .fractionalWidth(1 / 3)
-        )
-        
-        let inset = trinapOffset / 2
-        item.contentInsets = NSDirectionalEdgeInsets(top: inset, leading: inset, bottom: inset, trailing: inset)
-        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitem: item, count: 3)
-        
-        let section = NSCollectionLayoutSection(group: group)
-        
-        let isEditable = self.isEditable.value
-        
-        let header = NSCollectionLayoutBoundarySupplementaryItem(
-            layoutSize: NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(trinapOffset * 8)
-            ),
-            elementKind: isEditable ? EditPhotographerPhotoDeleteHeaderView.reuseIdentifier : EditPhotographerPhotoHeaderView.reuseIdentifier,
-            alignment: .top
-        )
-        
-        section.boundarySupplementaryItems = [header]
-        
-        section.contentInsets = NSDirectionalEdgeInsets(top: inset, leading: 0, bottom: 0, trailing: inset)
-        return section
-    }
-    
-    /// 상세 정보 레이아웃
-    private func generateDetailLayout() -> NSCollectionLayoutSection {
-        let item = NSCollectionLayoutItem(
-            layoutSize:
-                NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .fractionalHeight(1.0)
-                )
-        )
-        
-        let group = NSCollectionLayoutGroup.vertical(
-            layoutSize:
-                NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .estimated(trinapOffset * 40)
-                ),
-            subitems: [item]
-        )
-        
-        let offset = trinapOffset * 2
-        let section = NSCollectionLayoutSection(group: group)
-        section.contentInsets = NSDirectionalEdgeInsets(top: offset, leading: offset, bottom: offset, trailing: offset)
-        return section
-    }
-    
-    private func generateReviewRatingLayout() -> NSCollectionLayoutSection {
-        let item = NSCollectionLayoutItem(
-            layoutSize: NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .fractionalHeight(1.0)
-            )
-        )
-        
-        let group = NSCollectionLayoutGroup.vertical(
-            layoutSize: NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .estimated(trinapOffset * 8)),
-            subitems: [item]
-        )
-        
-        let section = NSCollectionLayoutSection(group: group)
-        
-        let offset = trinapOffset * 2
-        section.contentInsets = NSDirectionalEdgeInsets(
-            top: offset,
-            leading: offset,
-            bottom: offset,
-            trailing: offset
-        )
-        
-        return section
-    }
-    
-    private func generateReviewLayout() -> NSCollectionLayoutSection {
-        let item = NSCollectionLayoutItem(
-            layoutSize: .init(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .estimated(trinapOffset * 13)
-            )
-        )
-        
-        let group = NSCollectionLayoutGroup.vertical(
-            layoutSize: .init(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .estimated(trinapOffset * 13)
-            ),
-            subitems: [item]
-        )
-        
-        let section = NSCollectionLayoutSection(group: group)
-        
-        let offset = trinapOffset * 2
-        section.contentInsets = NSDirectionalEdgeInsets(
-            top: offset,
-            leading: offset,
-            bottom: offset,
-            trailing: offset
-        )
-        
-        return section
     }
 }
