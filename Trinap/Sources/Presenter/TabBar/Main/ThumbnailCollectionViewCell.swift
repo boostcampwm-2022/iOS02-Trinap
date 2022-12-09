@@ -15,7 +15,9 @@ import Kingfisher
 final class ThumbnailCollectionViewCell: BaseCollectionViewCell {
     
     // MARK: UI
-    private lazy var imageView = UIImageView()
+    private lazy var imageView = UIImageView().than {
+        $0.contentMode = .scaleAspectFill
+    }
     
     // MARK: Properties
     
@@ -36,18 +38,13 @@ final class ThumbnailCollectionViewCell: BaseCollectionViewCell {
         let width = imageView.frame.width
         let height = imageView.frame.height
         let url = URL(string: imageString)
-        Logger.print(imageString)
         
         imageView.kf.setImage(
             with: url,
-            placeholder: UIView.placeholder(width: width, height: height)
-//            options: [.processor(DownsamplingImageProcessor(size: CGSize(width: width, height: height)))]
+            placeholder: UIView.placeholder(width: width, height: height),
+            options: [.processor(DownsamplingImageProcessor(size: CGSize(width: 400, height: 300)))]
         )
-        Logger.print(imageView.image)
     }
-    
-    override func configureAttributes() {}
-    override func bind() {}
 
     override func prepareForReuse() {
         imageView.image = nil

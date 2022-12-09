@@ -42,6 +42,8 @@ final class TrinapAlert: BaseViewController {
     
     // MARK: Properties
     private var dismissCompletion: (() -> Void)?
+    private var width = 300.0
+    private var height = 200.0
     
     // MARK: Initializers
     init(title: String, timeText: String?, subtitle: String) {
@@ -50,6 +52,21 @@ final class TrinapAlert: BaseViewController {
         subtitleLabel.text = subtitle
         configureTimeLabel(timeText: timeText)
     }
+    
+    init(
+        title: String,
+        timeText: String?,
+        subtitle: String,
+        size: CGSize
+    ) {
+        super.init()
+        alertTitleLabel.text = title
+        subtitleLabel.text = subtitle
+        configureTimeLabel(timeText: timeText)
+        self.width = size.width
+        self.height = size.height
+    }
+
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -97,10 +114,10 @@ final class TrinapAlert: BaseViewController {
     }
     
     override func configureConstraints() {
-        alertView.snp.makeConstraints { make in
+        alertView.snp.makeConstraints { [weak self] make in
             make.centerX.centerY.equalToSuperview()
-            make.width.equalTo(350)
-            make.height.equalTo(200)
+            make.width.equalTo(self?.width ?? 300)
+            make.height.equalTo(self?.height ?? 200)
         }
         
         alertTitleLabel.snp.makeConstraints { make in
@@ -110,7 +127,7 @@ final class TrinapAlert: BaseViewController {
         
         subtitleLabel.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.top.equalTo(alertTitleLabel.snp.bottom).offset(40)
+            make.bottom.equalTo(buttonStack.snp.top).offset(-24)
         }
         
         buttonStack.snp.makeConstraints { make in

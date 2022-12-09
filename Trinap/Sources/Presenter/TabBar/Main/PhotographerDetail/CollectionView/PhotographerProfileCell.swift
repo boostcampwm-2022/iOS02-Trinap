@@ -19,7 +19,7 @@ final class PhotographerProfileCell: BaseCollectionViewCell {
         $0.textColor = .black
         $0.font = TrinapFontFamily.Pretendard.bold.font(size: 20)
     }
-     
+    
     private lazy var locationLabel = UILabel().than {
         $0.text = "서울시 성동구"
         $0.textColor = TrinapAsset.gray40.color
@@ -71,7 +71,7 @@ final class PhotographerProfileCell: BaseCollectionViewCell {
         }
         
         filterView.snp.makeConstraints { make in
-            make.leading.trailing.bottom.equalToSuperview()
+            make.leading.trailing.equalToSuperview()
             make.top.equalTo(collectionView.snp.bottom)
             make.height.equalTo(trinapOffset * 6)
         }

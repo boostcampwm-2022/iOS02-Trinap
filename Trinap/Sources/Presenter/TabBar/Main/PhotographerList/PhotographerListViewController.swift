@@ -79,8 +79,7 @@ final class PhotographerListViewController: BaseViewController {
         }
         
         collectionView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(trinapOffset)
-            make.trailing.equalToSuperview().offset(-trinapOffset)
+            make.horizontalEdges.equalToSuperview()
             make.top.equalTo(filterView.snp.bottom).offset(15)
             make.bottom.equalToSuperview()
         }

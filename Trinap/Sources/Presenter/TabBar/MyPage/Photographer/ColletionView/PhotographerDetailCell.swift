@@ -32,14 +32,6 @@ final class PhotographerDetailIntroductionCell: BaseCollectionViewCell {
     
     private lazy var introduceLabel = UILabel().than {
         $0.text = """
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi et, auctor egestas sit integer.
-            Vel tellus aliquam hac commodo pulvinar non nam. Amet,
-            molestie orci, vivamus congue sed diam sem quisque enim. Auctor nibh commodo suspendisse eget urna,
-            rutrum fames. Sed mattis cursus odio dignissim aliquam,
-            laoreet placerat. Aliquam elit mauris sodales interdum in a in non ut.
-            Donec elementum, feugiat ultricies est.
-            Hendrerit aliquam adipiscing elit augue et convallis tempor ullamcorper nulla.
-            Dictumst massa bibendum hac donec amet vitae feugiat.
             """
         $0.numberOfLines = 0
         $0.textColor = TrinapAsset.gray40.color
@@ -53,8 +45,10 @@ final class PhotographerDetailIntroductionCell: BaseCollectionViewCell {
     
     private lazy var precautionsLabel = UILabel().than {
         $0.text = """
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi et, auctor egestas sit integer.
-            Vel tellus aliquam hac commodo pulvinar non nam. Amet, molestie orci, vivamus congue sed diam
+            예약과 관련된 상세한 정보는 채팅으로 정해주세요.
+            채팅 시 민감한 정보 교환에 주의해주세요.
+            작가의 위법행위를 발견한다면 즉시 신고해주세요.
+            Trinap 외 다른 채널을 사용하여 발생한 불이익은 Trinap에서 책임지지 않습니다.
             """
         $0.numberOfLines = 0
         $0.textColor = TrinapAsset.gray40.color

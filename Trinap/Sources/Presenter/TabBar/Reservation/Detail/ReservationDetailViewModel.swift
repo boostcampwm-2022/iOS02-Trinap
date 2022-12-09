@@ -69,7 +69,18 @@ final class ReservationDetailViewModel: ViewModelType {
             .disposed(by: disposeBag)
         
         input.photographerUserViewTap
-            .bind(onNext: { Logger.print("Photographer") })
+            .withUnretained(self)
+            .bind(onNext: { owner, _ in
+                guard let userId = owner.reservation?.customerUser.userId,
+                      let lat = owner.reservation?.latitude,
+                      let lng = owner.reservation?.longitude
+                else { return }
+                
+                owner.reservationCoordinator?.connectDetailPhotographerFlow(
+                    userId: userId,
+                    searchCoordinate: Coordinate(lat: lat, lng: lng)
+                )
+            })
             .disposed(by: disposeBag)
         
         let fetchReservation = fetchReservationUseCase.execute(reservationId: reservationId)

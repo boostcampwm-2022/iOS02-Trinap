@@ -179,7 +179,12 @@ class PhotographerDetailViewController: BaseViewController {
         self.viewModel.blockPhotographer()
             .asObservable()
             .subscribe(onNext: { [weak self] in
-                let alert = TrinapAlert(title: "신고 완료", timeText: nil, subtitle: "신고가 완료되었습니다.")
+                let alert = TrinapAlert(
+                    title: "차단 완료",
+                    timeText: nil,
+                    subtitle: "차단이 완료되었습니다.",
+                    size: CGSize(width: 300, height: 170)
+                )
                 alert.addAction(title: "확인", style: .primary)
                 alert.showAlert(navigationController: self?.navigationController)
             })
@@ -305,7 +310,7 @@ extension PhotographerDetailViewController {
             layoutSize:
                 NSCollectionLayoutSize(
                     widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .estimated(trinapOffset * 22)
+                    heightDimension: .estimated(trinapOffset * 23)
                 ),
             subitems: [item]
         )
@@ -391,16 +396,17 @@ extension PhotographerDetailViewController {
     
     private func generateReviewLayout() -> NSCollectionLayoutSection {
         let item = NSCollectionLayoutItem(
-            layoutSize: NSCollectionLayoutSize(
+            layoutSize: .init(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .fractionalHeight(1.0)
+                heightDimension: .estimated(trinapOffset * 13)
             )
         )
         
         let group = NSCollectionLayoutGroup.vertical(
-            layoutSize: NSCollectionLayoutSize(
+            layoutSize: .init(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .estimated(trinapOffset * 12)),
+                heightDimension: .estimated(trinapOffset * 13)
+            ),
             subitems: [item]
         )
         
