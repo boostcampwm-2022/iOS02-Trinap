@@ -53,22 +53,23 @@ final class PhotographerPreviewCell: BaseCollectionViewCell {
     override func configureConstraints() {
         
         thumbnailImageView.snp.makeConstraints { make in
-            make.horizontalEdges.top.equalToSuperview()
+            make.top.equalToSuperview()
+            make.horizontalEdges.equalToSuperview().inset(trinapOffset)
             make.bottom.equalToSuperview().offset(-60)
         }
         
         locationLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview()
+            make.leading.equalToSuperview().inset(trinapOffset)
             make.top.equalTo(thumbnailImageView.snp.bottom).offset(trinapOffset)
         }
         
         ratingLabel.snp.makeConstraints { make in
-            make.trailing.equalToSuperview()
+            make.trailing.equalToSuperview().inset(trinapOffset)
             make.centerY.equalTo(locationLabel.snp.centerY)
         }
         
         nicknameLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview()
+            make.leading.equalToSuperview().inset(trinapOffset)
             make.top.equalTo(locationLabel.snp.bottom).offset(trinapOffset * 0.5)
         }
     }
