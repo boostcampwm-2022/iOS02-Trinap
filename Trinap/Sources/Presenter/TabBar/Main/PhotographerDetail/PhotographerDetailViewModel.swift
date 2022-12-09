@@ -232,7 +232,7 @@ extension PhotographerDetailViewModel {
                 self.fetchPhotographerUseCase.fetch(photographerUserId: user.userId)
                     .flatMap { photographer in
                         return self.mapRepository.fetchLocationName(
-                            using: Coordinate(lat: photographer.latitude, lng: photographer.latitude)
+                            using: Coordinate(lat: photographer.latitude, lng: photographer.longitude)
                         )
                         .map { location in
                             var photographer = PhotographerUser(user: user, photographer: photographer, location: location)
