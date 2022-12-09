@@ -66,3 +66,27 @@ extension ReservationCoordinator {
         self.navigationController.pushViewController(customerReviewListViewController, animated: true)
     }
 }
+
+extension ReservationCoordinator {
+    
+    func connectDetailPhotographerFlow(userId: String, searchCoordinate: Coordinate) {
+        let photographerDetailCoordinator = PhotographerDetailCoordinator(
+            userId: userId,
+            searchCoordinate: searchCoordinate,
+            navigationController: self.navigationController
+        )
+        photographerDetailCoordinator.delegate = self
+        photographerDetailCoordinator.start()
+        self.childCoordinators.append(photographerDetailCoordinator)
+    }
+}
+
+// MARK: - Coodinator Delegate
+extension ReservationCoordinator: CoordinatorDelegate {
+    
+    func didFinish(childCoordinator: Coordinator) {
+        if childCoordinator is PhotographerDetailCoordinator {
+            self.navigationController.popViewController(animated: false)
+        }
+    }
+}
