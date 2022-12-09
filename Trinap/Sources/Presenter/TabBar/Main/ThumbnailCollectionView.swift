@@ -19,6 +19,7 @@ final class ThumbnailCollectionView: BaseView {
     }
     
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout).than {
+        self.setViewShadow(backView: $0)
         $0.isScrollEnabled = true
         $0.isPagingEnabled = true
         $0.clipsToBounds = true
@@ -114,5 +115,18 @@ extension ThumbnailCollectionView: UICollectionViewDelegateFlowLayout {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let page = scrollView.contentOffset.x / scrollView.frame.size.width
         thumbnailPageControl.currentPage = Int(round(page))
+    }
+}
+
+private extension UIView {
+    func setViewShadow(backView: UIView) {
+        backView.layer.masksToBounds = true
+        backView.layer.cornerRadius = 20
+        
+        layer.cornerRadius = 20
+layer.masksToBounds = false
+        layer.shadowOpacity = 0.5
+        layer.shadowOffset = CGSize(width: 2, height: 2)
+        layer.shadowRadius = 3
     }
 }
