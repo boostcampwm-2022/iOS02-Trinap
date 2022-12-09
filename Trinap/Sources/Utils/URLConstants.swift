@@ -10,7 +10,7 @@ import Foundation
 
 enum URLConstants {
     
-    static let notificationAuthorization = "app-settings:root=LOCATION_SERVICES"
+    static let notificationAuthorization = "app-settings:root=NOTIFICATIONS_ID"
     static let photoAuthorization = "app-settings:root=Photos"
-    static let locationAuthorization = "app-settings:root=NOTIFICATIONS_ID"
+    static let locationAuthorization = "app-settings:root=LOCATION_SERVICES"
 }
