@@ -15,7 +15,7 @@ final class EditProfileViewController: BaseViewController {
     
     // MARK: - UI
     private lazy var doneButton = UIButton().than {
-        $0.setTitle("확인", for: .normal)
+        $0.setTitle("완료", for: .normal)
         $0.setTitleColor(TrinapAsset.primary.color, for: .normal)
     }
     
