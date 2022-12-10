@@ -49,35 +49,39 @@ final class PhotographerReivewCell: BaseCollectionViewCell {
         super.configureConstraints()
         
         profileImageView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(16)
-            make.top.equalToSuperview().offset(24)
-            make.width.height.equalTo(40)
+            make.leading.equalToSuperview().offset(trinapOffset * 2)
+            make.top.equalToSuperview().offset(trinapOffset * 3)
+            make.width.height.equalTo(trinapOffset * 5)
         }
         
         nicknameLabel.snp.makeConstraints { make in
-            make.leading.equalTo(profileImageView.snp.trailing).offset(8)
+            make.leading.equalTo(profileImageView.snp.trailing).offset(trinapOffset)
             make.top.equalTo(profileImageView.snp.top)
         }
         
         dateLabel.snp.makeConstraints { make in
-            make.leading.equalTo(profileImageView.snp.trailing).offset(8)
+            make.leading.equalTo(profileImageView.snp.trailing).offset(trinapOffset)
             make.bottom.equalTo(profileImageView.snp.bottom)
         }
         
         ratingView.snp.makeConstraints { make in
             make.width.equalTo(68)
-            make.trailing.equalToSuperview().offset(-16)
+            make.trailing.equalToSuperview().inset(trinapOffset * 2)
             make.centerY.equalTo(profileImageView)
         }
         
         contentLabel.snp.makeConstraints { make in
             make.leading.equalTo(profileImageView.snp.leading)
             make.trailing.equalTo(ratingView.snp.trailing)
-            make.top.equalTo(profileImageView.snp.bottom).offset(16)
-            make.bottom.equalToSuperview().offset(-24)
+            make.top.equalTo(profileImageView.snp.bottom).offset(trinapOffset * 2)
+            make.bottom.equalToSuperview().inset(trinapOffset * 3)
         }
     }
 
+    override func configureAttributes() {
+        self.isUserInteractionEnabled = false
+    }
+    
     func configure(with review: UserReview) {
         self.nicknameLabel.text = review.user.nickname
         self.dateLabel.text = review.createdAt.toString(type: .yearAndMonthAndDate)

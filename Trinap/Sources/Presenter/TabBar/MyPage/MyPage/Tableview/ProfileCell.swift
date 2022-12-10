@@ -59,6 +59,7 @@ final class ProfileCell: BaseTableViewCell {
     
     override func configureAttributes() {
         self.backgroundColor = TrinapAsset.background.color
+        self.selectionStyle = .none
     }
     
     private func configure() {

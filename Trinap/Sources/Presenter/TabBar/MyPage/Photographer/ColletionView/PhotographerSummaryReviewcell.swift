@@ -56,6 +56,10 @@ final class PhotographerSummaryReviewcell: BaseCollectionViewCell {
         }
     }
     
+    override func configureAttributes() {
+        self.isUserInteractionEnabled = false
+    }
+    
     func configure(with review: ReviewSummary) {
         self.ratingCountLabel.text = String(review.rating)
         self.reviewCountLabel.text = "리뷰 \(review.count)개"

@@ -14,7 +14,7 @@ final class MyPageViewController: BaseViewController {
     
     // MARK: - Properties
     private let viewModel: MyPageViewModel
-    private lazy var tableView = UITableView(frame: .zero, style: .plain)
+    private lazy var tableView = UITableView(frame: .zero, style: .grouped)
     
     private var dataSource: UITableViewDiffableDataSource<MyPageSection, MyPageCellType>?
     // MARK: - Initializers
@@ -73,31 +73,39 @@ extension MyPageViewController: UITableViewDelegate {
     private func configureTableView() {
         tableView.register(ProfileCell.self)
         tableView.register(MyPageInfoCell.self)
+        tableView.register(MyPageSwitchRow.self)
+        
         tableView.separatorStyle = .none
     }
     
     private func generateDataSource() -> UITableViewDiffableDataSource<MyPageSection, MyPageCellType> {
-        return UITableViewDiffableDataSource(tableView: tableView) { tableView, indexPath, itemIdentifier in
-            if case let .profile(user) = itemIdentifier {
+        return UITableViewDiffableDataSource(tableView: tableView) { tableView, indexPath, item in
+            
+            switch item {
+            case let .profile(user):
                 guard let cell = tableView.dequeueCell(ProfileCell.self, for: indexPath) else {
                     return UITableViewCell()
                 }
                 cell.user = user
-                cell.selectionStyle = .none
                 return cell
-            } else {
-                guard let cell = tableView.dequeueCell(MyPageInfoCell.self, for: indexPath) else {
+            case let .photographerExposure(isExposure):
+                guard let cell = tableView.dequeueCell(MyPageSwitchRow.self, for: indexPath) else {
                     return UITableViewCell()
                 }
-                cell.type = itemIdentifier
+                cell.configure(isExposure: isExposure)
+                
                 cell.exposureSwitch.rx.controlEvent(.valueChanged)
                     .withUnretained(self)
                     .subscribe(onNext: { owner, _ in
                         owner.viewModel.updatePhotographerExposure(cell.exposureSwitch.isOn)
                     })
                     .disposed(by: cell.disposeBag)
-                
-                cell.selectionStyle = .none
+                return cell
+            default:
+                guard let cell = tableView.dequeueCell(MyPageInfoCell.self, for: indexPath) else {
+                    return UITableViewCell()
+                }
+                cell.type = item
                 return cell
             }
         }
