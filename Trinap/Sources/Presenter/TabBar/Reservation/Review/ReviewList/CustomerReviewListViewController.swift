@@ -15,17 +15,9 @@ import SnapKit
 final class CustomerReviewListViewController: BaseViewController {
     
     // MARK: - UI
-    private lazy var backButton = UIButton().than {
-        $0.setImage(UIImage(systemName: "arrow.left"), for: .normal)
-        $0.tintColor = TrinapAsset.black.color
-    }
-    
-    private lazy var titleLabel = UILabel().than {
-        $0.font = TrinapFontFamily.Pretendard.bold.font(size: 16)
-        $0.textColor = TrinapAsset.black.color
-    }
-    
     private lazy var reviewListTableView = UITableView().than {
+        $0.tableHeaderView = UIView()
+        $0.tableFooterView = UIView()
         $0.register(ReviewCell.self)
     }
     
@@ -42,36 +34,24 @@ final class CustomerReviewListViewController: BaseViewController {
     }
     
     // MARK: - Methods
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        configureNavigationBar()
     }
     
     override func configureHierarchy() {
         super.configureHierarchy()
         
-        self.view.addSubviews([
-            backButton,
-            titleLabel,
-            reviewListTableView
-        ])
+        self.view.addSubview(reviewListTableView)
     }
     
     override func configureConstraints() {
         super.configureConstraints()
         
-        backButton.snp.makeConstraints { make in
-            make.top.equalTo(self.view.safeAreaLayoutGuide).offset(12)
-            make.leading.equalToSuperview().offset(16)
-        }
-        
-        titleLabel.snp.makeConstraints { make in
-            make.centerX.equalTo(self.view)
-            make.centerY.equalTo(backButton)
-        }
-        
         reviewListTableView.snp.makeConstraints { make in
-            make.top.equalTo(backButton.snp.bottom).offset(12)
-            make.leading.trailing.bottom.equalTo(self.view.safeAreaLayoutGuide)
+            make.leading.trailing.top.equalTo(self.view.safeAreaLayoutGuide)
+            make.bottom.equalToSuperview()
         }
     }
     
@@ -79,13 +59,12 @@ final class CustomerReviewListViewController: BaseViewController {
         super.configureAttributes()
         
         configureDataSource()
-        self.titleLabel.text = "\(viewModel.userNickname)님의 리뷰"
     }
     
     override func bind() {
         super.bind()
         
-        let input = CustomerReviewListViewModel.Input(backButtonTap: backButton.rx.tap)
+        let input = CustomerReviewListViewModel.Input()
         let output = viewModel.transform(input: input)
         
         output.reviewList
@@ -121,5 +100,19 @@ private extension CustomerReviewListViewController {
         snapshot.appendItems(userReviews)
         
         return snapshot
+    }
+    
+    func configureNavigationBar() {
+        let appearance = UINavigationBarAppearance()
+        let backButtonImage = UIImage(systemName: "arrow.left")
+        
+        appearance.configureWithDefaultBackground()
+        appearance.backgroundColor = TrinapAsset.white.color
+        appearance.setBackIndicatorImage(backButtonImage, transitionMaskImage: backButtonImage)
+        
+        self.navigationItem.standardAppearance = appearance
+        self.navigationItem.scrollEdgeAppearance = appearance
+        self.navigationItem.scrollEdgeAppearance?.shadowColor = .clear
+        self.navigationItem.title = "\(viewModel.userNickname)님의 리뷰"
     }
 }
