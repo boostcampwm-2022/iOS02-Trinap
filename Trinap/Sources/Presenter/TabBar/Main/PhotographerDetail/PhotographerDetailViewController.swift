@@ -53,8 +53,9 @@ class PhotographerDetailViewController: BaseViewController {
     }
     
     // MARK: - Methods
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
         configureNavigationBar()
     }
     
@@ -143,23 +144,6 @@ class PhotographerDetailViewController: BaseViewController {
                 self?.configureCalendarButton(startDate: start, endDate: end)
             }
             .disposed(by: disposeBag)
-    }
-    
-    private func configureNavigationBar() {
-        navigationController?.navigationBar.backIndicatorImage = UIImage(systemName: "arrow.backward")
-        navigationController?.navigationBar.backIndicatorTransitionMaskImage = UIImage(systemName: "arrow.backward")
-        navigationController?.navigationBar.tintColor = .black
-        self.navigationController?.navigationBar.topItem?.title = ""
-        
-        
-        let buttonItem = UIBarButtonItem(
-            image: TrinapAsset.dotdotdot.image,
-            style: .plain,
-            target: self,
-            action: #selector(showActionSheet)
-        )
-        
-        navigationItem.setRightBarButton(buttonItem, animated: false)
     }
     
     @objc private func showActionSheet() {
@@ -345,3 +329,28 @@ private extension NSMutableAttributedString {
     }
 }
 
+// MARK: - Privates
+private extension PhotographerDetailViewController {
+    
+    func configureNavigationBar() {
+        let appearance = UINavigationBarAppearance()
+        let backButtonImage = UIImage(systemName: "arrow.backward")
+        
+        appearance.configureWithTransparentBackground()
+        appearance.setBackIndicatorImage(backButtonImage, transitionMaskImage: backButtonImage)
+        self.navigationController?.navigationBar.tintColor = .black
+        
+        self.navigationItem.standardAppearance = appearance
+        self.navigationItem.scrollEdgeAppearance = appearance
+        self.navigationItem.backButtonTitle = ""
+        
+        let buttonItem = UIBarButtonItem(
+            image: TrinapAsset.dotdotdot.image,
+            style: .plain,
+            target: self,
+            action: #selector(showActionSheet)
+        )
+        
+        navigationItem.setRightBarButton(buttonItem, animated: false)
+    }
+}
