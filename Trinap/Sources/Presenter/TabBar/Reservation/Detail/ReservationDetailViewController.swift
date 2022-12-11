@@ -15,11 +15,6 @@ import SnapKit
 final class ReservationDetailViewController: BaseViewController {
     
     // MARK: - UI
-    private lazy var backButton = UIButton().than {
-        $0.setImage(UIImage(systemName: "arrow.left"), for: .normal)
-        $0.tintColor = TrinapAsset.black.color
-    }
-    
     private lazy var titleLabel = UILabel().than {
         $0.text = "예약 정보"
         $0.font = TrinapFontFamily.Pretendard.bold.font(size: 24)
@@ -48,11 +43,16 @@ final class ReservationDetailViewController: BaseViewController {
     }
     
     // MARK: - Methods
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        configureNavigationBar()
+    }
+    
     override func configureHierarchy() {
         super.configureHierarchy()
         
         self.view.addSubviews([
-            backButton,
             titleLabel,
             statusButton,
             reservationInformationView,
@@ -66,14 +66,9 @@ final class ReservationDetailViewController: BaseViewController {
     override func configureConstraints() {
         super.configureConstraints()
         
-        backButton.snp.makeConstraints { make in
-            make.top.equalTo(self.view.safeAreaLayoutGuide).offset(12)
-            make.leading.equalToSuperview().offset(16)
-        }
-        
         titleLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(16)
-            make.top.equalTo(backButton.snp.bottom).offset(20)
+            make.top.equalTo(self.view.safeAreaLayoutGuide).offset(20)
         }
         
         statusButton.snp.makeConstraints { make in
@@ -114,10 +109,7 @@ final class ReservationDetailViewController: BaseViewController {
     override func bind() {
         super.bind()
         
-        let backButtonTap = backButton.rx.tap.asSignal()
-        
         let input = ReservationDetailViewModel.Input(
-            backButtonTap: backButtonTap,
             customerUserViewTap: customerUserView.tap,
             photographerUserViewTap: photographerUserView.tap,
             primaryButtonTap: reservationButtonView.primaryButtonTap.asObservable(),
@@ -179,5 +171,18 @@ private extension ReservationDetailViewController {
         } else {
             reservationButtonView.removeSecondaryButton()
         }
+    }
+    
+    func configureNavigationBar() {
+        let appearance = UINavigationBarAppearance()
+        let backButtonImage = UIImage(systemName: "arrow.left")
+        
+        appearance.configureWithTransparentBackground()
+        appearance.setBackIndicatorImage(backButtonImage, transitionMaskImage: backButtonImage)
+        
+        self.navigationController?.navigationBar.tintColor = TrinapAsset.black.color
+        self.navigationItem.backButtonTitle = ""
+        self.navigationItem.standardAppearance = appearance
+        self.navigationItem.scrollEdgeAppearance = appearance
     }
 }
