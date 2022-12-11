@@ -145,12 +145,13 @@ final class PhotographerDetailViewModel: ViewModelType {
                 )
             })
             .disposed(by: disposeBag)
-                        
-        Observable.combineLatest(input.calendarTrigger, photographer)
+        
+        input.calendarTrigger
+            .withLatestFrom(photographer)
             .throttle(.seconds(1), scheduler: MainScheduler.instance)
             .withUnretained(self)
             .subscribe(onNext: { owner, value in
-                let photographerUser = value.1
+                let photographerUser = value
                 owner.coordinator?.showSelectReservationDateViewController(with: photographerUser.possibleDate, detailViewModel: self)
             })
             .disposed(by: disposeBag)
