@@ -25,6 +25,8 @@ class PhotographerDetailViewController: BaseViewController {
         collectionViewLayout: configureCollectionViewLayout(.portfolio)
     )
     
+    private lazy var backgroundButtonView = UIView()
+    
     private lazy var calendarButton = TrinapButton(style: .primary, fillType: .border).than {
         $0.setTitle("예약 날짜 선택", for: .normal)
         $0.setTitleColor(TrinapAsset.primary.color, for: .normal)
@@ -59,11 +61,21 @@ class PhotographerDetailViewController: BaseViewController {
         configureNavigationBar()
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        backgroundButtonView.layer.addBorder([.top])
+    }
+    
     override func configureHierarchy() {
-        self.view.addSubviews([
-            collectionView,
+        backgroundButtonView.addSubviews([
             calendarButton,
             confirmButton
+        ])
+        
+        self.view.addSubviews([
+            collectionView,
+            backgroundButtonView
         ])
     }
     
@@ -73,18 +85,21 @@ class PhotographerDetailViewController: BaseViewController {
             make.bottom.equalToSuperview().offset(-88)
         }
         
+        backgroundButtonView.snp.makeConstraints { make in
+            make.leading.trailing.bottom.equalTo(self.view.safeAreaLayoutGuide)
+            make.height.equalTo(64)
+        }
+        
         calendarButton.snp.makeConstraints { make in
-            make.top.equalTo(collectionView.snp.bottom).offset(trinapOffset)
-            make.leading.equalToSuperview().offset(trinapOffset)
-            make.width.equalTo((view.frame.width - 4 * trinapOffset) / 2)
-            make.height.equalTo(48)
+            make.top.bottom.equalToSuperview().inset(8)
+            make.leading.equalToSuperview().offset(16)
+            make.width.equalTo(confirmButton.snp.width)
         }
         
         confirmButton.snp.makeConstraints { make in
-            make.top.equalTo(collectionView.snp.bottom).offset(trinapOffset)
-            make.trailing.equalToSuperview().offset(-trinapOffset)
-            make.width.equalTo((view.frame.width - 2 * trinapOffset) / 2)
-            make.height.equalTo(48)
+            make.top.bottom.equalToSuperview().inset(8)
+            make.trailing.equalToSuperview().offset(-16)
+            make.leading.equalTo(calendarButton.snp.trailing).offset(8)
         }
     }
     
@@ -336,8 +351,9 @@ private extension PhotographerDetailViewController {
         let appearance = UINavigationBarAppearance()
         let backButtonImage = UIImage(systemName: "arrow.backward")
         
-        appearance.configureWithTransparentBackground()
+        appearance.configureWithOpaqueBackground()
         appearance.setBackIndicatorImage(backButtonImage, transitionMaskImage: backButtonImage)
+        appearance.shadowColor = TrinapAsset.white.color
         self.navigationController?.navigationBar.tintColor = .black
         
         self.navigationItem.standardAppearance = appearance
