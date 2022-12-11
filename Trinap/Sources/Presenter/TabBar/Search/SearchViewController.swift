@@ -16,12 +16,7 @@ import Than
 final class SearchViewController: BaseViewController {
     
     // MARK: - UI
-    private lazy var searchBar = UISearchBar().than {
-        $0.searchTextField.layer.cornerRadius = 20
-        $0.searchTextField.layer.masksToBounds = true
-        $0.setImage(nil, for: UISearchBar.Icon.search, state: .normal)
-        $0.placeholder = "장소를 입력해주세요"
-    }
+    private lazy var searchBar = TrinapSearchBar()
     
     private lazy var currentLocationButton = TrinapButton(style: .secondary).than {
         $0.setTitle("현재 위치", for: .normal)
@@ -52,32 +47,35 @@ final class SearchViewController: BaseViewController {
     }
     
     // MARK: - Methods
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        configureBackButton()
-    }
-    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        navigationController?.navigationBar.topItem?.titleView = searchBar
+        
+        self.searchBar.textField.becomeFirstResponder()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        configureNavigationBar()
     }
     
     override func configureHierarchy() {
         self.view.addSubviews([
-            searchBar,
+//            searchBar,
             currentLocationButton,
             searchTableView
         ])
     }
     
     override func configureConstraints() {
-        searchBar.snp.makeConstraints { make in
-            make.top.equalToSuperview()
-        }
+//        searchBar.snp.makeConstraints { make in
+//            make.top.equalTo(self.view.safeAreaLayoutGuide)
+//            make.leading.trailing.equalToSuperview().inset(16)
+//            make.height.equalTo(48)
+//        }
         
         currentLocationButton.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide)
+            make.top.equalTo(self.view.safeAreaLayoutGuide).offset(16)
             make.leading.equalToSuperview().offset(trinapOffset)
             make.trailing.equalToSuperview().offset(-trinapOffset)
             make.height.equalTo(36)
@@ -96,7 +94,7 @@ final class SearchViewController: BaseViewController {
     override func bind() {
         
         viewModel.searchText?
-            .bind(to: searchBar.searchTextField.rx.text)
+            .bind(to: searchBar.textField.rx.text)
             .disposed(by: disposeBag)
         
         let selectedSpace = searchTableView.rx.itemSelected
@@ -112,7 +110,7 @@ final class SearchViewController: BaseViewController {
             .disposed(by: disposeBag)
         
         let input = SearchViewModel.Input(
-            searchText: searchBar.rx.text.orEmpty.asObservable(),
+            searchText: searchBar.textField.rx.text.orEmpty.asObservable(),
             selectedSpace: selectedSpace,
             currentLocationTrigger: currentLocationButton.rx.tap.asObservable()
         )
@@ -127,13 +125,6 @@ final class SearchViewController: BaseViewController {
                 self?.dataSource?.apply(snapshot, animatingDifferences: true)
             }
             .disposed(by: disposeBag)
-    }
-    
-    private func configureBackButton() {
-        navigationController?.navigationBar.backIndicatorImage = UIImage(systemName: "arrow.backward")
-        navigationController?.navigationBar.backIndicatorTransitionMaskImage = UIImage(systemName: "arrow.backward")
-        navigationController?.navigationBar.tintColor = .black
-        self.navigationController?.navigationBar.topItem?.title = ""
     }
 }
 
@@ -163,5 +154,22 @@ extension SearchViewController {
             cell.contentConfiguration = content
             return cell
         }
+    }
+}
+
+// MARK: - Privates
+private extension SearchViewController {
+    
+    func configureNavigationBar() {
+        let appearance = UINavigationBarAppearance()
+        let backButtonImage = UIImage(systemName: "arrow.left")?
+            .withTintColor(TrinapAsset.black.color, renderingMode: .alwaysOriginal)
+        
+        appearance.configureWithTransparentBackground()
+        appearance.setBackIndicatorImage(backButtonImage, transitionMaskImage: backButtonImage)
+        
+        self.navigationItem.titleView = searchBar
+        self.navigationItem.standardAppearance = appearance
+        self.navigationItem.scrollEdgeAppearance = appearance
     }
 }
