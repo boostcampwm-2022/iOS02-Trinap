@@ -66,6 +66,7 @@ final class PhotographerPreviewCell: BaseCollectionViewCell {
         ratingLabel.snp.makeConstraints { make in
             make.trailing.equalToSuperview().inset(trinapOffset)
             make.centerY.equalTo(locationLabel.snp.centerY)
+            make.height.equalTo(18)
         }
         
         nicknameLabel.snp.makeConstraints { make in
