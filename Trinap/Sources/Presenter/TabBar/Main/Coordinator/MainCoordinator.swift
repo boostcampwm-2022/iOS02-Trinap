@@ -36,7 +36,6 @@ extension MainCoordinator {
     
     func showPhotographerListViewController() {
         let viewController = dependencies.makePhotographerListViewController()
-        self.navigationController.setNavigationBarHidden(true, animated: false)
         self.navigationController.pushViewController(viewController, animated: true)
     }
         
@@ -59,10 +58,9 @@ extension MainCoordinator {
             viewModel: viewModel
         )
         
-        self.navigationController.setNavigationBarHidden(false, animated: false)
-        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
+//        self.navigationController.isNavigationBarHidden = true
+        viewController.hidesBottomBarWhenPushed = true
         self.navigationController.pushViewController(viewController, animated: true)
-        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
     }
     
     func connectDetailPhotographerFlow(userId: String, searchCoordinate: Coordinate) {
