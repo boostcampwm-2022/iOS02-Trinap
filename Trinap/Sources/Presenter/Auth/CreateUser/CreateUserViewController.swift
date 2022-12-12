@@ -16,6 +16,8 @@ import Than
 final class CreateUserViewController: BaseViewController {
     
     // MARK: - UI
+    private lazy var navigationBarView = TrinapNavigationBarView()
+    
     private lazy var titleLabel = UILabel().than {
         $0.text = "만나서 반가워요!\n트리냅과 추억을 만들어 보세요"
         $0.numberOfLines = 0
@@ -58,48 +60,53 @@ final class CreateUserViewController: BaseViewController {
     }
     
     override func configureHierarchy() {
-        [
+        self.view.addSubviews([
+            navigationBarView,
             titleLabel,
             subTitleLabel,
             nicknameTextFieldView,
             signUpButton
-        ].forEach { self.view.addSubview($0) }
+        ])
     }
 
     override func configureConstraints() {
+        navigationBarView.snp.makeConstraints { make in
+            make.horizontalEdges.equalToSuperview()
+            make.top.equalTo(view.safeAreaLayoutGuide)
+            make.height.equalTo(trinapOffset * 6)
+        }
+        
         titleLabel.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide).offset(8)
+            make.top.equalTo(navigationBarView.snp.bottom).offset(trinapOffset)
             make.centerX.equalToSuperview()
-            make.leading.equalToSuperview().offset(16)
+            make.leading.equalToSuperview().offset(trinapOffset * 2)
         }
                 
         subTitleLabel.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.bottom).offset(8)
+            make.top.equalTo(titleLabel.snp.bottom).offset(trinapOffset)
             make.leading.centerX.equalTo(titleLabel)
         }
 
         nicknameTextFieldView.snp.makeConstraints { make in
-            make.top.equalTo(subTitleLabel.snp.bottom).offset(24)
+            make.top.equalTo(subTitleLabel.snp.bottom).offset(trinapOffset * 3)
             make.leading.centerX.equalTo(titleLabel)
-            make.height.equalTo(48)
+            make.height.equalTo(trinapOffset * 6)
         }
         
         signUpButton.snp.makeConstraints { make in
-            make.top.equalTo(nicknameTextFieldView.snp.bottom).offset(16)
+            make.top.equalTo(nicknameTextFieldView.snp.bottom).offset(trinapOffset * 2)
             make.leading.centerX.equalTo(titleLabel)
-            make.height.equalTo(48)
+            make.height.equalTo(trinapOffset * 6)
         }
-    }
-    
-    override func configureAttributes() {
-        configureNavigationBar()
     }
 
     override func bind() {
         let input = CreateUserViewModel.Input(
             nickname: nicknameTextFieldView.textField.rx.text.orEmpty.asObservable(),
             signUpButtonTap: signUpButton.rx.tap.asObservable(),
-            generateButtonTap: nicknameTextFieldView.generateButton.rx.tap.asObservable())
+            generateButtonTap: nicknameTextFieldView.generateButton.rx.tap.asObservable(),
+            backButtonTap: self.navigationBarView.backButton.rx.tap.asSignal()
+        )
         
         let output = viewModel.transform(input: input)
         
@@ -116,11 +123,5 @@ final class CreateUserViewController: BaseViewController {
                 owner.nicknameTextFieldView.textField.sendActions(for: .valueChanged)
             }
             .disposed(by: disposeBag)
-    }
-    
-    func configureNavigationBar() {
-        self.navigationController?.navigationBar.backgroundColor = TrinapAsset.white.color
-        self.navigationController?.navigationBar.barTintColor = TrinapAsset.white.color
-        self.navigationController?.navigationBar.shadowImage = UIImage()
     }
 }
