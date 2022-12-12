@@ -214,6 +214,7 @@ final class EditPhotographerViewController: BaseViewController {
         self.defaultPhotographerView.isHidden = true
     }
     
+    // TODO: 제거
     private func configureNavigation() {
         self.navigationItem.title = "작가 프로필 설정"
         self.navigationController?.navigationBar.tintColor = TrinapAsset.black.color

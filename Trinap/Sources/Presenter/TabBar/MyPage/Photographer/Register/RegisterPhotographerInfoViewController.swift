@@ -20,17 +20,10 @@ struct TagItem: Hashable {
 
 final class RegisterPhotographerInfoViewController: BaseViewController {
     
-    // MARK: - Properties
-    private let selectedTags = BehaviorRelay<[TagType]>(value: [])
-    private lazy var scrollView = UIScrollView()
-    private lazy var contentView = UIView()
-    
-    private var dataSource: UICollectionViewDiffableDataSource<Int, TagItem>?
-    private lazy var tagCollectionView = UICollectionView(frame: .zero, collectionViewLayout: TagCollectionViewLeftAlignFlowLayout(offset: trinapOffset, direction: .vertical)).than {
-        $0.backgroundColor = TrinapAsset.white.color
+    // MARK: - UI
+    private lazy var navigationBarView = TrinapNavigationBarView().than {
+        $0.setTitleText("작가 프로필 등록")
     }
-    
-    private let viewModel: RegisterPhotographerInfoViewModel
     
     private lazy var titleLabel = UILabel().than {
         $0.text = "고객님을 위해\n작가님의 정보를 등록해주세요"
@@ -99,6 +92,18 @@ final class RegisterPhotographerInfoViewController: BaseViewController {
         $0.setTitle("작성 완료", for: .normal)
     }
     
+    private lazy var scrollView = UIScrollView()
+    private lazy var contentView = UIView()
+    
+    private lazy var tagCollectionView = UICollectionView(frame: .zero, collectionViewLayout: TagCollectionViewLeftAlignFlowLayout(offset: trinapOffset, direction: .vertical)).than {
+        $0.backgroundColor = TrinapAsset.white.color
+    }
+    
+    // MARK: - Properties
+    private let selectedTags = BehaviorRelay<[TagType]>(value: [])
+    private var dataSource: UICollectionViewDiffableDataSource<Int, TagItem>?
+    private let viewModel: RegisterPhotographerInfoViewModel
+    
     // MARK: - Initializers
     init(viewModel: RegisterPhotographerInfoViewModel) {
         self.viewModel = viewModel
@@ -106,16 +111,44 @@ final class RegisterPhotographerInfoViewController: BaseViewController {
         super.init()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.navigationController?.isNavigationBarHidden = true
+    }
+    
     // MARK: - Configure
     override func configureHierarchy() {
-        self.view.addSubview(scrollView)
+        self.view.addSubviews([
+            navigationBarView,
+            scrollView
+        ])
         self.scrollView.addSubview(contentView)
-        self.contentView.addSubviews([titleLabel, locationTitleLabel, registerLocationView, tagCollectionView, tagTitleLabel, priceTitleLabel, priceSubtitleLabel, timeUnitLabel, registerPriceView, introduceLabel, introducingTextView, applyButton])
+        self.contentView.addSubviews([
+            titleLabel,
+            locationTitleLabel,
+            registerLocationView,
+            tagCollectionView,
+            tagTitleLabel,
+            priceTitleLabel,
+            priceSubtitleLabel,
+            timeUnitLabel,
+            registerPriceView,
+            introduceLabel,
+            introducingTextView,
+            applyButton
+        ])
     }
     
     override func configureConstraints() {
+        navigationBarView.snp.makeConstraints { make in
+            make.horizontalEdges.equalToSuperview()
+            make.top.equalTo(view.safeAreaLayoutGuide)
+            make.height.equalTo(trinapOffset * 6)
+        }
+        
         scrollView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.equalTo(navigationBarView.snp.bottom)
+            make.horizontalEdges.bottom.equalToSuperview()
         }
         
         contentView.snp.makeConstraints { make in
@@ -208,7 +241,8 @@ final class RegisterPhotographerInfoViewController: BaseViewController {
             tags: self.selectedTags.asObservable(),
             priceText: price,
             introduction: introducingTextView.rx.text.orEmpty.asObservable(),
-            applyTrigger: applyButton.rx.tap.asObservable()
+            applyTrigger: applyButton.rx.tap.asObservable(),
+            backButtonTap: self.navigationBarView.backButton.rx.tap.asSignal()
         )
         
         let output = viewModel.transform(input: input)
