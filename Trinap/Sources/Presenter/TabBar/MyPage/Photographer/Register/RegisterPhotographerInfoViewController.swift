@@ -26,7 +26,9 @@ final class RegisterPhotographerInfoViewController: BaseViewController {
     private lazy var contentView = UIView()
     
     private var dataSource: UICollectionViewDiffableDataSource<Int, TagItem>?
-    private lazy var tagCollectionView = UICollectionView(frame: .zero, collectionViewLayout: TagCollectionViewLeftAlignFlowLayout(offset: trinapOffset, direction: .vertical))
+    private lazy var tagCollectionView = UICollectionView(frame: .zero, collectionViewLayout: TagCollectionViewLeftAlignFlowLayout(offset: trinapOffset, direction: .vertical)).than {
+        $0.backgroundColor = TrinapAsset.white.color
+    }
     
     private let viewModel: RegisterPhotographerInfoViewModel
     

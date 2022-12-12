@@ -31,7 +31,9 @@ final class EditPhotographerViewController: BaseViewController {
     private lazy var collectionView = UICollectionView(
         frame: .zero,
         collectionViewLayout: configureCollectionViewLayout(.portfolio, isEditable: self.isEditable.value)
-    )
+    ).than {
+        $0.backgroundColor = TrinapAsset.white.color
+    }
     
     private lazy var defaultPhotographerView = DefaultEditPhotographerView()
     

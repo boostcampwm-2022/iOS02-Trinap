@@ -26,7 +26,9 @@ final class PhotographerProfileCell: BaseCollectionViewCell {
         $0.font = TrinapFontFamily.Pretendard.regular.font(size: 14)
     }
     
-    private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: TagCollectionViewLeftAlignFlowLayout(offset: trinapOffset, direction: .horizontal))
+    private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: TagCollectionViewLeftAlignFlowLayout(offset: trinapOffset, direction: .horizontal)).than {
+        $0.backgroundColor = TrinapAsset.white.color
+    }
     
     // MARK: Properties
     private var dataSource: DataSource?
