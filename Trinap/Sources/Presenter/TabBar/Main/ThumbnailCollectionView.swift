@@ -14,7 +14,7 @@ final class ThumbnailCollectionView: BaseView {
     
     // MARK: UI
     private lazy var layout = UICollectionViewFlowLayout().than {
-        $0.itemSize = CGSize(width: self.frame.width, height: self.frame.height)
+        $0.minimumLineSpacing = 0
         $0.scrollDirection = .horizontal
     }
     
