@@ -13,6 +13,11 @@ import RxSwift
 
 final class EditPhotographerViewController: BaseViewController {
     
+    // MARK: - UI
+    private lazy var navigationBarView = TrinapNavigationBarView().than {
+        $0.setTitleText("작가 프로필 설정")
+    }
+    
     typealias DataSource = UICollectionViewDiffableDataSource<PhotographerSection, PhotographerSection.Item>
     typealias Snapshot = NSDiffableDataSourceSnapshot<PhotographerSection, PhotographerSection.Item>
     
@@ -54,12 +59,23 @@ final class EditPhotographerViewController: BaseViewController {
     
     // MARK: - Configuration
     override func configureHierarchy() {
-        self.view.addSubviews([collectionView, defaultPhotographerView])
+        self.view.addSubviews([
+            navigationBarView,
+            collectionView,
+            defaultPhotographerView
+        ])
     }
     
     override func configureConstraints() {
+        navigationBarView.snp.makeConstraints { make in
+            make.horizontalEdges.equalToSuperview()
+            make.top.equalTo(view.safeAreaLayoutGuide)
+            make.height.equalTo(trinapOffset * 6)
+        }
+        
         collectionView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.equalTo(navigationBarView.snp.bottom)
+            make.horizontalEdges.bottom.equalToSuperview()
         }
         
         UIView.animate(withDuration: 1.5, delay: 1.0) {

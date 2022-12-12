@@ -73,7 +73,7 @@ final class EditProfileViewModel: ViewModelType {
             .bind(to: nicknameSubject)
             .disposed(by: disposeBag)
         
-        let doneButtonEnabled = input.nickname
+        let doneButtonEnabled = nicknameSubject
             .map { !$0.isEmpty }
             .asDriver(onErrorJustReturn: false)
         
