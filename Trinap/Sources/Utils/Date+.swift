@@ -16,6 +16,7 @@ extension Date {
         case timeStamp = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
         case hourAndMinute = "HH:mm"
         case monthAndDate = "M월 d일"
+        case monthAndDate2 = "MM/dd"
         case yearAndMonthAndDate = "YYYY년 M월 d일"
         case yearAndMonth = "YYYY년 M월"
     }

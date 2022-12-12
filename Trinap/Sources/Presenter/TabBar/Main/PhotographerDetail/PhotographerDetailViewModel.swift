@@ -21,7 +21,7 @@ final class PhotographerDetailViewModel: ViewModelType {
 
     struct Output {
         let confirmButtonEnabled: Driver<Bool>
-        let resevationDates: Driver<[Date]>
+        let resevationDates: Driver<String>
         let dataSource: Driver<[PhotographerDataSource]>
     }
     
@@ -77,7 +77,6 @@ final class PhotographerDetailViewModel: ViewModelType {
 
     // MARK: - Methods
     func transform(input: Input) -> Output {
-        coordinator?.calendarViewModel.rx.selectedDates
         
         input.viewWillAppear
             .map { _ in }
@@ -163,7 +162,15 @@ final class PhotographerDetailViewModel: ViewModelType {
                 return self.mappingDataSource(isEditable: false, state: section, photographer: photographer, review: review)
             }
         
-        let reservationDates = self.reservationDate.asDriver(onErrorJustReturn: [])
+        let reservationDates = self.reservationDate
+            .asDriver(onErrorJustReturn: [])
+            .map { [weak self] dates -> String in
+                guard
+                    let start = dates[safe: 0],
+                    let end = dates[safe: 1]
+                else { return "" }
+                return self?.convertDateToStringUseCase.convert(startDate: start, endDate: end) ?? ""
+            }
             
 
         return Output(
@@ -294,8 +301,12 @@ extension PhotographerDetailViewModel {
     }
 }
 
-//TODO: 프록시로 바꿔보기
-// 2. 이 이벤트 발생했을 때 캘린더 버튼 string도 같이 전달해주기
+extension PhotographerDetailViewModel {
+    func blockPhotographer() -> Single<Void> {
+        self.createBlockUseCase.create(blockedUserId: self.userId)
+    }
+}
+
 extension PhotographerDetailViewModel: SelectReservationDateViewModelDelegate {
     
     func selectedReservationDate(startDate: Date, endDate: Date) {
