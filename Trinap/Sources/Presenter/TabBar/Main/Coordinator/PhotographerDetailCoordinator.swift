@@ -97,19 +97,3 @@ final class PhotographerDetailCoordinator: Coordinator {
         self.childCoordinators.append(chatDetailCoordinator)
     }
 }
-
-// MARK: - Chat Detail
-extension PhotographerDetailCoordinator {
-    
-    func connectChatDetailCoordinator(chatroomId: String, nickname: String) {
-        let chatDetailCoordinator = ChatDetailCoordinator(
-            self.navigationController,
-            chatroomId: chatroomId,
-            nickname: nickname
-        )
-        
-        self.childCoordinators.append(chatDetailCoordinator)
-        
-        chatDetailCoordinator.start()
-    }
-}
