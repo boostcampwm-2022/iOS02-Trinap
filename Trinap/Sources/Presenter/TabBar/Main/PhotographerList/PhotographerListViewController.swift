@@ -22,7 +22,8 @@ final class PhotographerListViewController: BaseViewController {
     
     private lazy var layout = UICollectionViewFlowLayout().than {
         let width = self.view.frame.width - (2 * trinapOffset)
-        let height = width * 0.8
+//        let height = 300.0
+        let height = 0.8 * width
         $0.sectionInset = UIEdgeInsets(top: 24, left: 0, bottom: 24, right: 0)
         $0.minimumLineSpacing = 24
         $0.estimatedItemSize = CGSize(width: width, height: height)
@@ -51,6 +52,9 @@ final class PhotographerListViewController: BaseViewController {
         super.viewWillAppear(animated)
         
         configureNavigationBar()
+        
+        collectionView.isSkeletonable = true
+        collectionView.showSkeleton()
     }
     
     override func configureHierarchy() {
@@ -113,6 +117,7 @@ final class PhotographerListViewController: BaseViewController {
                 self?.generateSnapshot(sources: previews)
             }
             .drive(onNext: { [weak self] snapshot in
+                self?.collectionView.hideSkeleton()
                 self?.dataSource?.apply(snapshot, animatingDifferences: false)
             })
             .disposed(by: disposeBag)
@@ -134,7 +139,7 @@ extension PhotographerListViewController {
     }
     
     func configureDataSource() -> UICollectionViewDiffableDataSource<Section, PhotographerPreview> {
-        return UICollectionViewDiffableDataSource(collectionView: collectionView) { collectionView, indexPath, itemIdentifier in
+        return PhotographerListSkeletonDiffableDataSource(collectionView: self.collectionView) { collectionView, indexPath, itemIdentifier in
             guard let cell = collectionView.dequeueCell(PhotographerPreviewCell.self, for: indexPath)
             else { return UICollectionViewCell() }
             

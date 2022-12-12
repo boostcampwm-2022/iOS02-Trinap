@@ -232,7 +232,9 @@ extension EditPhotographerViewController {
     }
     
     private func configureDataSource() {
-        
+//        self.dataSource = PhotographerListSkeletonDiffableDataSource(collectionView: self.collectionView, cellProvider: { collectionView, indexPath, itemIdentifier in
+//            <#code#>
+//        })
         self.dataSource = DataSource(collectionView: self.collectionView) { [weak self] collectionView, indexPath, item in
             guard let self else { return UICollectionViewCell() }
             

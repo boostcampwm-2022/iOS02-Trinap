@@ -12,23 +12,33 @@ import RxCocoa
 import RxSwift
 import RxGesture
 import Than
+import SkeletonView
 
 final class PhotographerPreviewCell: BaseCollectionViewCell {
     
     // MARK: UI
 //    private lazy var thumbnailImageView = ThumbnailImageView()
-    private lazy var thumbnailImageView = ThumbnailCollectionView()
+    private lazy var thumbnailImageView = ThumbnailCollectionView().than {
+        $0.isSkeletonable = true
+    }
     
     private lazy var locationLabel = UILabel().than {
+        $0.text = "      "
+        $0.isSkeletonable = true
         $0.textColor = TrinapAsset.gray40.color
         $0.font = TrinapFontFamily.Pretendard.regular.font(size: 14)
+        $0.setContentHuggingPriority(.required, for: .horizontal)
     }
     
     private lazy var nicknameLabel = UILabel().than {
+        $0.text = "     "
+        $0.isSkeletonable = true
         $0.font = TrinapFontFamily.Pretendard.semiBold.font(size: 16)
     }
     
-    private lazy var ratingLabel = StarView()
+    private lazy var ratingLabel = StarView().than {
+        $0.isSkeletonable = true
+    }
     
     // MARK: Properties
     
@@ -40,6 +50,9 @@ final class PhotographerPreviewCell: BaseCollectionViewCell {
     }
 
     override func configureHierarchy() {
+        self.isSkeletonable = true
+        contentView.isSkeletonable = true
+        
         contentView.addSubviews(
             [
             ratingLabel,
@@ -55,23 +68,28 @@ final class PhotographerPreviewCell: BaseCollectionViewCell {
         thumbnailImageView.snp.makeConstraints { make in
             make.top.equalToSuperview()
             make.horizontalEdges.equalToSuperview().inset(trinapOffset)
-            make.bottom.equalToSuperview().offset(-60)
+//            make.bottom.equalToSuperview().offset(-60)
         }
         
         locationLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().inset(trinapOffset)
             make.top.equalTo(thumbnailImageView.snp.bottom).offset(trinapOffset)
+            make.trailing.lessThanOrEqualTo(ratingLabel.snp.leading).offset(-116)
         }
         
         ratingLabel.snp.makeConstraints { make in
             make.trailing.equalToSuperview().inset(trinapOffset)
             make.centerY.equalTo(locationLabel.snp.centerY)
             make.height.equalTo(18)
+            make.width.equalTo(50)
         }
         
         nicknameLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().inset(trinapOffset)
+//            make.trailing.equalTo(ratingLabel.snp.leading)
+            make.width.equalTo(200)
             make.top.equalTo(locationLabel.snp.bottom).offset(trinapOffset * 0.5)
+            make.bottom.equalToSuperview()
         }
     }
 }
