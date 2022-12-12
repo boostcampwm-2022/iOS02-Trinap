@@ -54,6 +54,7 @@ final class FilterView: UICollectionView, UICollectionViewDelegate {
     }
     
     private func configureUI() {
+        self.backgroundColor = TrinapAsset.white.color
         self.layer.masksToBounds = false
         self.layer.shadowOffset = CGSize(width: 0, height: 1.5)
         self.layer.shadowRadius = 1

@@ -52,7 +52,6 @@ extension AuthCoordinator {
                 coordinator: self
             )
         )
-        self.navigationController.setNavigationBarHidden(false, animated: false)
         self.navigationController.pushViewController(viewController, animated: true)
     }
 }

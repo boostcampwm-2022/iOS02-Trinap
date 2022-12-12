@@ -32,6 +32,7 @@ final class EditProfileViewModel: ViewModelType {
         let nickName: Observable<String>
         let defaultImage: Observable<URL?>
         let result: Observable<Void>
+        let doneButtonEnabled: Driver<Bool>
     }
     
     private lazy var nicknameSubject = PublishSubject<String>()
@@ -72,6 +73,10 @@ final class EditProfileViewModel: ViewModelType {
             .bind(to: nicknameSubject)
             .disposed(by: disposeBag)
         
+        let doneButtonEnabled = nicknameSubject
+            .map { !$0.isEmpty }
+            .asDriver(onErrorJustReturn: false)
+        
         input.profileImage
             .bind(to: imageData)
             .disposed(by: disposeBag)
@@ -90,7 +95,11 @@ final class EditProfileViewModel: ViewModelType {
                 return owner.requestUpdate(image: image, nickName: nickname)
             }
         
-        return Output(nickName: nicknameSubject, defaultImage: user.map { $0.profileImage }, result: result)
+        return Output(
+            nickName: nicknameSubject,
+            defaultImage: user.map { $0.profileImage },
+            result: result,
+            doneButtonEnabled: doneButtonEnabled)
     }
 }
 

@@ -20,7 +20,9 @@ final class EditPhotographerProfileCell: BaseCollectionViewCell {
     
     lazy var filterView = FilterView(filterMode: .photographer)
     private lazy var profileImage = ProfileImageView()
-    private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: TagCollectionViewLeftAlignFlowLayout(offset: trinapOffset, direction: .horizontal))
+    private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: TagCollectionViewLeftAlignFlowLayout(offset: trinapOffset, direction: .horizontal)).than {
+        $0.backgroundColor = TrinapAsset.white.color
+    }
     
     private var dataSource: DataSource?
     

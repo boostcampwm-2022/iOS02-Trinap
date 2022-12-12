@@ -20,6 +20,7 @@ final class RegisterPhotographerInfoViewModel: ViewModelType {
         let priceText: Observable<String>
         let introduction: Observable<String>
         let applyTrigger: Observable<Void>
+        let backButtonTap: Signal<Void>
     }
     
     struct Output {
@@ -123,6 +124,12 @@ final class RegisterPhotographerInfoViewModel: ViewModelType {
                     searchText: owner.locationText,
                     coordinate: owner.coordinate
                 )
+            })
+            .disposed(by: disposeBag)
+        
+        input.backButtonTap
+            .emit(onNext: { [weak self] _ in
+                self?.coordinator?.popViewController()
             })
             .disposed(by: disposeBag)
         

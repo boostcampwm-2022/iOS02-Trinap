@@ -32,6 +32,7 @@ final class PhotographerListViewController: BaseViewController {
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout).than {
         $0.allowsSelection = false
         $0.register(PhotographerPreviewCell.self)
+        $0.backgroundColor = TrinapAsset.white.color
     }
     
     private var dataSource: UICollectionViewDiffableDataSource<Section, PhotographerPreview>?

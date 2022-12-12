@@ -14,7 +14,11 @@ import SnapKit
 
 final class DetailContactViewController: BaseViewController {
     
-    // MARK: - Properties
+    // MARK: - UI
+    private lazy var navigationBarView = TrinapNavigationBarView().than {
+        $0.setTitleText("문의 상세내역")
+    }
+    
     private lazy var titleLabel = UILabel().than {
         $0.textColor = TrinapAsset.black.color
         $0.font = TrinapFontFamily.Pretendard.bold.font(size: 24)
@@ -28,6 +32,7 @@ final class DetailContactViewController: BaseViewController {
         $0.sizeToFit()
     }
     
+    // MARK: - Properties
     private let viewModel: DetailContactViewModel
     
     // MARK: - Initializers
@@ -43,13 +48,23 @@ final class DetailContactViewController: BaseViewController {
     }
     
     override func configureHierarchy() {
-        self.view.addSubviews([titleLabel, contentsLabel])
+        self.view.addSubviews([
+            navigationBarView,
+            titleLabel,
+            contentsLabel
+        ])
     }
     
     override func configureConstraints() {
+        navigationBarView.snp.makeConstraints { make in
+            make.horizontalEdges.equalToSuperview()
+            make.top.equalTo(view.safeAreaLayoutGuide)
+            make.height.equalTo(trinapOffset * 6)
+        }
+        
         titleLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().inset(trinapOffset * 2)
-            make.top.equalTo(view.safeAreaLayoutGuide).inset(trinapOffset * 2)
+            make.top.equalTo(navigationBarView.snp.bottom).offset(trinapOffset * 3)
             make.height.equalTo(trinapOffset * 4)
         }
         
@@ -64,7 +79,10 @@ final class DetailContactViewController: BaseViewController {
     }
     
     override func bind() {
-        let input = DetailContactViewModel.Input()
+        let input = DetailContactViewModel.Input(
+            backButtonTap: self.navigationBarView.backButton.rx.tap.asSignal()
+        )
+        
         let output = self.viewModel.transform(input: input)
         
         output.title
