@@ -57,7 +57,7 @@ final class DefaultMapRepository: NSObject, MapRepository {
             
             geocoder.reverseGeocodeLocation(location) { placemarks, _ in
                 guard let address = placemarks else {
-                    observable.onNext("lat: \(coordinate.lat), lng: \(coordinate.lng)")
+                    observable.onNext("위도: \(coordinate.lat), 경도: \(coordinate.lng)")
                     return 
                 }
                 
