@@ -16,6 +16,8 @@ final class ContactListViewModel: ViewModelType {
     struct Input {
         let viewWillAppear: Observable<Void>
         let cellDidSelect: Observable<String>
+        let addContactTap: Signal<Void>
+        let backButtonTap: Signal<Void>
     }
     
     struct Output {
@@ -44,6 +46,18 @@ final class ContactListViewModel: ViewModelType {
             })
             .disposed(by: disposeBag)
         
+        input.backButtonTap
+            .emit(onNext: { [weak self] _ in
+                self?.coordinator?.popViewController()
+            })
+            .disposed(by: disposeBag)
+        
+        input.addContactTap
+            .emit(onNext: { [weak self] _ in
+                self?.coordinator?.showCreateContactViewController()
+            })
+            .disposed(by: disposeBag)
+        
         let dataSource = input.viewWillAppear
             .withUnretained(self)
             .flatMap { owner, _ in
@@ -51,9 +65,5 @@ final class ContactListViewModel: ViewModelType {
             }
         
         return Output(dataSource: dataSource.asDriver(onErrorJustReturn: []))
-    }
-    
-    func showAddContactViewController() {
-        self.coordinator?.showCreateContactViewController()
     }
 }

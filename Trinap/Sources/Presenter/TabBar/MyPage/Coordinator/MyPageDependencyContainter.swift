@@ -171,7 +171,11 @@ private extension MyPageDependencyContainter {
     }
     
     func makeDetailContactViewModel(contactId: String) -> DetailContactViewModel {
-        return DetailContactViewModel(contactId: contactId, fetchContactUseCase: makeFetchContactUseCase())
+        return DetailContactViewModel(
+            contactId: contactId,
+            fetchContactUseCase: makeFetchContactUseCase(),
+            coordinator: self.mypageCoordinator
+        )
     }
     
     func makeCreateContactViewModel() -> CreateContactViewModel {

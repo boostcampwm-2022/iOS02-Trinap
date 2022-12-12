@@ -71,7 +71,7 @@ final class CreateContactViewController: BaseViewController {
     override func configureConstraints() {
         titleTextField.snp.makeConstraints { make in
             make.horizontalEdges.equalToSuperview().inset(trinapOffset * 3)
-            make.top.equalTo(view.safeAreaLayoutGuide).offset(trinapOffset * 2)
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(trinapOffset * 3)
             make.height.equalTo(trinapOffset * 6)
         }
         

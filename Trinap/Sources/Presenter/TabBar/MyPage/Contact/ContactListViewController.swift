@@ -13,6 +13,22 @@ import RxSwift
 
 final class ContactListViewController: BaseViewController {
     
+    // MARK: - UI
+    private lazy var addButton = UIButton().than {
+        $0.imageView?.tintColor = TrinapAsset.black.color
+        $0.setImage(UIImage(systemName: "plus"), for: .normal)
+    }
+    
+    private lazy var navigationBarView = TrinapNavigationBarView().than {
+        $0.setTitleText("문의 내역")
+        $0.addRightButton(addButton)
+    }
+    
+    private lazy var tableView = UITableView(frame: self.view.bounds, style: .plain).than {
+        $0.separatorStyle = .none
+    }
+    
+    
     typealias DataSource = UITableViewDiffableDataSource<Section, Contact>
     
     enum Section {
@@ -20,13 +36,6 @@ final class ContactListViewController: BaseViewController {
     }
     
     private var dataSource: DataSource?
-    
-    private lazy var tableView = UITableView(frame: self.view.bounds, style: .plain)
-    
-    private lazy var addButton = UIButton().than {
-        $0.imageView?.tintColor = TrinapAsset.black.color
-        $0.setImage(UIImage(systemName: "circle.plus"), for: .normal)
-    }
     
     private let viewModel: ContactListViewModel
     
@@ -36,19 +45,23 @@ final class ContactListViewController: BaseViewController {
         super.init()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        configureNavigationBar()
-    }
-    
     override func configureHierarchy() {
-        self.view.addSubviews([tableView])
+        self.view.addSubviews([
+            navigationBarView,
+            tableView
+        ])
     }
     
     override func configureConstraints() {
+        navigationBarView.snp.makeConstraints { make in
+            make.horizontalEdges.equalToSuperview()
+            make.top.equalTo(view.safeAreaLayoutGuide)
+            make.height.equalTo(trinapOffset * 6)
+        }
+        
         tableView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.equalTo(navigationBarView.snp.bottom)
+            make.horizontalEdges.bottom.equalToSuperview()
         }
     }
     
@@ -60,10 +73,11 @@ final class ContactListViewController: BaseViewController {
     override func bind() {
         let input = ContactListViewModel.Input(
             viewWillAppear: self.rx.viewWillAppear.map { _ in }.asObservable(),
-            cellDidSelect: tableView.rx.itemSelected.compactMap {
-                self.dataSource?.itemIdentifier(for: $0)?.contactId
-            }
-                .asObservable()
+            cellDidSelect: tableView.rx.itemSelected
+                .compactMap { self.dataSource?.itemIdentifier(for: $0)?.contactId }
+                .asObservable(),
+            addContactTap: self.addButton.rx.tap.asSignal(),
+            backButtonTap: self.navigationBarView.backButton.rx.tap.asSignal()
         )
         
         let output = viewModel.transform(input: input)
@@ -74,17 +88,6 @@ final class ContactListViewController: BaseViewController {
                 self.dataSource?.apply($0, animatingDifferences: false)
             })
             .disposed(by: disposeBag)
-    }
-    
-    private func configureNavigationBar() {
-        self.navigationItem.title = "문의 내역"
-        self.navigationController?.tabBarController?.tabBar.isHidden = true
-        self.navigationController?.navigationBar.tintColor = TrinapAsset.black.color
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "plus.circle"), style: .done, target: self, action: #selector(addContact))
-    }
-    
-    @objc func addContact() {
-        self.viewModel.showAddContactViewController()
     }
 }
 

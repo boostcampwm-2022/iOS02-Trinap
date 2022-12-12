@@ -12,7 +12,9 @@ import RxSwift
 
 final class DetailContactViewModel: ViewModelType {
     
-    struct Input { }
+    struct Input {
+        let backButtonTap: Signal<Void>
+    }
     
     struct Output {
         let title: Observable<String>
@@ -25,18 +27,26 @@ final class DetailContactViewModel: ViewModelType {
     
     private let contactId: String
     private let fetchContactUseCase: FetchContactUseCase
+    weak var coordinator: MyPageCoordinator?
     
     // MARK: - Initializer
     init(
         contactId: String,
-        fetchContactUseCase: FetchContactUseCase
+        fetchContactUseCase: FetchContactUseCase,
+        coordinator: MyPageCoordinator?
     ) {
         self.contactId = contactId
         self.fetchContactUseCase = fetchContactUseCase
+        self.coordinator = coordinator
     }
     
     // MARK: - Methods
     func transform(input: Input) -> Output {
+        input.backButtonTap
+            .emit(onNext: { [weak self] _ in
+                self?.coordinator?.popViewController()
+            })
+            .disposed(by: disposeBag)
         
         let detailContact = self.fetchContactUseCase.fetchDetailContact(contactId: self.contactId)
             .share()
