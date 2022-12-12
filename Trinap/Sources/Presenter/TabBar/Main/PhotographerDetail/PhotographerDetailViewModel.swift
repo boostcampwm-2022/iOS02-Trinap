@@ -28,15 +28,13 @@ final class PhotographerDetailViewModel: ViewModelType {
     // MARK: - Properties
     let disposeBag = DisposeBag()
     
-    private let fetchUserUseCase: FetchUserUseCase
-    private let fetchPhotographerUseCase: FetchPhotographerUseCase
-    private let fetchReviewUseCase: FetchReviewUseCase
     private let createReservationUseCase: CreateReservationUseCase
     private let createBlockUseCase: CreateBlockUseCase
     private let createChatroomUseCase: CreateChatroomUseCase
     private let sendFirstChatUseCase: SendFirstChatUseCase
     private let convertDateToStringUseCase: ConvertDateToStringUseCase
-    private let mapRepository: MapRepository
+    private let fetchPhotographerUserUseCase: FetchPhotographerUserUseCase
+    private let fetchReviewInformationUseCase: FetchReviewInformationUseCase
     
     private let reloadTrigger = BehaviorSubject<Void>(value: ())
     
@@ -48,25 +46,21 @@ final class PhotographerDetailViewModel: ViewModelType {
     
     // MARK: - Initializer
     init(
-        fetchUserUseCase: FetchUserUseCase,
-        fetchPhotographerUseCase: FetchPhotographerUseCase,
-        fetchReviewUseCase: FetchReviewUseCase,
         createReservationUseCase: CreateReservationUseCase,
         createBlockUseCase: CreateBlockUseCase,
         createChatroomUseCase: CreateChatroomUseCase,
         sendFirstChatUseCase: SendFirstChatUseCase,
         convertDateToStringUseCase: ConvertDateToStringUseCase,
-        mapRepository: MapRepository,
+        fetchPhotographerUserUseCase: FetchPhotographerUserUseCase,
+        fetchReviewInformationUseCase: FetchReviewInformationUseCase,
         userId: String,
         searchCoordinate: Coordinate,
         coordinator: PhotographerDetailCoordinator?
     ) {
-        self.fetchUserUseCase = fetchUserUseCase
-        self.fetchPhotographerUseCase = fetchPhotographerUseCase
-        self.fetchReviewUseCase = fetchReviewUseCase
         self.createReservationUseCase = createReservationUseCase
         self.createBlockUseCase = createBlockUseCase
-        self.mapRepository = mapRepository
+        self.fetchPhotographerUserUseCase = fetchPhotographerUserUseCase
+        self.fetchReviewInformationUseCase = fetchReviewInformationUseCase
         self.createChatroomUseCase = createChatroomUseCase
         self.sendFirstChatUseCase = sendFirstChatUseCase
         self.convertDateToStringUseCase = convertDateToStringUseCase
@@ -86,14 +80,14 @@ final class PhotographerDetailViewModel: ViewModelType {
         let photographer = self.reloadTrigger
             .withUnretained(self)
             .flatMap { owner, _ in
-                owner.fetchPhotographer()
+                owner.fetchPhotographerUserUseCase.fetch(userId: owner.userId)
             }
             .share()
         
-        let reviewInformation = Observable.combineLatest(reloadTrigger, photographer)
+        let reviewInformation = reloadTrigger
             .withUnretained(self)
-            .flatMap { owner, value in
-                return owner.fetchReviews(photographerId: value.1.photographerId)
+            .flatMap { owner, _ in
+                owner.fetchReviewInformationUseCase.fetch(photographerUserId: owner.userId)
             }
             .share()
         
@@ -222,42 +216,6 @@ final class PhotographerDetailViewModel: ViewModelType {
 
 
 extension PhotographerDetailViewModel {
-    
-    private func fetchPhotographer() -> Observable<PhotographerUser> {
-        return self.fetchUserUseCase.fetchUserInfo(userId: userId)
-            .flatMap { user in
-                self.fetchPhotographerUseCase.fetch(photographerUserId: user.userId)
-                    .flatMap { photographer in
-                        return self.mapRepository.fetchLocationName(
-                            using: Coordinate(lat: photographer.latitude, lng: photographer.longitude)
-                        )
-                        .map { location in
-                            PhotographerUser(user: user, photographer: photographer, location: location)
-                        }
-                    }
-            }
-    }
-    
-    private func fetchReviews(photographerId: String) -> Observable<ReviewInformation> {
-        let summary = self.fetchReviewUseCase.fetchAverageReview(photographerUserId: userId)
-        let reviews = self.fetchReviewUseCase.fetchReviews(photographerUserId: userId)
-        return Observable.zip(summary, reviews)
-            .map { summary, reviews in
-                Logger.print(summary)
-                Logger.printArray(reviews)
-                guard !summary.rating.isNaN
-                else {
-                    return ReviewInformation(
-                        summary: ReviewSummary(
-                            rating: 0.0,
-                            count: summary.count
-                        ),
-                        reviews: reviews
-                    )
-                }
-                return ReviewInformation(summary: summary, reviews: reviews)
-            }
-    }
     
     private func mappingDataSource(isEditable: Bool, state: Int, photographer: PhotographerUser, review: ReviewInformation) -> [PhotographerDataSource] {
         

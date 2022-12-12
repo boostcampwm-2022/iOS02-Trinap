@@ -57,18 +57,31 @@ final class PhotographerDetailDependencyContainer {
         searchCoordinate: Coordinate
     ) -> PhotographerDetailViewModel {
         return PhotographerDetailViewModel(
-            fetchUserUseCase: makeFetchUserUseCase(),
-            fetchPhotographerUseCase: makeFetchPhotographerUseCase(),
-            fetchReviewUseCase: makeFetchReviewUseCase(),
             createReservationUseCase: makeCreateReservationUseCase(),
             createBlockUseCase: makeCreateBlockUseCase(),
             createChatroomUseCase: makeCreateChatRoomUseCase(),
             sendFirstChatUseCase: makeSendFirstChatUseCase(),
             convertDateToStringUseCase: DefaultConvertDateToStringUseCase(),
-            mapRepository: mapRepository,
+            fetchPhotographerUserUseCase: makeFetchPhotographerUserUseCase(),
+            fetchReviewInformationUseCase: makeFetchReviewInformationUseCase(),
             userId: userId,
             searchCoordinate: searchCoordinate,
             coordinator: photographerDetailCoordinator
+        )
+    }
+    
+    private func makeFetchReviewInformationUseCase() -> FetchReviewInformationUseCase {
+        return DefaultFetchReviewInformationUseCase(
+            reviewRepository: reviewRepository,
+            userRepository: userRepository
+        )
+    }
+    
+    private func makeFetchPhotographerUserUseCase() -> FetchPhotographerUserUseCase {
+        return DefaultFetchPhotographerUserUseCase(
+            userRepository: userRepository,
+            photographerRepository: photographerRepository,
+            mapRepository: mapRepository
         )
     }
     
