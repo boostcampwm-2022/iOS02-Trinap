@@ -17,13 +17,13 @@ import SkeletonView
 final class PhotographerPreviewCell: BaseCollectionViewCell {
     
     // MARK: UI
-//    private lazy var thumbnailImageView = ThumbnailImageView()
+    //    private lazy var thumbnailImageView = ThumbnailImageView()
     private lazy var thumbnailImageView = ThumbnailCollectionView().than {
         $0.isSkeletonable = true
     }
     
     private lazy var locationLabel = UILabel().than {
-        $0.text = "      "
+        $0.text = "XXXXXXXXXXXX"
         $0.isSkeletonable = true
         $0.textColor = TrinapAsset.gray40.color
         $0.font = TrinapFontFamily.Pretendard.regular.font(size: 14)
@@ -31,7 +31,7 @@ final class PhotographerPreviewCell: BaseCollectionViewCell {
     }
     
     private lazy var nicknameLabel = UILabel().than {
-        $0.text = "     "
+        $0.text = "XXXXXXXXXXXXX"
         $0.isSkeletonable = true
         $0.font = TrinapFontFamily.Pretendard.semiBold.font(size: 16)
     }
@@ -48,17 +48,17 @@ final class PhotographerPreviewCell: BaseCollectionViewCell {
         
         self.disposeBag = DisposeBag()
     }
-
+    
     override func configureHierarchy() {
         self.isSkeletonable = true
         contentView.isSkeletonable = true
         
         contentView.addSubviews(
             [
-            ratingLabel,
-            thumbnailImageView,
-            locationLabel,
-            nicknameLabel
+                ratingLabel,
+                thumbnailImageView,
+                locationLabel,
+                nicknameLabel
             ]
         )
     }
@@ -68,28 +68,23 @@ final class PhotographerPreviewCell: BaseCollectionViewCell {
         thumbnailImageView.snp.makeConstraints { make in
             make.top.equalToSuperview()
             make.horizontalEdges.equalToSuperview().inset(trinapOffset)
-//            make.bottom.equalToSuperview().offset(-60)
+            make.bottom.equalToSuperview().offset(-60)
         }
         
         locationLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().inset(trinapOffset)
             make.top.equalTo(thumbnailImageView.snp.bottom).offset(trinapOffset)
-            make.trailing.lessThanOrEqualTo(ratingLabel.snp.leading).offset(-116)
         }
         
         ratingLabel.snp.makeConstraints { make in
             make.trailing.equalToSuperview().inset(trinapOffset)
             make.centerY.equalTo(locationLabel.snp.centerY)
             make.height.equalTo(18)
-            make.width.equalTo(50)
         }
         
         nicknameLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().inset(trinapOffset)
-//            make.trailing.equalTo(ratingLabel.snp.leading)
-            make.width.equalTo(200)
             make.top.equalTo(locationLabel.snp.bottom).offset(trinapOffset * 0.5)
-            make.bottom.equalToSuperview()
         }
     }
 }
