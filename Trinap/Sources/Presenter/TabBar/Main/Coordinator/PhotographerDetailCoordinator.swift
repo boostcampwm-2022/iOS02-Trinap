@@ -54,12 +54,10 @@ final class PhotographerDetailCoordinator: Coordinator {
         )
 
         self.navigationController.isNavigationBarHidden = false
-        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
+        viewController.hidesBottomBarWhenPushed = true
         self.navigationController.pushViewController(viewController, animated: true)
-        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
     }
     
-    // TODO: - ViewModel Delegate Setting
     func showSelectReservationDateViewController(with possibleDate: [Date], detailViewModel: PhotographerDetailViewModel) {
         let viewModel = SelectReservationDateViewModel(
             createReservationDateUseCase: DefaultCreateReservationDateUseCase(),

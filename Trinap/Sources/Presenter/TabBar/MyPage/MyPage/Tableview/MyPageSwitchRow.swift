@@ -16,7 +16,7 @@ final class MyPageSwitchRow: BaseTableViewCell {
     lazy var exposureSwitch = UISwitch()
     
     override func configureHierarchy() {
-        addSubviews([infoLabel, exposureSwitch])
+        self.contentView.addSubviews([infoLabel, exposureSwitch])
     }
     
     override func configureConstraints() {
@@ -39,4 +39,3 @@ final class MyPageSwitchRow: BaseTableViewCell {
         self.exposureSwitch.isOn = isExposure
     }
 }
-

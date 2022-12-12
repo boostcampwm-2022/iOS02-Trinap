@@ -25,6 +25,8 @@ class PhotographerDetailViewController: BaseViewController {
         collectionViewLayout: configureCollectionViewLayout(.portfolio)
     )
     
+    private lazy var backgroundButtonView = UIView()
+    
     private lazy var calendarButton = TrinapButton(style: .primary, fillType: .border).than {
         $0.setTitle("예약 날짜 선택", for: .normal)
         $0.setTitleColor(TrinapAsset.primary.color, for: .normal)
@@ -36,8 +38,6 @@ class PhotographerDetailViewController: BaseViewController {
         $0.setTitleColor(TrinapAsset.white.color, for: .normal)
         $0.titleLabel?.font = TrinapFontFamily.Pretendard.bold.font(size: 14)
     }
-
-    //TODO: 예약 관련 컴포넌트들 선언 및 연결
     
     // MARK: - Properties
     private let tabState = BehaviorRelay<Int>(value: 0)
@@ -53,16 +53,27 @@ class PhotographerDetailViewController: BaseViewController {
     }
     
     // MARK: - Methods
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
         configureNavigationBar()
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        backgroundButtonView.layer.addBorder([.top])
+    }
+    
     override func configureHierarchy() {
-        self.view.addSubviews([
-            collectionView,
+        backgroundButtonView.addSubviews([
             calendarButton,
             confirmButton
+        ])
+        
+        self.view.addSubviews([
+            collectionView,
+            backgroundButtonView
         ])
     }
     
@@ -72,18 +83,21 @@ class PhotographerDetailViewController: BaseViewController {
             make.bottom.equalToSuperview().offset(-88)
         }
         
+        backgroundButtonView.snp.makeConstraints { make in
+            make.leading.trailing.bottom.equalTo(self.view.safeAreaLayoutGuide)
+            make.height.equalTo(64)
+        }
+        
         calendarButton.snp.makeConstraints { make in
-            make.top.equalTo(collectionView.snp.bottom).offset(trinapOffset)
-            make.leading.equalToSuperview().offset(trinapOffset)
-            make.width.equalTo((view.frame.width - 4 * trinapOffset) / 2)
-            make.height.equalTo(48)
+            make.top.bottom.equalToSuperview().inset(8)
+            make.leading.equalToSuperview().offset(16)
+            make.width.equalTo(confirmButton.snp.width)
         }
         
         confirmButton.snp.makeConstraints { make in
-            make.top.equalTo(collectionView.snp.bottom).offset(trinapOffset)
-            make.trailing.equalToSuperview().offset(-trinapOffset)
-            make.width.equalTo((view.frame.width - 2 * trinapOffset) / 2)
-            make.height.equalTo(48)
+            make.top.bottom.equalToSuperview().inset(8)
+            make.trailing.equalToSuperview().offset(-16)
+            make.leading.equalTo(calendarButton.snp.trailing).offset(8)
         }
     }
     
@@ -145,33 +159,16 @@ class PhotographerDetailViewController: BaseViewController {
             .disposed(by: disposeBag)
     }
     
-    private func configureNavigationBar() {
-        navigationController?.navigationBar.backIndicatorImage = UIImage(systemName: "arrow.backward")
-        navigationController?.navigationBar.backIndicatorTransitionMaskImage = UIImage(systemName: "arrow.backward")
-        navigationController?.navigationBar.tintColor = .black
-        self.navigationController?.navigationBar.topItem?.title = ""
-        
-        
-        let buttonItem = UIBarButtonItem(
-            image: TrinapAsset.dotdotdot.image,
-            style: .plain,
-            target: self,
-            action: #selector(showActionSheet)
-        )
-        
-        navigationItem.setRightBarButton(buttonItem, animated: false)
-    }
-    
     @objc private func showActionSheet() {
         let alert = UIAlertController()
-            .appendingAction(title: "신고하기", style: .default) {
-                //TODO: 해당 아이 userId로 신고박는 페이지로 이동
-                self.viewModel.showSueController()
+            .appendingAction(title: "신고하기", style: .default) { [weak self] in
+                self?.viewModel.showSueController()
             }
-            .appendingAction(title: "차단하기", style: .default) {
-                self.confirmBlock()
+            .appendingAction(title: "차단하기", style: .default) { [weak self] in
+                self?.confirmBlock()
             }
             .appendingAction(title: "취소", style: .cancel)
+        
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -345,3 +342,29 @@ private extension NSMutableAttributedString {
     }
 }
 
+// MARK: - Privates
+private extension PhotographerDetailViewController {
+    
+    func configureNavigationBar() {
+        let appearance = UINavigationBarAppearance()
+        let backButtonImage = UIImage(systemName: "arrow.backward")
+        
+        appearance.configureWithOpaqueBackground()
+        appearance.setBackIndicatorImage(backButtonImage, transitionMaskImage: backButtonImage)
+        appearance.shadowColor = TrinapAsset.white.color
+        self.navigationController?.navigationBar.tintColor = .black
+        
+        self.navigationItem.standardAppearance = appearance
+        self.navigationItem.scrollEdgeAppearance = appearance
+        self.navigationItem.backButtonTitle = ""
+        
+        let buttonItem = UIBarButtonItem(
+            image: TrinapAsset.dotdotdot.image,
+            style: .plain,
+            target: self,
+            action: #selector(showActionSheet)
+        )
+        
+        navigationItem.setRightBarButton(buttonItem, animated: false)
+    }
+}

@@ -34,7 +34,6 @@ extension ReservationCoordinator {
     func showReservationPreviewListViewController() {
         let reservationPreviewListViewController = dependencies.makeReservationPreviewListViewController()
         
-        self.navigationController.navigationBar.isHidden = true
         self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
         self.navigationController.pushViewController(reservationPreviewListViewController, animated: true)
     }

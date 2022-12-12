@@ -16,7 +16,7 @@ struct Sue {
     let suingUserId: String
     let contents: SueContents
     
-    //MARK: Initializer
+    // MARK: Initializer
     init(sueId: String, suedUserId: String, suingUserId: String, contents: SueContents) {
         self.sueId = sueId
         self.suedUserId = suedUserId

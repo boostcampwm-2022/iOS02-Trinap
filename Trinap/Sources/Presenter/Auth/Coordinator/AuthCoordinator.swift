@@ -41,7 +41,6 @@ extension AuthCoordinator {
         self.navigationController.pushViewController(viewController, animated: false)
     }
     
-    // TODO: CreateUserViewController로 이동하는 Method 구현
     func showCreateUserViewController() {
         let viewController = CreateUserViewController(
             viewModel: CreateUserViewModel(

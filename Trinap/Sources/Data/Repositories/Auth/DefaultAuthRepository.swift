@@ -161,8 +161,7 @@ final class DefaultAuthRepository: AuthRepository {
                     return
                 }
                 
-                if self.tokenManager.deleteToken(with: .userId),
-                   self.tokenManager.deleteToken(with: .fcmToken) {
+                if self.tokenManager.deleteToken(with: .userId) && self.tokenManager.deleteToken(with: .fcmToken) {
                     single(.success(()))
                 } else {
                     single(.failure(FireStoreError.unknown))

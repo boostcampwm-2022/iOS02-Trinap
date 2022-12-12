@@ -17,7 +17,6 @@ struct ReservationDone {
     private let reservation: Reservation
     private let userType: Reservation.UserType
     
-    // TODO: - ***** 리뷰 작성 화면으로의 전환 로직이 들어가며, 임시로 작성해 놓은 부분이라 수정이 필요합니다. *****
     private let navigateToWriteReview: ((Reservation) -> Void)?
     
     // MARK: - Initializers

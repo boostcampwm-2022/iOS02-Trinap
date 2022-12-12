@@ -72,7 +72,6 @@ final class PhotographerListViewModel: ViewModelType {
         let previews = Observable.combineLatest(
             self.coordinate,
             input.tagType.startWith(.all)
-//                .debounce(.seconds(1), scheduler: MainScheduler.instance)
         )
             .withUnretained(self)
             .flatMap { owner, val -> Observable<[PhotographerPreview]> in

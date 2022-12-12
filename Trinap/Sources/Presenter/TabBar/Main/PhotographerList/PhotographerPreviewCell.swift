@@ -66,6 +66,7 @@ final class PhotographerPreviewCell: BaseCollectionViewCell {
         ratingLabel.snp.makeConstraints { make in
             make.trailing.equalToSuperview().inset(trinapOffset)
             make.centerY.equalTo(locationLabel.snp.centerY)
+            make.height.equalTo(18)
         }
         
         nicknameLabel.snp.makeConstraints { make in
@@ -81,7 +82,6 @@ extension PhotographerPreviewCell {
         nicknameLabel.text = "\(preview.name) 작가"
         locationLabel.text = preview.location
         ratingLabel.configure(rating: preview.rating)
-//        thumbnailImageView.configure(imageStrings: preview.pictures)
         thumbnailImageView.configure(urlStrings: preview.pictures)
     }
 }

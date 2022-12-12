@@ -65,5 +65,4 @@ final class MainDependencyContainer {
     private func makeFetchCurrentLocationUseCase() -> FetchCurrentLocationUseCase {
         return DefaultFetchCurrentLocationUseCase(mapRepository: mapRepository)
     }
-    
 }

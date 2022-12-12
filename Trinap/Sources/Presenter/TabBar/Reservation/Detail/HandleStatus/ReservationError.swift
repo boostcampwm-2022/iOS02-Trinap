@@ -8,13 +8,10 @@
 
 import RxSwift
 
-struct ReservationError {
+struct ReservationError: ReservationStatusConvertible, ReservationUseCaseExecutable {
     
     private typealias Configurations = ReservationStatusConfigurations
     private typealias Configuration = ReservationStatusConfigurations.Configuration
-}
-
-extension ReservationError: ReservationStatusConvertible {
     
     func convert() -> ReservationStatusConfigurations {
         return Configurations(
@@ -24,5 +21,3 @@ extension ReservationError: ReservationStatusConvertible {
         )
     }
 }
-
-extension ReservationError: ReservationUseCaseExecutable {}

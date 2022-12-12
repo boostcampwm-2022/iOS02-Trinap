@@ -36,7 +36,6 @@ extension MainCoordinator {
     
     func showPhotographerListViewController() {
         let viewController = dependencies.makePhotographerListViewController()
-        self.navigationController.setNavigationBarHidden(true, animated: false)
         self.navigationController.pushViewController(viewController, animated: true)
     }
         
@@ -59,10 +58,8 @@ extension MainCoordinator {
             viewModel: viewModel
         )
         
-        self.navigationController.setNavigationBarHidden(false, animated: false)
-        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = true
+        viewController.hidesBottomBarWhenPushed = true
         self.navigationController.pushViewController(viewController, animated: true)
-        self.navigationController.viewControllers.first?.hidesBottomBarWhenPushed = false
     }
     
     func connectDetailPhotographerFlow(userId: String, searchCoordinate: Coordinate) {
@@ -80,7 +77,7 @@ extension MainCoordinator {
 // MARK: - Coodinator Delegate
 extension MainCoordinator: CoordinatorDelegate {
     
-    //TODO: 프록시로 하고싶은데....
+    // TODO: 프록시로 하고싶은데....
     func didFinish(childCoordinator: Coordinator) {
         // PhotographerDetailCoordinator 끝났을 때
         // 근데 네비바에서 뒤로 가기 하면 이거 해줄 필요가 있을까?????????

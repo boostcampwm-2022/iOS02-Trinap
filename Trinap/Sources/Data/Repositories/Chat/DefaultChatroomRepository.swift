@@ -109,7 +109,7 @@ private extension DefaultChatroomRepository {
         )
         .asObservable()
         .map { data -> [Chatroom] in
-            data.compactMap { $0.toObject(ChatroomDTO.self)?.toModel()}
+            data.compactMap { $0.toObject(ChatroomDTO.self)?.toModel() }
         }
     }
 }

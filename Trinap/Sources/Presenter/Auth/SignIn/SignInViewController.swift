@@ -100,8 +100,9 @@ extension SignInViewController: ASAuthorizationControllerDelegate {
                 return
             }
             
-            guard let authorizationCode = appleIDCredential.authorizationCode,
-                  let codeString = String(data: authorizationCode, encoding: .utf8)
+            guard
+                let authorizationCode = appleIDCredential.authorizationCode,
+                let codeString = String(data: authorizationCode, encoding: .utf8)
             else {
                 Logger.print("Unable to serialize token string from authorizationCode")
                 return

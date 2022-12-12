@@ -108,8 +108,9 @@ final class BlockListViewController: BaseViewController {
 private extension BlockListViewController {
     func configureDataSource() {
         self.dataSource = DataSource(tableView: blockListTableView, cellProvider: { [weak self] tableView, indexPath, user in
-            guard let self,
-                  let cell = tableView.dequeueCell(BlockListCell.self, for: indexPath)
+            guard
+                let self,
+                let cell = tableView.dequeueCell(BlockListCell.self, for: indexPath)
             else {
                 return UITableViewCell()
             }

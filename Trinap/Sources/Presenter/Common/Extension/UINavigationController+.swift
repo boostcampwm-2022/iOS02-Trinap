@@ -10,10 +10,6 @@ import UIKit
 
 extension UINavigationController {
     
-    /**
-     backButton 타이틀 제거
-    TintColor black으로 설정
-     */
     func pushViewControllerHideBottomBar(rootViewController: UIViewController, isNavigationBarHidden: Bool = false, animated: Bool) {
         self.navigationBar.isHidden = isNavigationBarHidden
         self.navigationBar.topItem?.title = ""

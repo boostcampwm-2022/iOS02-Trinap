@@ -100,7 +100,7 @@ final class LocationShareViewController: BaseViewController {
             .map { Coordinate(lat: $0.coordinate.latitude, lng: $0.coordinate.longitude) }
         
         let input = LocationShareViewModel.Input(
-            didTapTrackingMe: trackingMeButton.rx.tap.asSignal(),
+            didTapTrackingMe: trackingMeButton.rx.tap.asSignal().startWith(()),
             didTapTrackingOther: trackingOtherButton.rx.tap.asSignal(),
             willChangeRegionWithScroll: willChangeRegionWithScroll(),
             myCoordinate: myCoordinate

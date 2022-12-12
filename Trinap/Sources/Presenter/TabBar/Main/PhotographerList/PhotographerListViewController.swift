@@ -23,7 +23,8 @@ final class PhotographerListViewController: BaseViewController {
     private lazy var layout = UICollectionViewFlowLayout().than {
         let width = self.view.frame.width - (2 * trinapOffset)
         let height = width * 0.8
-        $0.minimumLineSpacing = 10
+        $0.sectionInset = UIEdgeInsets(top: 24, left: 0, bottom: 24, right: 0)
+        $0.minimumLineSpacing = 24
         $0.estimatedItemSize = CGSize(width: width, height: height)
         $0.scrollDirection = .vertical
     }
@@ -46,42 +47,31 @@ final class PhotographerListViewController: BaseViewController {
     }
 
     // MARK: - Methods
-    override func viewDidLoad() {
-        super.viewDidLoad()
-    }
-
     override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(false)
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
+        super.viewWillAppear(animated)
+        
+        configureNavigationBar()
     }
     
     override func configureHierarchy() {
         self.view.addSubviews([
-            searchBarView,
             filterView,
             collectionView
         ])
     }
 
     override func configureConstraints() {
-        searchBarView.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide)
-            make.leading.equalToSuperview().offset(trinapOffset)
-            make.trailing.equalToSuperview().offset(-trinapOffset)
-            make.height.equalTo(48)
-        }
-        
         filterView.snp.makeConstraints { make in
             make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
-            make.top.equalTo(searchBarView.snp.bottom)
+            make.top.equalTo(self.view.safeAreaLayoutGuide)
             make.height.equalTo(trinapOffset * 6)
         }
         
         collectionView.snp.makeConstraints { make in
             make.horizontalEdges.equalToSuperview()
-            make.top.equalTo(filterView.snp.bottom).offset(15)
-            make.bottom.equalToSuperview()
+            make.top.equalTo(filterView.snp.bottom).offset(2)
+            make.bottom.equalTo(self.view.safeAreaLayoutGuide)
         }
     }
 
@@ -161,5 +151,20 @@ extension PhotographerListViewController {
             
             return cell
         }
+    }
+}
+
+// MARK: - Privates
+private extension PhotographerListViewController {
+    
+    func configureNavigationBar() {
+        let appearance = UINavigationBarAppearance()
+        
+        appearance.configureWithTransparentBackground()
+        
+        self.navigationItem.titleView = searchBarView
+        self.navigationItem.backButtonTitle = ""
+        self.navigationItem.standardAppearance = appearance
+        self.navigationItem.scrollEdgeAppearance = appearance
     }
 }
