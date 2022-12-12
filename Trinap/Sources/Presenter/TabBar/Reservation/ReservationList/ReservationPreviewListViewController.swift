@@ -22,7 +22,7 @@ final class ReservationPreviewListViewController: BaseViewController {
     }
     
     // MARK: - UI
-    private lazy var filterView = FilterView(filterMode: .reservation)
+    private lazy var reservationFilterView = ReservationFilterView()
     
     // MARK: - Properties
     private lazy var reservationListTableView = UITableView().than {
@@ -42,23 +42,23 @@ final class ReservationPreviewListViewController: BaseViewController {
     }
     
     // MARK: - Methods
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        configureNavigationBar()
+    }
+    
     override func configureHierarchy() {
         super.configureHierarchy()
         
-        self.view.addSubviews([filterView, reservationListTableView])
+        self.view.addSubviews([reservationListTableView])
     }
     
     override func configureConstraints() {
         super.configureConstraints()
         
-        filterView.snp.makeConstraints { make in
-            make.top.leading.trailing.equalTo(self.view.safeAreaLayoutGuide)
-            make.height.equalTo(trinapOffset * 6)
-        }
-        
         reservationListTableView.snp.makeConstraints { make in
-            make.top.equalTo(self.filterView.snp.bottom).offset(2)
-            make.leading.trailing.bottom.equalTo(self.view.safeAreaLayoutGuide)
+            make.edges.equalTo(self.view.safeAreaLayoutGuide)
         }
     }
     
@@ -71,7 +71,7 @@ final class ReservationPreviewListViewController: BaseViewController {
     override func bind() {
         super.bind()
         
-        let reservationType = filterView.rx.itemSelected
+        let reservationType = reservationFilterView.rx.selectedSegmentIndex
             .withUnretained(self) { $0.filterMode(of: $1) }
             .startWith(.receive)
         
@@ -116,7 +116,7 @@ private extension ReservationPreviewListViewController {
                 return UITableViewCell()
             }
             
-            let selectedIndexPath = self.filterView.indexPathsForSelectedItems?.first ?? IndexPath(item: 0, section: 0)
+            let selectedIndexPath = self.reservationFilterView.selectedSegmentIndex
             cell.configureCell(preview, reservationFilter: self.filterMode(of: selectedIndexPath))
             
             return cell
@@ -131,7 +131,19 @@ private extension ReservationPreviewListViewController {
         return snapshot
     }
     
-    func filterMode(of indexPath: IndexPath) -> ReservationFilter {
-        return ReservationFilter(rawValue: indexPath.item) ?? .receive
+    func filterMode(of index: Int) -> ReservationFilter {
+        return ReservationFilter(rawValue: index) ?? .receive
+    }
+    
+    func configureNavigationBar() {
+        let appearance = UINavigationBarAppearance()
+        
+        appearance.configureWithDefaultBackground()
+        appearance.backgroundColor = TrinapAsset.white.color
+        
+        self.navigationItem.standardAppearance = appearance
+        self.navigationItem.scrollEdgeAppearance = appearance
+        self.navigationItem.titleView = reservationFilterView
+        self.navigationItem.backButtonTitle = ""
     }
 }

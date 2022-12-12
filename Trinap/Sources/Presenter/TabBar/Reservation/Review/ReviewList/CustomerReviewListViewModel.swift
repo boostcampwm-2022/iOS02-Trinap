@@ -12,9 +12,7 @@ import RxSwift
 
 final class CustomerReviewListViewModel: ViewModelType {
     
-    struct Input {
-        var backButtonTap: ControlEvent<Void>
-    }
+    struct Input {}
     
     struct Output {
         var reviewList: Observable<[UserReview]>
@@ -42,12 +40,6 @@ final class CustomerReviewListViewModel: ViewModelType {
     
     // MARK: - Methods
     func transform(input: Input) -> Output {
-        input.backButtonTap
-            .bind(onNext: { [weak self] _ in
-                self?.reservationCoordinator?.popViewController()
-            })
-            .disposed(by: disposeBag)
-        
         let reviewList = fetchReviewUseCase.fetchReviews(userId: creatorUser.userId)
         
         return Output(reviewList: reviewList)

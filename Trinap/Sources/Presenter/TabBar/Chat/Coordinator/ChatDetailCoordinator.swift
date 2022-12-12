@@ -102,4 +102,3 @@ extension ChatDetailCoordinator {
         self.navigationController.pushViewController(locationShareViewController, animated: true)
     }
 }
-

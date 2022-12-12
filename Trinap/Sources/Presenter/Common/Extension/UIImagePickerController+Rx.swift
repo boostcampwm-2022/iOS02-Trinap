@@ -26,29 +26,29 @@ protocol ImagePickerDelegate: AnyObject {
 }
 
 /**
- 사용법
- 
- ```
- class SomeViewController: UIViewController {
-    
-    private let imagePicker = ImagePickerController()
-    
-    init(...) {
-        super.init(...)
- 
-        self.imagePicker.delegate = self
-    }
- 
-    ...
-    imagePicker.pickImage(source: ..., allowsEditing: ...) // <- 둘 다 Default로 지정되어 있습니다.
-        .observe(on: MainScheduler.instance)
-        .subscribe(onNext: { image in
-            // processing image
-        })
-        .disposed(by: disposeBag)
- }
- ```
- */
+사용법
+
+```
+class SomeViewController: UIViewController {
+
+private let imagePicker = ImagePickerController()
+
+init(...) {
+    super.init(...)
+
+    self.imagePicker.delegate = self
+}
+
+...
+imagePicker.pickImage(source: ..., allowsEditing: ...) // <- 둘 다 Default로 지정되어 있습니다.
+    .observe(on: MainScheduler.instance)
+    .subscribe(onNext: { image in
+        // processing image
+    })
+    .disposed(by: disposeBag)
+}
+```
+*/
 final class ImagePickerController: NSObject {
     
     // MARK: - Properties

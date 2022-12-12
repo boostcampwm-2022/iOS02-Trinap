@@ -144,8 +144,10 @@ extension MyPageViewModel {
     }
     
     private func getVerson() -> String? {
-        guard let dictionary = Bundle.main.infoDictionary,
-              let version = dictionary["CFBundleShortVersionString"] as? String else {
+        guard
+            let dictionary = Bundle.main.infoDictionary,
+            let version = dictionary["CFBundleShortVersionString"] as? String
+        else {
             return nil
         }
         return version

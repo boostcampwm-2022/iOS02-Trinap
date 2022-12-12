@@ -83,6 +83,4 @@ extension NicknameTextFieldView: UITextFieldDelegate {
         
         return true
     }
-    
-    // TODO: - 외부에서 복사한 텍스트에 대한 길이 제한 기능 추가
 }

@@ -15,7 +15,6 @@ final class ReservationDetailViewModel: ViewModelType {
     typealias ReservationStatus = ReservationStatusConvertible & ReservationUseCaseExecutable
     
     struct Input {
-        var backButtonTap: Signal<Void>
         var customerUserViewTap: Observable<Void>
         var photographerUserViewTap: Observable<Void>
         var primaryButtonTap: Observable<Void>
@@ -53,12 +52,6 @@ final class ReservationDetailViewModel: ViewModelType {
     
     // MARK: - Methods
     func transform(input: Input) -> Output {
-        input.backButtonTap
-            .emit(onNext: { [weak self] _ in
-                self?.reservationCoordinator?.popViewController()
-            })
-            .disposed(by: disposeBag)
-        
         input.customerUserViewTap
             .compactMap { [weak self] _ in
                 return self?.reservation?.customerUser
@@ -71,10 +64,13 @@ final class ReservationDetailViewModel: ViewModelType {
         input.photographerUserViewTap
             .withUnretained(self)
             .bind(onNext: { owner, _ in
-                guard let userId = owner.reservation?.customerUser.userId,
-                      let lat = owner.reservation?.latitude,
-                      let lng = owner.reservation?.longitude
-                else { return }
+                guard
+                    let userId = owner.reservation?.customerUser.userId,
+                    let lat = owner.reservation?.latitude,
+                    let lng = owner.reservation?.longitude
+                else {
+                    return
+                }
                 
                 owner.reservationCoordinator?.connectDetailPhotographerFlow(
                     userId: userId,

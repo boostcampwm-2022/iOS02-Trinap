@@ -26,6 +26,9 @@ final class SearchBarView: BaseView {
     }
     
     // MARK: Properties
+    override var intrinsicContentSize: CGSize {
+        return UIView.layoutFittingExpandedSize
+    }
     
     // MARK: Initializers
     

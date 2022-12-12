@@ -103,7 +103,7 @@ final class PhotographerDetailDependencyContainer {
         return DefaultSendFirstChatUseCase(chatRepository: chatRepository)
     }
     
-    //MARK: 신고하기 뷰
+    // MARK: - 신고하기 뷰
     func makeSueViewController(userId: String) -> SueViewController {
         return SueViewController(viewModel: makeSueViewModel(userId: userId))
     }

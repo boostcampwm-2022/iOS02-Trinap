@@ -97,8 +97,9 @@ private extension ChatPreviewsViewController {
         appearance.configureWithDefaultBackground()
         appearance.backgroundColor = TrinapAsset.white.color
         
-        self.navigationController?.navigationBar.standardAppearance = appearance
-        self.navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        self.navigationItem.standardAppearance = appearance
+        self.navigationItem.scrollEdgeAppearance = appearance
+        self.navigationItem.scrollEdgeAppearance?.shadowColor = .clear
         
         self.navigationController?.navigationBar.topItem?.titleView = LargeNavigationTitleView(title: "채팅")
         self.navigationController?.navigationBar.topItem?.backButtonTitle = ""

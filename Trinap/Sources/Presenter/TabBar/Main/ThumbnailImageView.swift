@@ -89,7 +89,6 @@ extension ThumbnailImageView {
     }
     
     private func configureThumbnailImage(_ imageNames: [String]) {
-        Logger.printArray(imageNames)
         for (index, name) in imageNames.enumerated() {
             guard let url = URL(string: name) else { continue }
             let imageView = UIImageView()
@@ -108,7 +107,6 @@ extension ThumbnailImageView {
                 self?.thumbnailScrollView.contentSize.width = imageView.frame.width * CGFloat(index + 1)
                 self?.thumbnailScrollView.addSubview(imageView)
             }
-            
         }
     }
 }

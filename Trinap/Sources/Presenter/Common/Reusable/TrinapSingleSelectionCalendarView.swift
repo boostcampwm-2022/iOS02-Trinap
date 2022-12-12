@@ -103,8 +103,10 @@ private extension TrinapSingleSelectionCalendarView {
         var invariantViewProperties = DayView.InvariantViewProperties.baseInteractive
         
         if self.possibleDate.contains(where: { calendar.component(.day, from: $0) == day.day }) {
-            if let selectedDate = self.selectedDate,
-               calendar.component(.day, from: selectedDate) == day.day {
+            if
+                let selectedDate = self.selectedDate,
+                calendar.component(.day, from: selectedDate) == day.day
+            {
                 invariantViewProperties.font = TrinapFontFamily.Pretendard.bold.font(size: 16)
                 invariantViewProperties.textColor = TrinapAsset.white.color
                 invariantViewProperties.backgroundShapeDrawingConfig.fillColor = TrinapAsset.primary.color

@@ -47,6 +47,8 @@ final class ThumbnailCollectionViewCell: BaseCollectionViewCell {
     }
 
     override func prepareForReuse() {
+        super.prepareForReuse()
+        
         imageView.image = nil
     }
 }

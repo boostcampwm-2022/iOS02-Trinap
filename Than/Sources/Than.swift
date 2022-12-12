@@ -34,16 +34,16 @@ extension Than where Self: AnyObject {
     }
 }
 
-extension NSObject:     Than {}
+extension NSObject: Than {}
 
-extension CGPoint:      Than {}
-extension CGRect:       Than {}
-extension CGSize:       Than {}
+extension CGPoint: Than {}
+extension CGRect: Than {}
+extension CGSize: Than {}
 
-extension Array:        Than {}
-extension Dictionary:   Than {}
-extension Set:          Than {}
+extension Array: Than {}
+extension Dictionary: Than {}
+extension Set: Than {}
 
 extension UIEdgeInsets: Than {}
-extension UIOffset:     Than {}
-extension UIRectEdge:   Than {}
+extension UIOffset: Than {}
+extension UIRectEdge: Than {}

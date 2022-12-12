@@ -119,12 +119,13 @@ extension ThumbnailCollectionView: UICollectionViewDelegateFlowLayout {
 }
 
 private extension UIView {
+    
     func setViewShadow(backView: UIView) {
         backView.layer.masksToBounds = true
         backView.layer.cornerRadius = 20
         
         layer.cornerRadius = 20
-layer.masksToBounds = false
+        layer.masksToBounds = false
         layer.shadowOpacity = 0.5
         layer.shadowOffset = CGSize(width: 2, height: 2)
         layer.shadowRadius = 3
