@@ -58,7 +58,6 @@ extension MainCoordinator {
             viewModel: viewModel
         )
         
-//        self.navigationController.isNavigationBarHidden = true
         viewController.hidesBottomBarWhenPushed = true
         self.navigationController.pushViewController(viewController, animated: true)
     }
@@ -78,7 +77,7 @@ extension MainCoordinator {
 // MARK: - Coodinator Delegate
 extension MainCoordinator: CoordinatorDelegate {
     
-    //TODO: 프록시로 하고싶은데....
+    // TODO: 프록시로 하고싶은데....
     func didFinish(childCoordinator: Coordinator) {
         // PhotographerDetailCoordinator 끝났을 때
         // 근데 네비바에서 뒤로 가기 하면 이거 해줄 필요가 있을까?????????

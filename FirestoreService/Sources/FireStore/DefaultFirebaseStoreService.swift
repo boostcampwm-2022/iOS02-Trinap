@@ -33,7 +33,6 @@ public final class DefaultFireStoreService: FireStoreService {
         if !allowsCaching {
             let setting = Firestore.firestore().settings
             setting.isPersistenceEnabled = false
-            
             firestore.settings = setting
         }
         
@@ -41,16 +40,12 @@ public final class DefaultFireStoreService: FireStoreService {
     }
     
     public func getDocument(collection: FireStoreCollection, document: String) -> Single<FirebaseData> {
-        
-
         return Single<FirebaseData>.create { [weak self] single in
-            
             guard let self else { return Disposables.create() }
             
             self.database.collection(collection.name).document(document).getDocument { snapshot, error in
-                if let error = error {
-                    single(.failure(error))
-                }
+                if let error = error { single(.failure(error)) }
+                
                 guard let snapshot = snapshot, let data = snapshot.data() else {
                     single(.failure(FireStoreError.unknown))
                     return
@@ -62,20 +57,16 @@ public final class DefaultFireStoreService: FireStoreService {
     }
     
     public func getDocument(collection: FireStoreCollection, field: String, condition: [String]) -> Single<[FirebaseData]> {
-    
         return Single.create { [weak self] single in
-    
             guard let self else { return Disposables.create() }
-    
+            
             self.database.collection(collection.name)
                 .whereField(field, arrayContains: condition)
                 .getDocuments { snapshot, error in
+                    if let error = error { single(.failure(error)) }
     
-                    if let error = error {
-                        single(.failure(error))
-                    }
-    
-                    guard let snapshot = snapshot else { single(.failure(FireStoreError.unknown))
+                    guard let snapshot = snapshot else {
+                        single(.failure(FireStoreError.unknown))
                         return
                     }
     
@@ -91,16 +82,13 @@ public final class DefaultFireStoreService: FireStoreService {
             guard let self else { return Disposables.create() }
             
             var queries = values
-            if queries.isEmpty {
-                queries.append("")
-            }
+            if queries.isEmpty { queries.append("") }
             
             self.database.collection(collection.name)
                 .whereField(field, in: queries)
                 .getDocuments { snapshot, error in
-                    if let error = error {
-                        single(.failure(error))
-                    }
+                    if let error = error { single(.failure(error)) }
+                    
                     guard let snapshot = snapshot else {
                         single(.failure(FireStoreError.unknown))
                         return
@@ -112,21 +100,16 @@ public final class DefaultFireStoreService: FireStoreService {
         }
     }
     
-    /// collection의 모든 값 가져올 때
     public func getDocument(collection: FireStoreCollection) -> Single<[FirebaseData]> {
-        
         return Single.create { [weak self] single in
-            
             guard let self else { return Disposables.create() }
             
             self.database.collection(collection.name)
                 .getDocuments { snapshot, error in
+                    if let error = error { single(.failure(error)) }
                     
-                    if let error = error {
-                        single(.failure(error))
-                    }
-                    
-                    guard let snapshot = snapshot else { single(.failure(FireStoreError.unknown))
+                    guard let snapshot = snapshot else {
+                        single(.failure(FireStoreError.unknown))
                         return
                     }
                     
@@ -137,17 +120,11 @@ public final class DefaultFireStoreService: FireStoreService {
         }
     }
     
-    // TODO: 아래 getDocument(documents:) -> Single<[String: Any]> 사용하시나요?
     public func getDocument(documents: [String]) -> Single<[String: Any]> {
-        
         return Single.create { single in
-            
             self.database.document(documents.joined(separator: "/"))
                 .getDocument { snapshot, error in
-                    
-                    if let error = error {
-                        single(.failure(error))
-                    }
+                    if let error = error { single(.failure(error)) }
                     
                     guard let snapshot = snapshot, let data = snapshot.data() else {
                         single(.failure(FireStoreError.unknown))
@@ -161,38 +138,27 @@ public final class DefaultFireStoreService: FireStoreService {
     }
     
     public func createDocument(collection: FireStoreCollection, document: String, values: FirebaseData) -> Single<Void> {
-        
         return Single.create { [weak self] single in
-            
             guard let self else { return Disposables.create() }
             
             self.database.collection(collection.name)
                 .document(document)
                 .setData(values) { error in
-                    
-                    if let error = error {
-                        single(.failure(error))
-                    }
-                    
+                    if let error = error { single(.failure(error)) }
                     single(.success(()))
                 }
+            
             return Disposables.create()
         }
     }
     
     public func createDocument(documents: [String], values: FirebaseData) -> Single<Void> {
-        
         return Single.create { [weak self] single in
-            
             guard let self else { return Disposables.create() }
             
             self.database.document(documents.joined(separator: "/"))
                 .setData(values) { error in
-                    
-                    if let error = error {
-                        single(.failure(error))
-                    }
-                    
+                    if let error = error { single(.failure(error)) }
                     single(.success(()))
                 }
             return Disposables.create()
@@ -201,19 +167,13 @@ public final class DefaultFireStoreService: FireStoreService {
 
     
     public func updateDocument(collection: FireStoreCollection, document: String, values: FirebaseData) -> Single<Void> {
-        
         return Single.create { [weak self] single in
-            
             guard let self else { return Disposables.create() }
             
             self.database.collection(collection.name)
                 .document(document)
                 .updateData(values) { error in
-                    
-                    if let error = error {
-                        single(.failure(error))
-                    }
-                    
+                    if let error = error { single(.failure(error)) }
                     single(.success(()))
                 }
             return Disposables.create()
@@ -221,44 +181,30 @@ public final class DefaultFireStoreService: FireStoreService {
     }
     
     public func deleteDocument(collection: FireStoreCollection, document: String) -> Single<Void> {
-        
         return Single.create { [weak self] single in
-            
             guard let self else { return Disposables.create() }
             
             self.database.collection(collection.name)
                 .document(document)
                 .delete { error in
-                    
-                    if let error = error {
-                        single(.failure(error))
-                    }
-                    
+                    if let error = error { single(.failure(error)) }
                     single(.success(()))
                 }
             return Disposables.create()
         }
     }
     
-    // [(collection, document)]
-    public func deleteDocuments(
-        collections: [(FireStoreCollection, String)]
-    ) -> Single<Void> {
+    public func deleteDocuments(collections: [(FireStoreCollection, String)]) -> Single<Void> {
         let batch = self.database.batch()
+        
         collections.forEach { collection, document in
-            let document = self.database
-                .collection(collection.name)
-                .document(document)
+            let document = self.database.collection(collection.name).document(document)
             batch.deleteDocument(document)
         }
         
         return Single.create { single in
-            
-            batch.commit() { error in
-                if let error = error {
-                    single(.failure(error))
-                }
-                
+            batch.commit { error in
+                if let error = error { single(.failure(error)) }
                 single(.success(()))
             }
             
@@ -271,18 +217,13 @@ public final class DefaultFireStoreService: FireStoreService {
 public extension DefaultFireStoreService {
     
     func observer(collection: FireStoreCollection, document: String) -> Observable<FirebaseData> {
-        
         return Observable<FirebaseData>.create { [weak self] observable in
-            
             guard let self else { return Disposables.create() }
             
             self.database.collection(collection.name)
                 .document(document)
                 .addSnapshotListener { snapshot, error in
-                    
-                    if let error = error {
-                        observable.onError(error)
-                    }
+                    if let error = error { observable.onError(error) }
                     
                     guard let snapshot = snapshot, let data = snapshot.data() else {
                         observable.onError(FireStoreError.unknown)
@@ -296,18 +237,13 @@ public extension DefaultFireStoreService {
     }
     
     func observer(documents: [String]) -> Observable<FirebaseData> {
-        
         return Observable<FirebaseData>.create { [weak self] observable in
-            
             guard let self else { return Disposables.create() }
             
             self.database
                 .document(documents.joined(separator: "/"))
                 .addSnapshotListener { snapshot, error in
-                    
-                    if let error = error {
-                        observable.onError(error)
-                    }
+                    if let error = error { observable.onError(error) }
                     
                     guard let snapshot = snapshot, let data = snapshot.data() else {
                         observable.onError(FireStoreError.unknown)
@@ -324,21 +260,15 @@ public extension DefaultFireStoreService {
 public extension DefaultFireStoreService {
     
     func uploadImage(imageData: Data) -> Single<String> {
-        
         return Single.create { single in
-            
             let metaData = StorageMetadata()
             metaData.contentType = "image/jpeg"
             
             let imageName = UUID().uuidString + String(Date().timeIntervalSince1970)
-            
             let firebaseReference = Storage.storage().reference().child("\(imageName)")
             
             firebaseReference.putData(imageData, metadata: metaData) { _, error in
-                
-                if let error = error {
-                    single(.failure(error))
-                }
+                if let error = error { single(.failure(error)) }
                 
                 firebaseReference.downloadURL { url, _ in
                     guard let url = url else {
@@ -378,9 +308,7 @@ public extension DefaultFireStoreService {
             self.database
                 .collection(documents.joined(separator: "/"))
                 .addSnapshotListener { snapshot, error in
-                    if let error = error {
-                        observable.onError(error)
-                    }
+                    if let error = error { observable.onError(error) }
                     guard let snapshot = snapshot else {
                         observable.onError(FireStoreError.unknown)
                         return
@@ -394,17 +322,13 @@ public extension DefaultFireStoreService {
     }
     
     func deleteDocument(documents: [String]) -> Single<Void> {
-        
         return Single.create { [weak self] single in
-            
             guard let self else { return Disposables.create() }
             
             self.database
                 .document(documents.joined(separator: "/"))
                 .delete { error in
-                    if let error = error {
-                        single(.failure(error))
-                    }
+                    if let error = error { single(.failure(error)) }
                     
                     single(.success(()))
                 }
@@ -417,9 +341,7 @@ public extension DefaultFireStoreService {
             guard let self else { return Disposables.create() }
             
             var queries = values
-            if queries.isEmpty {
-                queries.append("")
-            }
+            if queries.isEmpty { queries.append("") }
             
             self.database
                 .collection(collection.name)

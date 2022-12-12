@@ -27,8 +27,7 @@ final class PhotographerDetailViewModel: ViewModelType {
     
     // MARK: - Properties
     let disposeBag = DisposeBag()
-
-    //TODO: PhotographerUser로 반환하는 UseCase 만들어서 바로 받아오도록 변경
+    
     private let fetchUserUseCase: FetchUserUseCase
     private let fetchPhotographerUseCase: FetchPhotographerUseCase
     private let fetchReviewUseCase: FetchReviewUseCase
@@ -42,7 +41,6 @@ final class PhotographerDetailViewModel: ViewModelType {
     
     private let searchCoordinate: Coordinate
     private let userId: String
-    //TODO: 델리게이트로 넘어오는 값 여기에 넣기
     private var reservationDate = BehaviorRelay<[Date]>(value: [])
     
     private weak var coordinator: PhotographerDetailCoordinator?
@@ -303,17 +301,19 @@ extension PhotographerDetailViewModel: SelectReservationDateViewModelDelegate {
 
 // MARK: 차단, 신고 관련 메소드
 extension PhotographerDetailViewModel {
+    
     func blockPhotographer() -> Single<Void> {
         self.createBlockUseCase.create(blockedUserId: self.userId)
     }
     
     func reportPhotographer() {
-        
+        Logger.print("Reported.")
     }
 }
 
 
 extension PhotographerDetailViewModel {
+    
     private func formattingCalendarButtonText(startDate: Date, endDate: Date) -> String? {
         let startSeperated = startDate.toString(type: .yearToSecond).components(separatedBy: " ")
         let endSeperated = endDate.toString(type: .yearToSecond).components(separatedBy: " ")
@@ -337,12 +337,11 @@ extension PhotographerDetailViewModel {
             let endHour = endHourToSec[safe: 0],
             let endMin = endHourToSec[safe: 1]
         else { return nil }
-
+        
         let reservationDate = "\(month)/\(day)"
         let reservationStart = "\(startHour):\(startMin)"
         let reservationEnd = "\(endHour):\(endMin)"
         let dateInfo = "\(reservationDate) \(reservationStart)-\(reservationEnd)\n"
         return dateInfo
     }
-
 }

@@ -82,7 +82,6 @@ extension PhotographerPreviewCell {
         nicknameLabel.text = "\(preview.name) 작가"
         locationLabel.text = preview.location
         ratingLabel.configure(rating: preview.rating)
-//        thumbnailImageView.configure(imageStrings: preview.pictures)
         thumbnailImageView.configure(urlStrings: preview.pictures)
     }
 }

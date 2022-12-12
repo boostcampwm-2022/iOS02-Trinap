@@ -38,8 +38,6 @@ class PhotographerDetailViewController: BaseViewController {
         $0.setTitleColor(TrinapAsset.white.color, for: .normal)
         $0.titleLabel?.font = TrinapFontFamily.Pretendard.bold.font(size: 14)
     }
-
-    //TODO: 예약 관련 컴포넌트들 선언 및 연결
     
     // MARK: - Properties
     private let tabState = BehaviorRelay<Int>(value: 0)
@@ -163,14 +161,14 @@ class PhotographerDetailViewController: BaseViewController {
     
     @objc private func showActionSheet() {
         let alert = UIAlertController()
-            .appendingAction(title: "신고하기", style: .default) {
-                //TODO: 해당 아이 userId로 신고박는 페이지로 이동
-                self.viewModel.showSueController()
+            .appendingAction(title: "신고하기", style: .default) { [weak self] in
+                self?.viewModel.showSueController()
             }
-            .appendingAction(title: "차단하기", style: .default) {
-                self.confirmBlock()
+            .appendingAction(title: "차단하기", style: .default) { [weak self] in
+                self?.confirmBlock()
             }
             .appendingAction(title: "취소", style: .cancel)
+        
         self.present(alert, animated: true, completion: nil)
     }
     

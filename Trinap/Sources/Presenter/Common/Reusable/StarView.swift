@@ -51,5 +51,4 @@ final class StarView: BaseView {
     func configure(rating: Double) {
         ratingLabel.text = "\(rating)"
     }
-
 }

@@ -64,10 +64,13 @@ final class ReservationDetailViewModel: ViewModelType {
         input.photographerUserViewTap
             .withUnretained(self)
             .bind(onNext: { owner, _ in
-                guard let userId = owner.reservation?.customerUser.userId,
-                      let lat = owner.reservation?.latitude,
-                      let lng = owner.reservation?.longitude
-                else { return }
+                guard
+                    let userId = owner.reservation?.customerUser.userId,
+                    let lat = owner.reservation?.latitude,
+                    let lng = owner.reservation?.longitude
+                else {
+                    return
+                }
                 
                 owner.reservationCoordinator?.connectDetailPhotographerFlow(
                     userId: userId,

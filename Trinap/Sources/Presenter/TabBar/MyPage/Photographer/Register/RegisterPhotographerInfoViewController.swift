@@ -18,7 +18,6 @@ struct TagItem: Hashable {
     let isSelected: Bool
 }
 
-// TODO: - 키보드 나오면 y좌표 움직이기.
 final class RegisterPhotographerInfoViewController: BaseViewController {
     
     // MARK: - Properties

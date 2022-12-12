@@ -8,8 +8,6 @@
 
 import Foundation
 
-
-// TODO: 날짜 계산 로직 리펙토링
 final class DefaultCreateReservationDateUseCase: CreateReservationDateUseCase {
     
     // MARK: - Properties
@@ -40,8 +38,6 @@ final class DefaultCreateReservationDateUseCase: CreateReservationDateUseCase {
         return dateArray
     }
     
-    
-    // TODO: EndDate와 StartDate 계산하는 로직 개선
     func createEndDate(date: Date) -> [Date] {
         var dateArray: [Date] = []
         let date = date

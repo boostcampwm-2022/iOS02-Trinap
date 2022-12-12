@@ -11,12 +11,6 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-/**
- 사용법
- private lazy var filterView = FilterView(filterMode: .main)
- filterMode를 선택해서 사용하여 Layout을 지정하면 됩니다.
- 높이는 TrinapOffset * 6으로 해주세요!
- */
 final class FilterView: UICollectionView, UICollectionViewDelegate {
     
     private var filterMode: FilterMode

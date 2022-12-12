@@ -93,7 +93,7 @@ final class PhotographerProfileCell: BaseCollectionViewCell {
     }
 }
 
-//MARK: profileCell
+// MARK: - Profile Cell
 extension PhotographerProfileCell:
     UICollectionViewDelegateFlowLayout {
     enum Section {

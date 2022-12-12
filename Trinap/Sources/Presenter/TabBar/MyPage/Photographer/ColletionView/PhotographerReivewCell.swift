@@ -86,11 +86,9 @@ final class PhotographerReivewCell: BaseCollectionViewCell {
         self.nicknameLabel.text = review.user.nickname
         self.dateLabel.text = review.createdAt.toString(type: .yearAndMonthAndDate)
         self.contentLabel.text = review.contents
-//        let newSize = self.contentLabel.sizeThatFits(CGSize(width: self.frame.width, height: CGFloat.greatestFiniteMagnitude))
+        
         let newSize = contentLabel.intrinsicContentSize
         self.contentLabel.frame.size = newSize
-//        self.contentLabel.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
-//        self.contentLabel.invalidateIntrinsicContentSize()
         self.ratingView.configureRating(review.rating)
         self.profileImageView.setImage(at: review.user.profileImage)
     }

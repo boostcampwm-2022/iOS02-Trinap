@@ -58,7 +58,6 @@ final class PhotographerDetailCoordinator: Coordinator {
         self.navigationController.pushViewController(viewController, animated: true)
     }
     
-    // TODO: - ViewModel Delegate Setting
     func showSelectReservationDateViewController(with possibleDate: [Date], detailViewModel: PhotographerDetailViewModel) {
         let viewModel = SelectReservationDateViewModel(
             createReservationDateUseCase: DefaultCreateReservationDateUseCase(),

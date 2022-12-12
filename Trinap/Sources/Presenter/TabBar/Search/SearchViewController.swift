@@ -61,19 +61,12 @@ final class SearchViewController: BaseViewController {
     
     override func configureHierarchy() {
         self.view.addSubviews([
-//            searchBar,
             currentLocationButton,
             searchTableView
         ])
     }
     
     override func configureConstraints() {
-//        searchBar.snp.makeConstraints { make in
-//            make.top.equalTo(self.view.safeAreaLayoutGuide)
-//            make.leading.trailing.equalToSuperview().inset(16)
-//            make.height.equalTo(48)
-//        }
-        
         currentLocationButton.snp.makeConstraints { make in
             make.top.equalTo(self.view.safeAreaLayoutGuide).offset(16)
             make.leading.equalToSuperview().offset(trinapOffset)
