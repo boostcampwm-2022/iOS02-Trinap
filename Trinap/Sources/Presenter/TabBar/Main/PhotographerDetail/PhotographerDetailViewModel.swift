@@ -35,6 +35,7 @@ final class PhotographerDetailViewModel: ViewModelType {
     private let createBlockUseCase: CreateBlockUseCase
     private let createChatroomUseCase: CreateChatroomUseCase
     private let sendFirstChatUseCase: SendFirstChatUseCase
+    private let convertDateToStringUseCase: ConvertDateToStringUseCase
     private let mapRepository: MapRepository
     
     private let reloadTrigger = BehaviorSubject<Void>(value: ())
@@ -54,6 +55,7 @@ final class PhotographerDetailViewModel: ViewModelType {
         createBlockUseCase: CreateBlockUseCase,
         createChatroomUseCase: CreateChatroomUseCase,
         sendFirstChatUseCase: SendFirstChatUseCase,
+        convertDateToStringUseCase: ConvertDateToStringUseCase,
         mapRepository: MapRepository,
         userId: String,
         searchCoordinate: Coordinate,
@@ -67,15 +69,15 @@ final class PhotographerDetailViewModel: ViewModelType {
         self.mapRepository = mapRepository
         self.createChatroomUseCase = createChatroomUseCase
         self.sendFirstChatUseCase = sendFirstChatUseCase
+        self.convertDateToStringUseCase = convertDateToStringUseCase
         self.coordinator = coordinator
         self.searchCoordinate = searchCoordinate
         self.userId = userId
     }
 
-    // MARK: - Initializer
-
     // MARK: - Methods
     func transform(input: Input) -> Output {
+        coordinator?.calendarViewModel.rx.selectedDates
         
         input.viewWillAppear
             .map { _ in }
@@ -184,7 +186,7 @@ final class PhotographerDetailViewModel: ViewModelType {
             
             let alert = TrinapAlert(
                 title: "예약을 확인해주세요",
-                timeText: self?.formattingCalendarButtonText(
+                timeText: self?.convertDateToStringUseCase.convert(
                     startDate: startDate,
                     endDate: endDate
                 ),
@@ -292,56 +294,11 @@ extension PhotographerDetailViewModel {
     }
 }
 
+//TODO: 프록시로 바꿔보기
+// 2. 이 이벤트 발생했을 때 캘린더 버튼 string도 같이 전달해주기
 extension PhotographerDetailViewModel: SelectReservationDateViewModelDelegate {
     
     func selectedReservationDate(startDate: Date, endDate: Date) {
         self.reservationDate.accept([startDate, endDate])
-    }
-}
-
-// MARK: 차단, 신고 관련 메소드
-extension PhotographerDetailViewModel {
-    
-    func blockPhotographer() -> Single<Void> {
-        self.createBlockUseCase.create(blockedUserId: self.userId)
-    }
-    
-    func reportPhotographer() {
-        Logger.print("Reported.")
-    }
-}
-
-
-extension PhotographerDetailViewModel {
-    
-    private func formattingCalendarButtonText(startDate: Date, endDate: Date) -> String? {
-        let startSeperated = startDate.toString(type: .yearToSecond).components(separatedBy: " ")
-        let endSeperated = endDate.toString(type: .yearToSecond).components(separatedBy: " ")
-        
-        guard let date = startSeperated[safe: 0] else { return nil }
-        let dateSeperated = date.components(separatedBy: "-")
-        guard
-            let month = dateSeperated[safe: 1],
-            let day = dateSeperated[safe: 2]
-        else { return nil }
-        
-        guard
-            let startTime = startSeperated.last,
-            let endTime = endSeperated.last
-        else { return nil }
-        let startHourToSec = startTime.components(separatedBy: ":")
-        let endHourToSec = endTime.components(separatedBy: ":")
-        guard
-            let startHour = startHourToSec[safe: 0],
-            let startMin = startHourToSec[safe: 1],
-            let endHour = endHourToSec[safe: 0],
-            let endMin = endHourToSec[safe: 1]
-        else { return nil }
-        
-        let reservationDate = "\(month)/\(day)"
-        let reservationStart = "\(startHour):\(startMin)"
-        let reservationEnd = "\(endHour):\(endMin)"
-        let dateInfo = "\(reservationDate) \(reservationStart)-\(reservationEnd)\n"
-        return dateInfo
     }
 }

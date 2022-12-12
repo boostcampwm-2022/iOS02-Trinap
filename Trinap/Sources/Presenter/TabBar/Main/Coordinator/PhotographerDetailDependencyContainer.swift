@@ -64,6 +64,7 @@ final class PhotographerDetailDependencyContainer {
             createBlockUseCase: makeCreateBlockUseCase(),
             createChatroomUseCase: makeCreateChatRoomUseCase(),
             sendFirstChatUseCase: makeSendFirstChatUseCase(),
+            convertDateToStringUseCase: DefaultConvertDateToStringUseCase(),
             mapRepository: mapRepository,
             userId: userId,
             searchCoordinate: searchCoordinate,
