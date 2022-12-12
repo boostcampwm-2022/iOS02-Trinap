@@ -130,7 +130,8 @@ final class EditPhotographerViewController: BaseViewController {
                 .map { $0.compactMap { $0 }.map { $0 - 1 } }
                 .asObservable(),
             uploadImage: willUploadImage,
-            deleteTrigger: self.deleteTrigger.asObservable()
+            deleteTrigger: self.deleteTrigger.asObservable(),
+            backButtonTap: self.navigationBarView.backButton.rx.tap.asSignal()
         )
         
         let output = viewModel.transform(input: input)

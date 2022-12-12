@@ -123,7 +123,8 @@ private extension MyPageDependencyContainter {
             fetchReviewUseCase: makeFetchReviewUseCase(),
             editPortfolioPictureUseCase: makeEditPortfolioPictureUseCase(),
             uploadImageUseCase: makeUploadImageUseCase(),
-            mapRepository: mapRepository)
+            mapRepository: mapRepository,
+            coordinator: self.mypageCoordinator)
     }
     
     func makeRegisterPhotographerInfoViewModel() -> RegisterPhotographerInfoViewModel {
