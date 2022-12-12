@@ -17,6 +17,7 @@ final class EditProfileViewController: BaseViewController {
     private lazy var doneButton = UIButton().than {
         $0.setTitle("완료", for: .normal)
         $0.setTitleColor(TrinapAsset.primary.color, for: .normal)
+        $0.setTitleColor(TrinapAsset.disabled.color, for: .disabled)
     }
     
     private lazy var navigationBarView = TrinapNavigationBarView().than {
@@ -132,6 +133,10 @@ final class EditProfileViewController: BaseViewController {
         
         output.defaultImage
             .bind(to: profileImageView.rx.setImage)
+            .disposed(by: disposeBag)
+        
+        output.doneButtonEnabled.asObservable()
+            .bind(to: doneButton.rx.isEnabled)
             .disposed(by: disposeBag)
     }
 }
