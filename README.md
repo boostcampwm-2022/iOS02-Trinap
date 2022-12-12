@@ -194,7 +194,7 @@
 
 - 혼자 해결하기 힘든 문제가 발생하거나, 그 문제 때문에 개발이 지연될 경우 적극적으로 팀원들에게 도움을 요청하였습니다.
 
-<p align="center"><img width="300" alt="slack1" src="https://user-images.githubusercontent.com/27603734/205535824-124ec939-a7e8-4275-9968-ccbc366583af.png"></p>
+<img width="300" alt="slack1" src="https://user-images.githubusercontent.com/27603734/205535824-124ec939-a7e8-4275-9968-ccbc366583af.png">
 
 ### 💕 페어 프로그래밍
 
