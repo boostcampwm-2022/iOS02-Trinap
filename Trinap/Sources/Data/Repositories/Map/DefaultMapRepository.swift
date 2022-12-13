@@ -124,3 +124,38 @@ extension DefaultMapRepository: MKLocalSearchCompleterDelegate {
         print(error)
     }
 }
+
+extension MKMapItem {
+    
+    var fullName: String {
+        guard let name = name, !placemark.fullLocationAddress.contains(name) else {
+            return placemark.fullLocationAddress
+        }
+        return (name + ", ") + placemark.fullLocationAddress
+    }
+    
+}
+
+extension CLPlacemark {
+    
+    var fullLocationAddress: String {
+        var placemarkData: [String] = []
+        
+        if let stateArea = subAdministrativeArea?.localizedCapitalized { placemarkData.append(stateArea) }
+        if let state = administrativeArea?.localizedCapitalized { placemarkData.append(state) }
+        if let city = locality?.localizedCapitalized { placemarkData.append(city) }
+        if let subCity = subLocality?.localizedCapitalized { placemarkData.append(subCity) }
+        if let building = subThoroughfare?.localizedCapitalized { placemarkData.append(building)}
+        if let street = thoroughfare?.localizedCapitalized { placemarkData.append(street) }
+        if let area = areasOfInterest?.first { placemarkData.append(area.localizedCapitalized) }
+//        if let county = country?.localizedCapitalized { placemarkData.append(county) }
+        placemarkData.removeDuplicates()
+//        placemarkData = [placemarkData[0], placemarkData[1]]
+        var result = ""
+        
+        placemarkData.forEach { result.append($0 + " ") }
+        result.removeLast() // remove last comma
+        
+        return result
+    }
+}
