@@ -19,6 +19,7 @@ final class PhotographerPreviewCell: BaseCollectionViewCell {
     // MARK: UI
     //    private lazy var thumbnailImageView = ThumbnailImageView()
     private lazy var thumbnailImageView = ThumbnailCollectionView().than {
+        $0.skeletonCornerRadius = 20
         $0.isSkeletonable = true
     }
     
