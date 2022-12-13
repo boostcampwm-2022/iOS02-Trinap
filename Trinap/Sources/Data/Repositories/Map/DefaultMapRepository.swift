@@ -48,17 +48,25 @@ final class DefaultMapRepository: NSObject, MapRepository {
         
         return .success(Coordinate(lat: lat, lng: lng))
     }
-    
+
     func fetchLocationName(using coordinate: Coordinate) -> Observable<String> {
+  
         return Observable.create { observable in
-            let location = CLLocation(latitude: coordinate.lat, longitude: coordinate.lng)
+            let seoulCoor = Coordinate.seoulCoordinate
+
+            if coordinate.lat == seoulCoor.lat && coordinate.lng == seoulCoor.lng {
+                observable.onNext("서울시")
+                return Disposables.create()
+            }
             
+            let location = CLLocation(latitude: coordinate.lat, longitude: coordinate.lng)
             let geocoder = CLGeocoder()
             
-            geocoder.reverseGeocodeLocation(location) { placemarks, _ in
+            geocoder.reverseGeocodeLocation(location, preferredLocale: .current) { placemarks, _ in
                 guard let address = placemarks else {
-                    observable.onNext("위도: \(coordinate.lat), 경도: \(coordinate.lng)")
-                    return 
+//                    observable.onNext("위도: \(coordinate.lat), 경도: \(coordinate.lng)")
+                    observable.onNext("알수없음")
+                    return
                 }
                 
                 let locality = address.first?.locality ?? ""
