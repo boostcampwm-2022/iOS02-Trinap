@@ -66,6 +66,7 @@ final class ReservationButtonView: BaseView {
         primaryButton.fill = fillType
         primaryButton.style = style
         primaryButton.setTitle(title, for: .normal)
+        primaryButton.isEnabled = (style != .disabled)
     }
     
     func removePrimaryButton() {
@@ -81,6 +82,7 @@ final class ReservationButtonView: BaseView {
         secondaryButton.fill = fillType
         secondaryButton.style = style
         secondaryButton.setTitle(title, for: .normal)
+        secondaryButton.isEnabled = (style != .disabled)
     }
     
     func removeSecondaryButton() {
