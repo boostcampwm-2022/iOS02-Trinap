@@ -73,11 +73,10 @@ final class DefaultFetchPhotographerPreviewsUseCase: FetchPhotographerPreviewsUs
 //                    previews.filter { !$0.name.isEmpty }
 //                }
 //
-                let asd = photographers.map {
-                    Logger.print($0)
+                let photographerList = photographers.map {
                     return owner.convertPreview(photographer: $0)
                 }
-                return Observable.combineLatest(asd).map { $0.filter { !$0.name.isEmpty } }
+                return Observable.combineLatest(photographerList).map { $0.filter { !$0.name.isEmpty } }
             }
     }
     
