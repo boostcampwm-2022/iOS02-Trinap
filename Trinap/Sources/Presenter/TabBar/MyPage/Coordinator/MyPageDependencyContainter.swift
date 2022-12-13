@@ -30,6 +30,20 @@ final class MyPageDependencyContainter {
     
     // MARK: Initializers
     init(mypageCoordinator: MyPageCoordinator?) {
+        #if DEBUG
+        if FakeRepositoryEnvironment.useFakeRepository {
+            self.mypageCoordinator = mypageCoordinator
+            self.photographerRepository = FakePhotographerRepository()
+            self.mapRepository = FakeMapRepository()
+            self.reviewRepository = FakeReviewRepository()
+            self.userRepository = FakeUserRepository()
+            self.authRepository = FakeAuthRepository()
+            self.uploadImageRepository = FakeUploadImageRepository()
+            self.blockRepository = FakeBlockRepository()
+            
+            return
+        }
+        #endif
         self.mypageCoordinator = mypageCoordinator
         self.photographerRepository = DefaultPhotographerRepository()
         self.mapRepository = DefaultMapRepository()

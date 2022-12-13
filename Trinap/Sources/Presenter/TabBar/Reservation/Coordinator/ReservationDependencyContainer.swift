@@ -21,6 +21,15 @@ final class ReservationDependencyContainer {
         self.firestoreService = DefaultFireStoreService()
         self.reservationCoordinator = reservationCoordinator
         
+        #if DEBUG
+        if FakeRepositoryEnvironment.useFakeRepository {
+            self.reservationRepository = FakeReservationRepository()
+            self.userRepository = FakeUserRepository()
+            
+            return
+        }
+        #endif
+        
         self.reservationRepository = DefaultReservationRepository(firebaseStoreService: firestoreService)
         self.userRepository = DefaultUserRepository(firestoreService: firestoreService)
     }
@@ -83,6 +92,12 @@ final class ReservationDependencyContainer {
     }
     
     private func makeMapRepository() -> MapRepository {
+        #if DEBUG
+        if FakeRepositoryEnvironment.useFakeRepository {
+            return FakeMapRepository()
+        }
+        #endif
+        
         return DefaultMapRepository()
     }
     
@@ -109,6 +124,12 @@ final class ReservationDependencyContainer {
     }
     
     private func makeReviewRepository() -> ReviewRepository {
+        #if DEBUG
+        if FakeRepositoryEnvironment.useFakeRepository {
+            return FakeReviewRepository()
+        }
+        #endif
+        
         return DefaultReviewRepository()
     }
     
@@ -141,6 +162,12 @@ final class ReservationDependencyContainer {
     }
     
     private func makePhotographerRepository() -> PhotographerRepository {
+        #if DEBUG
+        if FakeRepositoryEnvironment.useFakeRepository {
+            return FakePhotographerRepository()
+        }
+        #endif
+        
         return DefaultPhotographerRepository(firestoreService: firestoreService)
     }
 }

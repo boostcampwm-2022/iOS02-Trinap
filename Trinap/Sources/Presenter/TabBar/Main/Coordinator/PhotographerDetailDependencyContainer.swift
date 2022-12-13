@@ -27,6 +27,24 @@ final class PhotographerDetailDependencyContainer {
     
     // MARK: Initializers
     init(photographerDetailCoordinator: PhotographerDetailCoordinator?) {
+        #if DEBUG
+        if FakeRepositoryEnvironment.useFakeRepository {
+            self.firestoreService = DefaultFireStoreService()
+            self.tokenManager = KeychainTokenManager()
+            self.photographerDetailCoordinator = photographerDetailCoordinator
+            self.photographerRepository = FakePhotographerRepository()
+            self.mapRepository = FakeMapRepository()
+            self.reviewRepository = FakeReviewRepository()
+            self.userRepository = FakeUserRepository()
+            self.reservationRepository = FakeReservationRepository()
+            self.blockRepository = FakeBlockRepository()
+            self.chatroomRepository = FakeChatroomRepository()
+            self.chatRepository = FakeChatRepository()
+            
+            return
+        }
+        #endif
+        
         self.firestoreService = DefaultFireStoreService()
         self.tokenManager = KeychainTokenManager()
         self.photographerDetailCoordinator = photographerDetailCoordinator

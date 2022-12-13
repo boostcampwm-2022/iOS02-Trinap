@@ -25,7 +25,7 @@ final class ThumbnailCollectionViewCell: BaseCollectionViewCell {
     
     // MARK: Methods
     override func configureHierarchy() {
-        self.addSubview(imageView)
+        self.contentView.addSubview(imageView)
     }
     
     override func configureConstraints() {

@@ -108,7 +108,11 @@ class BaseProjectFactory: ProjectFactory {
                 resources: "\(projectName)/Resources/**",
                 entitlements: "\(projectName).entitlements",
                 scripts: [.pre(path: "Scripts/SwiftLintRunScript.sh", arguments: [], name: "SwiftLint")],
-                dependencies: dependencies
+                dependencies: dependencies,
+                environment: [
+                    "use_fake_repository": "false",
+                    "is_succeed_case": "false"
+                ]
             ),
             Target(
                 name: "Queenfisher",

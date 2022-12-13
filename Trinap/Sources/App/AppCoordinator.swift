@@ -34,7 +34,7 @@ extension AppCoordinator {
         let splashViewController = SplashViewController(
             viewModel: SplashViewModel(
                 signInUseCase: DefaultSignInUseCase(
-                    authRepository: DefaultAuthRepository()
+                    authRepository: makeAuthRepository()
                 ),
                 coordinator: self
             )
@@ -57,6 +57,15 @@ extension AppCoordinator {
         tabBarCoordinator.delegate = self
         tabBarCoordinator.start()
         self.childCoordinators.append(tabBarCoordinator)
+    }
+    
+    private func makeAuthRepository() -> AuthRepository {
+        #if DEBUG
+        if FakeRepositoryEnvironment.useFakeRepository {
+            return FakeAuthRepository()
+        }
+        #endif
+        return DefaultAuthRepository()
     }
 }
 

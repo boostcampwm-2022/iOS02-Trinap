@@ -6,6 +6,8 @@
 //  Copyright © 2022 Trinap. All rights reserved.
 //
 
+import Foundation
+
 import FirestoreService
 
 final class MainDependencyContainer {
@@ -26,6 +28,24 @@ final class MainDependencyContainer {
     
     // MARK: Initializers
     init(mainCoordinator: MainCoordinator?) {
+        #if DEBUG
+        if FakeRepositoryEnvironment.useFakeRepository {
+            self.firestoreService = DefaultFireStoreService()
+            self.tokenManager = KeychainTokenManager()
+            self.mainCoordinator = mainCoordinator
+            self.photographerRepository = FakePhotographerRepository()
+            self.mapRepository = FakeMapRepository()
+            self.reviewRepository = FakeReviewRepository()
+            self.userRepository = FakeUserRepository()
+            self.reservationRepository = FakeReservationRepository()
+            self.blockRepository = FakeBlockRepository()
+            self.chatroomRepository = FakeChatroomRepository()
+            self.chatRepository = FakeChatRepository()
+            
+            return
+        }
+        #endif
+        
         self.firestoreService = DefaultFireStoreService()
         self.tokenManager = KeychainTokenManager()
         self.mainCoordinator = mainCoordinator
