@@ -37,6 +37,7 @@ final class DefaultFetchPhotographerPreviewsUseCase: FetchPhotographerPreviewsUs
         let coordinate = matchCoordinate(coordinate: coordinate)
         
         let photographers = fetch(coordinate: coordinate)
+        
         if type == .all {
             return toPreviews(photographers: photographers)
         }
@@ -67,15 +68,15 @@ final class DefaultFetchPhotographerPreviewsUseCase: FetchPhotographerPreviewsUs
                 if photographers.isEmpty {
                     return Observable.just([])
                 }
-                
-                return Observable.zip(
-                    photographers.map { photographer in
-                        owner.convertPreview(photographer: photographer)
-                    }
-                )
-                .map { previews in
-                    previews.filter { !$0.name.isEmpty }
+//                let asd = Observable.from(photographers.map { owner.convertPreview(photographer: $0) }).merge()
+//                return asd.toArray().asObservable().map { previews in
+//                    previews.filter { !$0.name.isEmpty }
+//                }
+//
+                let photographerList = photographers.map {
+                    return owner.convertPreview(photographer: $0)
                 }
+                return Observable.combineLatest(photographerList).map { $0.filter { !$0.name.isEmpty } }
             }
     }
     

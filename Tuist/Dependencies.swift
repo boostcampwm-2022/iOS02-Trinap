@@ -15,6 +15,7 @@ let spm = SwiftPackageManagerDependencies([
     .remote(url: "https://github.com/SnapKit/SnapKit", requirement: .upToNextMajor(from: "5.0.0")),
     .remote(url: "https://github.com/airbnb/HorizonCalendar.git", requirement: .branch("master")),
     .remote(url: "https://github.com/onevcat/Kingfisher", requirement: .upToNextMajor(from: "7.0")),
+    .remote(url: "https://github.com/Juanpe/SkeletonView", requirement: .upToNextMajor(from: "1.7.0"))
 ])
 
 let dependencies = Dependencies(

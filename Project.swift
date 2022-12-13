@@ -38,9 +38,10 @@ class BaseProjectFactory: ProjectFactory {
         .external(name: "SnapKit"),
         .external(name: "HorizonCalendar"),
         .external(name: "Kingfisher"),
+        .external(name: "SkeletonView"),
         .target(name: "Queenfisher"),
         .target(name: "FirestoreService"),
-        .target(name: "Than")
+        .target(name: "Than"),
     ]
     
     let testDependencies: [TargetDependency] = [

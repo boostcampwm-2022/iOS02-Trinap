@@ -12,23 +12,33 @@ import RxCocoa
 import RxSwift
 import RxGesture
 import Than
+import SkeletonView
 
 final class PhotographerPreviewCell: BaseCollectionViewCell {
     
     // MARK: UI
-//    private lazy var thumbnailImageView = ThumbnailImageView()
-    private lazy var thumbnailImageView = ThumbnailCollectionView()
+    //    private lazy var thumbnailImageView = ThumbnailImageView()
+    private lazy var thumbnailImageView = ThumbnailCollectionView().than {
+        $0.isSkeletonable = true
+    }
     
     private lazy var locationLabel = UILabel().than {
+        $0.text = "XXXXXXXXXXXX"
+        $0.isSkeletonable = true
         $0.textColor = TrinapAsset.gray40.color
         $0.font = TrinapFontFamily.Pretendard.regular.font(size: 14)
+        $0.setContentHuggingPriority(.required, for: .horizontal)
     }
     
     private lazy var nicknameLabel = UILabel().than {
+        $0.text = "XXXXXXXXXXXXX"
+        $0.isSkeletonable = true
         $0.font = TrinapFontFamily.Pretendard.semiBold.font(size: 16)
     }
     
-    private lazy var ratingLabel = StarView()
+    private lazy var ratingLabel = StarView().than {
+        $0.isSkeletonable = true
+    }
     
     // MARK: Properties
     
@@ -38,14 +48,17 @@ final class PhotographerPreviewCell: BaseCollectionViewCell {
         
         self.disposeBag = DisposeBag()
     }
-
+    
     override func configureHierarchy() {
+        self.isSkeletonable = true
+        contentView.isSkeletonable = true
+        
         contentView.addSubviews(
             [
-            ratingLabel,
-            thumbnailImageView,
-            locationLabel,
-            nicknameLabel
+                ratingLabel,
+                thumbnailImageView,
+                locationLabel,
+                nicknameLabel
             ]
         )
     }
