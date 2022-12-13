@@ -25,7 +25,7 @@ final class ChatPreviewsViewController: BaseViewController {
         return tableView
     }()
     
-    private lazy var placeHolderView = PlaceHolderView(text: "아직 채팅  내역이 없어요.")
+    private lazy var placeHolderView = PlaceHolderView(text: "아직 채팅 내역이 없어요.")
     
     private var dataSource: UITableViewDiffableDataSource<Section, ChatPreview>?
     
