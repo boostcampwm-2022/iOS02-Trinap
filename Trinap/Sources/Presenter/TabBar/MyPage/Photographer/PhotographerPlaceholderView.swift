@@ -1,5 +1,5 @@
 //
-//  DefaultEditPhotograhperView.swift
+//  PhotographerPlaceholderView.swift
 //  Trinap
 //
 //  Created by Doyun Park on 2022/12/07.
@@ -11,12 +11,14 @@ import UIKit
 import RxCocoa
 import RxSwift
 
-final class DefaultEditPhotographerView: BaseView {
+final class PhotographerPlaceholderView: BaseView {
     
     var type: ViewType = .portfolio {
         didSet { configure() }
     }
 
+    private let isEditable: Bool
+    
     private lazy var titleLabel = UILabel().than {
         $0.textAlignment = .center
         $0.textColor = TrinapAsset.black.color
@@ -34,10 +36,20 @@ final class DefaultEditPhotographerView: BaseView {
         $0.titleLabel?.font = TrinapFontFamily.Pretendard.bold.font(size: 14)
     }
     
+    init(isEditable: Bool) {
+        self.isEditable = isEditable
+        
+        super.init(frame: .zero)
+        
+        configureAttributes()
+        configureHierarchy()
+        configureConstraints()
+    }
+    
     private func configure() {
         self.titleLabel.text = type.title
         
-        guard let subTitle = type.subtitle, let buttonTitle = type.buttonTtile else {
+        guard let subTitle = type.subtitle, let buttonTitle = type.buttonTitle else {
             updateLayout(isHidden: true)
             return
         }
@@ -61,10 +73,12 @@ final class DefaultEditPhotographerView: BaseView {
             make.top.equalTo(titleLabel.snp.bottom).offset(trinapOffset)
         }
         
-        self.applyButton.snp.makeConstraints { make in
-            make.leading.trailing.equalToSuperview().inset(trinapOffset * 11)
-            make.top.equalTo(subTitleLabel.snp.bottom).offset(trinapOffset)
-            make.bottom.equalToSuperview()
+        if isEditable {
+            self.applyButton.snp.makeConstraints { make in
+                make.leading.trailing.equalToSuperview().inset(trinapOffset * 11)
+                make.top.equalTo(subTitleLabel.snp.bottom).offset(trinapOffset)
+                make.bottom.equalToSuperview()
+            }
         }
     }
     
@@ -80,7 +94,7 @@ final class DefaultEditPhotographerView: BaseView {
 }
 
 // MARK: - Type
-extension DefaultEditPhotographerView {
+extension PhotographerPlaceholderView {
     
     enum ViewType: Int, CaseIterable {
         case portfolio = 0
@@ -109,7 +123,7 @@ extension DefaultEditPhotographerView {
             }
         }
         
-        var buttonTtile: String? {
+        var buttonTitle: String? {
             switch self {
             case .portfolio:
                 return "포트폴리오 등록하기"
@@ -122,11 +136,11 @@ extension DefaultEditPhotographerView {
     }
 }
 
-extension Reactive where Base: DefaultEditPhotographerView {
+extension Reactive where Base: PhotographerPlaceholderView {
     
     var setState: Binder<Int> {
         Binder(self.base) { defaultView, type in
-            guard let type = DefaultEditPhotographerView.ViewType.init(rawValue: type) else {
+            guard let type = PhotographerPlaceholderView.ViewType.init(rawValue: type) else {
                 return
             }
             defaultView.type = type
