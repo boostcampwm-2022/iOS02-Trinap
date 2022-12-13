@@ -25,6 +25,8 @@ final class ChatPreviewsViewController: BaseViewController {
         return tableView
     }()
     
+    private lazy var placeHolderView = PlaceHolderView(text: "아직 채팅  내역이 없어요.")
+    
     private var dataSource: UITableViewDiffableDataSource<Section, ChatPreview>?
     
     // MARK: - Properties
@@ -66,6 +68,8 @@ final class ChatPreviewsViewController: BaseViewController {
         
         output.chatPreviews
             .compactMap { [weak self] chatPreviews in
+                self?.configurePlaceHolderView(with: chatPreviews)
+                
                 return self?.generateSnapshot(chatPreviews)
             }
             .drive { [weak self] snapshot in
@@ -103,6 +107,18 @@ private extension ChatPreviewsViewController {
         
         self.navigationController?.navigationBar.topItem?.titleView = LargeNavigationTitleView(title: "채팅")
         self.navigationController?.navigationBar.topItem?.backButtonTitle = ""
+    }
+    
+    func configurePlaceHolderView(with chatPreviews: [ChatPreview]) {
+        if chatPreviews.isEmpty {
+            self.view.addSubview(self.placeHolderView)
+            
+            self.placeHolderView.snp.makeConstraints { make in
+                make.edges.equalTo(self.view.safeAreaLayoutGuide)
+            }
+        } else {
+            self.placeHolderView.removeFromSuperview()
+        }
     }
 }
 
