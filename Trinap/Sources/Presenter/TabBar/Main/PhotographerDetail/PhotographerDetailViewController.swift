@@ -18,7 +18,6 @@ class PhotographerDetailViewController: BaseViewController {
     typealias DataSource = UICollectionViewDiffableDataSource<PhotographerSection, PhotographerSection.Item>
     typealias Snapshot = NSDiffableDataSourceSnapshot<PhotographerSection, PhotographerSection.Item>
     
-    
     // MARK: - UI
     private lazy var collectionView = UICollectionView(
         frame: .zero,
@@ -28,6 +27,7 @@ class PhotographerDetailViewController: BaseViewController {
     }
     
     private lazy var backgroundButtonView = UIView()
+    private lazy var placeholderView = PhotographerPlaceholderView(isEditable: false)
     
     private lazy var calendarButton = TrinapButton(style: .primary, fillType: .border).than {
         $0.setTitle("예약 날짜 선택", for: .normal)
@@ -75,7 +75,8 @@ class PhotographerDetailViewController: BaseViewController {
         
         self.view.addSubviews([
             collectionView,
-            backgroundButtonView
+            backgroundButtonView,
+            placeholderView
         ])
     }
     
@@ -101,11 +102,20 @@ class PhotographerDetailViewController: BaseViewController {
             make.trailing.equalToSuperview().offset(-16)
             make.leading.equalTo(calendarButton.snp.trailing).offset(8)
         }
+        
+        UIView.animate(withDuration: 1.5, delay: 1.0) {
+            self.placeholderView.snp.makeConstraints { make in
+                make.leading.trailing.equalToSuperview()
+                make.centerY.equalToSuperview()
+                make.height.equalTo(self.trinapOffset * 18)
+            }
+        }
     }
     
     override func configureAttributes() {
         configureCollectionView()
         self.confirmButton.isEnabled = false
+        self.placeholderView.isHidden = true
     }
     
     override func bind() {
@@ -117,6 +127,10 @@ class PhotographerDetailViewController: BaseViewController {
                     owner.viewModel.showDetailImage(urlString: picture?.picture)
                 }
             })
+            .disposed(by: disposeBag)
+        
+        self.tabState
+            .bind(to: placeholderView.rx.setState)
             .disposed(by: disposeBag)
         
         let input = PhotographerDetailViewModel.Input(
@@ -200,11 +214,14 @@ extension PhotographerDetailViewController {
     
     private func generateSnapShot(_ data: [PhotographerDataSource]) -> Snapshot {
         var snapshot = Snapshot()
-        
         data.forEach { items in
             items.forEach { section, values in
-                snapshot.appendSections([section])
-                snapshot.appendItems(values, toSection: section)
+                if !values.isEmpty {
+                    snapshot.appendSections([section])
+                    snapshot.appendItems(values, toSection: section)
+                } else {
+                    self.placeholderView.isHidden = false
+                }
             }
         }
         
@@ -232,18 +249,21 @@ extension PhotographerDetailViewController {
                 guard let cell = collectionView.dequeueCell(PhotoCell.self, for: indexPath) else {
                     return UICollectionViewCell()
                 }
+                self.placeholderView.isHidden = true
                 cell.configure(picture: picture)
                 return cell
             case .detail(let information):
                 guard let cell = collectionView.dequeueCell(PhotographerDetailIntroductionCell.self, for: indexPath) else {
                     return UICollectionViewCell()
                 }
+                self.placeholderView.isHidden = true
                 cell.configure(with: information)
                 return cell
             case .review(let review):
                 guard let cell = collectionView.dequeueCell(PhotographerReivewCell.self, for: indexPath) else {
                     return UICollectionViewCell()
                 }
+                self.placeholderView.isHidden = true
                 cell.configure(with: review)
                 return cell
             case .summaryReview(let review):

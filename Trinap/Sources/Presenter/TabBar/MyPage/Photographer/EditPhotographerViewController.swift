@@ -40,7 +40,7 @@ final class EditPhotographerViewController: BaseViewController {
         $0.backgroundColor = TrinapAsset.white.color
     }
     
-    private lazy var defaultPhotographerView = DefaultEditPhotographerView()
+    private lazy var placeholderView = PhotographerPlaceholderView(isEditable: true)
     
     private var dataSource: DataSource?
     
@@ -62,7 +62,7 @@ final class EditPhotographerViewController: BaseViewController {
         self.view.addSubviews([
             navigationBarView,
             collectionView,
-            defaultPhotographerView
+            placeholderView
         ])
     }
     
@@ -79,7 +79,7 @@ final class EditPhotographerViewController: BaseViewController {
         }
         
         UIView.animate(withDuration: 1.5, delay: 1.0) {
-            self.defaultPhotographerView.snp.makeConstraints { make in
+            self.placeholderView.snp.makeConstraints { make in
                 make.leading.trailing.equalToSuperview()
                 make.centerY.equalToSuperview()
                 make.height.equalTo(self.trinapOffset * 18)
@@ -104,10 +104,10 @@ final class EditPhotographerViewController: BaseViewController {
             }
             .share()
         
-        defaultPhotographerView.applyButton.rx.tap
+        placeholderView.applyButton.rx.tap
             .withUnretained(self)
             .map { owner, _ in
-                owner.defaultPhotographerView.type.rawValue
+                owner.placeholderView.type.rawValue
             }
             .withUnretained(self)
             .subscribe(onNext: { owner, state in
@@ -150,7 +150,7 @@ final class EditPhotographerViewController: BaseViewController {
             })
             .disposed(by: disposeBag)
         self.tabState
-            .bind(to: defaultPhotographerView.rx.setState)
+            .bind(to: placeholderView.rx.setState)
             .disposed(by: disposeBag)
         
         output.dataSource
@@ -211,7 +211,7 @@ final class EditPhotographerViewController: BaseViewController {
         configureDataSource()
         configureCollectionView()
         imagePicker.delegate = self
-        self.defaultPhotographerView.isHidden = true
+        self.placeholderView.isHidden = true
     }
     
     // TODO: 제거
@@ -243,7 +243,7 @@ extension EditPhotographerViewController {
                     snapshot.appendSections([section])
                     snapshot.appendItems(values, toSection: section)
                 } else {
-                    self.defaultPhotographerView.isHidden = false
+                    self.placeholderView.isHidden = false
                 }
             }
         }
@@ -252,9 +252,6 @@ extension EditPhotographerViewController {
     }
     
     private func configureDataSource() {
-//        self.dataSource = PhotographerListSkeletonDiffableDataSource(collectionView: self.collectionView, cellProvider: { collectionView, indexPath, itemIdentifier in
-//            <#code#>
-//        })
         self.dataSource = DataSource(collectionView: self.collectionView) { [weak self] collectionView, indexPath, item in
             guard let self else { return UICollectionViewCell() }
             
@@ -283,19 +280,20 @@ extension EditPhotographerViewController {
                     return UICollectionViewCell()
                 }
                 cell.configure(picture: picture)
-                self.defaultPhotographerView.isHidden = true
+                self.placeholderView.isHidden = true
                 return cell
             case .detail(let information):
                 guard let cell = collectionView.dequeueCell(PhotographerDetailIntroductionCell.self, for: indexPath) else {
                     return UICollectionViewCell()
                 }
                 cell.configure(with: information)
-                self.defaultPhotographerView.isHidden = true
+                self.placeholderView.isHidden = true
                 return cell
             case .review(let review):
                 guard let cell = collectionView.dequeueCell(PhotographerReivewCell.self, for: indexPath) else {
                     return UICollectionViewCell()
                 }
+                self.placeholderView.isHidden = true
                 cell.configure(with: review)
                 return cell
             case .summaryReview(let review):

@@ -239,25 +239,36 @@ extension PhotographerDetailViewModel {
 }
 
 // MARK: - MappingDataSource
-extension PhotographerDetailViewModel {
+private extension PhotographerDetailViewModel {
     
-    private func mappingProfileDataSource(photographer: PhotographerUser) -> PhotographerDataSource {
+    func mappingProfileDataSource(photographer: PhotographerUser) -> PhotographerDataSource {
         return [PhotographerSection.profile: [PhotographerSection.Item.profile(photographer)]]
     }
     
-    private func mappingPictureDataSource(isEditable: Bool, photographer: PhotographerUser) -> PhotographerDataSource {
+    func mappingPictureDataSource(isEditable: Bool, photographer: PhotographerUser) -> PhotographerDataSource {
+        if photographer.pictures.isEmpty {
+            return [PhotographerSection.photo: []]
+        }
+        
         return [PhotographerSection.photo: updatePictureState(isEditable: isEditable, pictures: photographer.pictures).map { PhotographerSection.Item.photo($0) } ]
     }
     
-    private func mappingDetailDataSource(photographer: PhotographerUser) -> PhotographerDataSource {
+    func mappingDetailDataSource(photographer: PhotographerUser) -> PhotographerDataSource {
+        guard photographer.introduction != nil else {
+            return [PhotographerSection.detail: []]
+        }
         return [PhotographerSection.detail: [PhotographerSection.Item.detail(photographer)]]
     }
     
-    private func mappingReviewDataSource(review: ReviewInformation) -> [PhotographerDataSource] {
+    func mappingReviewDataSource(review: ReviewInformation) -> [PhotographerDataSource] {
+        if review.reviews.isEmpty {
+            return [[PhotographerSection.review: []]]
+        }
         return [ [.detail: [.summaryReview(review.summary)]] ] +
-            [ [.review: review.reviews.map { PhotographerSection.Item.review($0) } ] ]
+        [ [.review: review.reviews.map { PhotographerSection.Item.review($0) } ] ]
     }
 }
+
 
 extension PhotographerDetailViewModel {
     func blockPhotographer() -> Single<Void> {
