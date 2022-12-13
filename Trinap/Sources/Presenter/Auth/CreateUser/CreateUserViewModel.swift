@@ -16,6 +16,7 @@ final class CreateUserViewModel: ViewModelType {
         let nickname: Observable<String>
         let signUpButtonTap: Observable<Void>
         let generateButtonTap: Observable<Void>
+        let backButtonTap: Signal<Void>
     }
     
     struct Output {
@@ -48,6 +49,12 @@ final class CreateUserViewModel: ViewModelType {
             }
             .subscribe(onNext: { [weak self] in
                 self?.coordinator?.finish()
+            })
+            .disposed(by: disposeBag)
+        
+        input.backButtonTap
+            .emit(onNext: { [weak self] _ in
+                self?.coordinator?.popViewController()
             })
             .disposed(by: disposeBag)
         

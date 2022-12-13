@@ -41,6 +41,7 @@ final class SplashViewController: BaseViewController {
         logoImageView.snp.makeConstraints { make in
             make.centerY.equalToSuperview().multipliedBy(0.8)
             make.centerX.equalToSuperview()
+            make.height.equalTo(140)
             make.horizontalEdges.equalToSuperview().inset(50)
         }
     }

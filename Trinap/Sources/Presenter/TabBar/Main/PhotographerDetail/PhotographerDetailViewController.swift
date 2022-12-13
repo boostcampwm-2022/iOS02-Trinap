@@ -23,7 +23,9 @@ class PhotographerDetailViewController: BaseViewController {
     private lazy var collectionView = UICollectionView(
         frame: .zero,
         collectionViewLayout: configureCollectionViewLayout(.portfolio)
-    )
+    ).than {
+        $0.backgroundColor = TrinapAsset.white.color
+    }
     
     private lazy var backgroundButtonView = UIView()
     

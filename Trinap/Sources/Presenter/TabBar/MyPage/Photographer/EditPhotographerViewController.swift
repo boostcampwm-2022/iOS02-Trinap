@@ -13,6 +13,11 @@ import RxSwift
 
 final class EditPhotographerViewController: BaseViewController {
     
+    // MARK: - UI
+    private lazy var navigationBarView = TrinapNavigationBarView().than {
+        $0.setTitleText("작가 프로필 설정")
+    }
+    
     typealias DataSource = UICollectionViewDiffableDataSource<PhotographerSection, PhotographerSection.Item>
     typealias Snapshot = NSDiffableDataSourceSnapshot<PhotographerSection, PhotographerSection.Item>
     
@@ -31,7 +36,9 @@ final class EditPhotographerViewController: BaseViewController {
     private lazy var collectionView = UICollectionView(
         frame: .zero,
         collectionViewLayout: configureCollectionViewLayout(.portfolio, isEditable: self.isEditable.value)
-    )
+    ).than {
+        $0.backgroundColor = TrinapAsset.white.color
+    }
     
     private lazy var defaultPhotographerView = DefaultEditPhotographerView()
     
@@ -52,12 +59,23 @@ final class EditPhotographerViewController: BaseViewController {
     
     // MARK: - Configuration
     override func configureHierarchy() {
-        self.view.addSubviews([collectionView, defaultPhotographerView])
+        self.view.addSubviews([
+            navigationBarView,
+            collectionView,
+            defaultPhotographerView
+        ])
     }
     
     override func configureConstraints() {
+        navigationBarView.snp.makeConstraints { make in
+            make.horizontalEdges.equalToSuperview()
+            make.top.equalTo(view.safeAreaLayoutGuide)
+            make.height.equalTo(trinapOffset * 6)
+        }
+        
         collectionView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.equalTo(navigationBarView.snp.bottom)
+            make.horizontalEdges.bottom.equalToSuperview()
         }
         
         UIView.animate(withDuration: 1.5, delay: 1.0) {
@@ -112,7 +130,8 @@ final class EditPhotographerViewController: BaseViewController {
                 .map { $0.compactMap { $0 }.map { $0 - 1 } }
                 .asObservable(),
             uploadImage: willUploadImage,
-            deleteTrigger: self.deleteTrigger.asObservable()
+            deleteTrigger: self.deleteTrigger.asObservable(),
+            backButtonTap: self.navigationBarView.backButton.rx.tap.asSignal()
         )
         
         let output = viewModel.transform(input: input)
@@ -195,6 +214,7 @@ final class EditPhotographerViewController: BaseViewController {
         self.defaultPhotographerView.isHidden = true
     }
     
+    // TODO: 제거
     private func configureNavigation() {
         self.navigationItem.title = "작가 프로필 설정"
         self.navigationController?.navigationBar.tintColor = TrinapAsset.black.color

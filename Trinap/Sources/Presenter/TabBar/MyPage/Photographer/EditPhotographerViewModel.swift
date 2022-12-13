@@ -22,6 +22,7 @@ final class EditPhotographerViewModel: ViewModelType {
         let selectedPicture: Observable<[Int]>
         let uploadImage: Observable<Data>
         let deleteTrigger: Observable<Void>
+        let backButtonTap: Signal<Void>
     }
     
     struct Output {
@@ -35,6 +36,7 @@ final class EditPhotographerViewModel: ViewModelType {
     private let editPortfolioPictureUseCase: EditPortfolioPictureUseCase
     private let uploadImageUseCase: UploadImageUseCase
     private let mapRepository: MapRepository
+    weak var coordinator: MyPageCoordinator?
     
     var disposeBag = DisposeBag()
     
@@ -47,7 +49,8 @@ final class EditPhotographerViewModel: ViewModelType {
         fetchReviewUseCase: FetchReviewUseCase,
         editPortfolioPictureUseCase: EditPortfolioPictureUseCase,
         uploadImageUseCase: UploadImageUseCase,
-        mapRepository: MapRepository
+        mapRepository: MapRepository,
+        coordinator: MyPageCoordinator?
     ) {
         self.fetchUserUseCase = fetchUserUseCase
         self.fetchPhotographerUseCase = fetchPhotographerUseCase
@@ -55,6 +58,7 @@ final class EditPhotographerViewModel: ViewModelType {
         self.editPortfolioPictureUseCase = editPortfolioPictureUseCase
         self.uploadImageUseCase = uploadImageUseCase
         self.mapRepository = mapRepository
+        self.coordinator = coordinator
     }
     
     // MARK: - Methods
@@ -101,6 +105,12 @@ final class EditPhotographerViewModel: ViewModelType {
                 )
             }
             .bind(to: reloadTrigger)
+            .disposed(by: disposeBag)
+        
+        input.backButtonTap
+            .emit(onNext: { [weak self] _ in
+                self?.coordinator?.popViewController()
+            })
             .disposed(by: disposeBag)
         
         let dataSource = Observable.combineLatest(
