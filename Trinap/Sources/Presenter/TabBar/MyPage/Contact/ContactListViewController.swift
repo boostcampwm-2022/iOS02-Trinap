@@ -28,6 +28,7 @@ final class ContactListViewController: BaseViewController {
         $0.separatorStyle = .none
     }
     
+    private lazy var placeHolderView = PlaceHolderView(text: "문의 내역이 없어요.")
     
     typealias DataSource = UITableViewDiffableDataSource<Section, Contact>
     
@@ -83,11 +84,29 @@ final class ContactListViewController: BaseViewController {
         let output = viewModel.transform(input: input)
         
         output.dataSource
-            .map { self.configureSnapshot($0) }
+            .map { contacts in
+                self.configurePlaceHolderView(with: contacts)
+                
+                return self.configureSnapshot(contacts)
+            }
             .drive(onNext: {
                 self.dataSource?.apply($0, animatingDifferences: false)
             })
             .disposed(by: disposeBag)
+    }
+    
+    private func configurePlaceHolderView(with contacts: [Contact]) {
+        if contacts.isEmpty {
+            self.view.addSubview(self.placeHolderView)
+            
+            self.placeHolderView.snp.makeConstraints { make in
+                make.top.equalTo(self.navigationBarView.snp.bottom)
+                make.horizontalEdges.equalToSuperview()
+                make.bottom.equalTo(self.view.safeAreaLayoutGuide)
+            }
+        } else {
+            self.placeHolderView.removeFromSuperview()
+        }
     }
 }
 
@@ -116,4 +135,6 @@ extension ContactListViewController: UITableViewDelegate {
         snapshot.appendItems(data, toSection: .main)
         return snapshot
     }
+    
+    
 }

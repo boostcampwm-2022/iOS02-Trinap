@@ -50,13 +50,6 @@ final class EditPhotographerViewController: BaseViewController {
         super.init()
     }
     
-    // MARK: - Methods
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        configureNavigation()
-    }
-    
     // MARK: - Configuration
     override func configureHierarchy() {
         self.view.addSubviews([
@@ -212,12 +205,6 @@ final class EditPhotographerViewController: BaseViewController {
         configureCollectionView()
         imagePicker.delegate = self
         self.defaultPhotographerView.isHidden = true
-    }
-    
-    // TODO: 제거
-    private func configureNavigation() {
-        self.navigationItem.title = "작가 프로필 설정"
-        self.navigationController?.navigationBar.tintColor = TrinapAsset.black.color
     }
 }
 

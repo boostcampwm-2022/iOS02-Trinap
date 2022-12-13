@@ -33,6 +33,8 @@ final class BlockListViewController: BaseViewController {
         $0.register(BlockListCell.self)
     }
     
+    private lazy var placeHolderView = PlaceHolderView(text: "차단 내역이 없어요.")
+    
     // MARK: - Properties
     private var dataSource: DataSource?
     private let viewModel: BlockListViewModel
@@ -94,7 +96,8 @@ final class BlockListViewController: BaseViewController {
         
         output.blockUsers
             .compactMap { [weak self] users in
-                Logger.printArray(users)
+                self?.configurePlaceHolderView(with: users)
+                
                 return self?.generateSnapshot(users)
             }
             .drive(onNext: { [weak self] snapshot in
@@ -136,5 +139,19 @@ private extension BlockListViewController {
         snapshot.appendSections([.main])
         snapshot.appendItems(users)
         return snapshot
+    }
+    
+    func configurePlaceHolderView(with users: [Block.BlockedUser]) {
+        if users.isEmpty {
+            self.view.addSubview(self.placeHolderView)
+            
+            self.placeHolderView.snp.makeConstraints { make in
+                make.top.equalTo(self.navigationBarView.snp.bottom)
+                make.horizontalEdges.equalToSuperview()
+                make.bottom.equalTo(self.view.safeAreaLayoutGuide)
+            }
+        } else {
+            self.placeHolderView.removeFromSuperview()
+        }
     }
 }
