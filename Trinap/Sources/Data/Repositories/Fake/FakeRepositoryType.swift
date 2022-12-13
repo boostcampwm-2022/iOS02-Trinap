@@ -10,6 +10,19 @@ import Foundation
 
 import RxSwift
 
+#if DEBUG
+enum FakeRepositoryEnvironment {
+    
+    static var useFakeRepository: Bool {
+        return ProcessInfo.processInfo.environment["use_fake_repository"] == "true"
+    }
+    
+    static var isSucceedCase: Bool {
+        return ProcessInfo.processInfo.environment["is_succeed_case"] == "true"
+    }
+}
+#endif
+
 protocol FakeRepositoryType {
     
     var isSucceedCase: Bool { get }

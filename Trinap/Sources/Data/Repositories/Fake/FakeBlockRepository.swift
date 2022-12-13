@@ -16,7 +16,7 @@ struct FakeBlockRepository: BlockRepository, FakeRepositoryType {
     let isSucceedCase: Bool
     
     // MARK: - Initializers
-    init(isSucceedCase: Bool) {
+    init(isSucceedCase: Bool = FakeRepositoryEnvironment.isSucceedCase) {
         self.isSucceedCase = isSucceedCase
     }
     

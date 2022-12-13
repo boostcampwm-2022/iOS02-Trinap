@@ -16,7 +16,7 @@ final class FakeChatroomRepository: ChatroomRepository, FakeRepositoryType {
     var isSucceedCase: Bool
     
     // MARK: - Initializer
-    init(isSucceedCase: Bool) {
+    init(isSucceedCase: Bool = FakeRepositoryEnvironment.isSucceedCase) {
         self.isSucceedCase = isSucceedCase
     }
     

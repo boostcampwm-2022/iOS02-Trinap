@@ -19,6 +19,9 @@ struct FakeMapRepository: MapRepository, FakeRepositoryType {
     let results = BehaviorRelay<[Space]>(value: [])
     
     // MARK: - Initializers
+    init(isSucceedCase: Bool = FakeRepositoryEnvironment.isSucceedCase) {
+        self.isSucceedCase = isSucceedCase
+    }
     
     // MARK: - Methods
     func setSearchText(with searchText: String) {}

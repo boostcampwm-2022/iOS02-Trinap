@@ -16,6 +16,9 @@ struct FakeSueRepository: SueRepository, FakeRepositoryType {
     let isSucceedCase: Bool
     
     // MARK: - Initializers
+    init(isSucceedCase: Bool = FakeRepositoryEnvironment.isSucceedCase) {
+        self.isSucceedCase = isSucceedCase
+    }
     
     // MARK: - Methods
     func sueUser(suedUserId: String, contents: String) -> Single<Void> {

@@ -16,16 +16,19 @@ struct FakePhotographerRepository: PhotographerRepository, FakeRepositoryType {
     let isSucceedCase: Bool
     
     // MARK: - Initializers
+    init(isSucceedCase: Bool = FakeRepositoryEnvironment.isSucceedCase) {
+        self.isSucceedCase = isSucceedCase
+    }
     
     // MARK: - Methods
     func fetchPhotographers(type: TagType) -> Observable<[Photographer]> {
         var photographers: [Photographer] = []
         
-        for i in 1...Int.random(in: 20...40) {
+        for i in 1...3 { //Int.random(in: 20...40) {
             let photographer = Photographer.stub(
                 photographerId: "photographerId\(i)",
                 photographerUserId: "userId\(i)",
-                tags: [type]
+                tags: [.all]
             )
             
             photographers.append(photographer)
@@ -53,7 +56,7 @@ struct FakePhotographerRepository: PhotographerRepository, FakeRepositoryType {
     func fetchPhotographers(coordinate: Coordinate) -> Observable<[Photographer]> {
         var photographers: [Photographer] = []
         
-        for i in 1...Int.random(in: 20...40) {
+        for i in 1...3 { //Int.random(in: 20...40) {
             let photographer = Photographer.stub(
                 photographerId: "photographerId\(i)",
                 photographerUserId: "userId\(i)",
@@ -103,8 +106,8 @@ extension Photographer {
         photographerId: String = UUID().uuidString,
         photographerUserId: String = "userId1",
         introduction: String = "사진 작가 소개글입니다. 사진 작가 소개글입니다. 사진 작가 소개글입니다. 사진 작가 소개글입니다. 사진 작가 소개글입니다. 사진 작가 소개글입니다. 사진 작가 소개글입니다. 사진 작가 소개글입니다. ",
-        latitude: Double = 37.123,
-        longitude: Double = 123.123,
+        latitude: Double = Coordinate.seoulCoordinate.lat,
+        longitude: Double = Coordinate.seoulCoordinate.lng,
         tags: [TagType] = [.all],
         pictures: [String] = [
             "https://media.istockphoto.com/id/1327824636/photo/cherry-blossom-in-spring-at-gyeongbokgung-palace.jpg?b=1&s=170667a&w=0&k=20&c=9u8hQ44fqCwShNu5JmZeNILPB0BHdgVOfRUKu4Ap6s4=",

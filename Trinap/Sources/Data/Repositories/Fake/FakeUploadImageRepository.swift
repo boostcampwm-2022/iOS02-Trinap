@@ -16,7 +16,7 @@ struct FakeUploadImageRepository: UploadImageRepository, FakeRepositoryType {
     var isSucceedCase: Bool
     
     // MARK: - Initializers
-    init(isSucceedCase: Bool) {
+    init(isSucceedCase: Bool = FakeRepositoryEnvironment.isSucceedCase) {
         self.isSucceedCase = isSucceedCase
     }
     

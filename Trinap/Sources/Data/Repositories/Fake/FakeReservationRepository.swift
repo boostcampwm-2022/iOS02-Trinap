@@ -16,6 +16,9 @@ struct FakeReservationRepository: ReservationRepository, FakeRepositoryType {
     let isSucceedCase: Bool
     
     // MARK: - Initializers
+    init(isSucceedCase: Bool = FakeRepositoryEnvironment.isSucceedCase) {
+        self.isSucceedCase = isSucceedCase
+    }
     
     // MARK: - Methods
     func fetchUserType(customerId: String, photographerId: String) -> Reservation.UserType? {

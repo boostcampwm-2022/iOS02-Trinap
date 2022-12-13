@@ -19,7 +19,7 @@ final class FakeChatRepository: ChatRepository, FakeRepositoryType {
     let disposeBag = DisposeBag()
     
     // MARK: - Initializers
-    init(isSucceedCase: Bool) {
+    init(isSucceedCase: Bool = FakeRepositoryEnvironment.isSucceedCase) {
         self.isSucceedCase = isSucceedCase
         
         Observable<Int>.timer(.seconds(1), period: .seconds(7), scheduler: MainScheduler.asyncInstance )

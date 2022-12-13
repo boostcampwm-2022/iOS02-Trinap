@@ -15,7 +15,7 @@ struct FakeUserRepository: UserRepository, FakeRepositoryType {
     var isSucceedCase: Bool
     
     // MARK: - Initializers
-    init(isSucceedCase: Bool) {
+    init(isSucceedCase: Bool = FakeRepositoryEnvironment.isSucceedCase) {
         self.isSucceedCase = isSucceedCase
     }
     
