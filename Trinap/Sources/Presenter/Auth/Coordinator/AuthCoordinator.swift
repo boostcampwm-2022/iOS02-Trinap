@@ -32,11 +32,12 @@ extension AuthCoordinator {
         let viewController = SignInViewController(
             viewModel: SignInViewModel(
                 signInUseCase: DefaultSignInUseCase(
-                    authRepository: DefaultAuthRepository()
+                    authRepository: makeAuthRepository()
                 ),
                 coordinator: self
             )
         )
+        
         self.navigationController.setNavigationBarHidden(true, animated: false)
         self.navigationController.pushViewController(viewController, animated: false)
     }
@@ -45,13 +46,40 @@ extension AuthCoordinator {
         let viewController = CreateUserViewController(
             viewModel: CreateUserViewModel(
                 createUserUseCase: DefaultCreateUserUseCase(
-                    authRepository: DefaultAuthRepository(),
-                    userRepository: DefaultUserRepository(),
-                    photographerRepository: DefaultPhotographerRepository()
+                    authRepository: makeAuthRepository(),
+                    userRepository: makeUserRepository(),
+                    photographerRepository: makePhotographerRepository()
                 ),
                 coordinator: self
             )
         )
         self.navigationController.pushViewController(viewController, animated: true)
+    }
+    
+    private func makeAuthRepository() -> AuthRepository {
+        #if DEBUG
+        if FakeRepositoryEnvironment.useFakeRepository {
+            return FakeAuthRepository()
+        }
+        #endif
+        return DefaultAuthRepository()
+    }
+    
+    private func makeUserRepository() -> UserRepository {
+        #if DEBUG
+        if FakeRepositoryEnvironment.useFakeRepository {
+            return FakeUserRepository()
+        }
+        #endif
+        return DefaultUserRepository()
+    }
+    
+    private func makePhotographerRepository() -> PhotographerRepository {
+        #if DEBUG
+        if FakeRepositoryEnvironment.useFakeRepository {
+            return FakePhotographerRepository()
+        }
+        #endif
+        return DefaultPhotographerRepository()
     }
 }

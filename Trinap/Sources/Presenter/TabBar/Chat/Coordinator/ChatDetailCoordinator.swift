@@ -35,6 +35,28 @@ final class ChatDetailCoordinator: Coordinator {
         self.childCoordinators = []
         
         let firestoreService = DefaultFireStoreService()
+        
+        #if DEBUG
+        if FakeRepositoryEnvironment.useFakeRepository {
+            let userRepository = FakeUserRepository()
+            let chatroomRepository = FakeChatroomRepository()
+            
+            self.chatRepository = FakeChatRepository()
+            
+            self.observeChatPreviewsUseCase = DefaultObserveChatPreviewsUseCase(
+                chatroomRepository: chatroomRepository,
+                userRepository: userRepository
+            )
+            
+            self.observeChatUseCase = DefaultObserveChatUseCase(
+                chatRepository: chatRepository,
+                userRepository: userRepository
+            )
+            
+            return
+        }
+        #endif
+        
         let userRepository = DefaultUserRepository(firestoreService: firestoreService)
         let chatroomRepository = DefaultChatroomRepository(firebaseStoreService: firestoreService)
         
