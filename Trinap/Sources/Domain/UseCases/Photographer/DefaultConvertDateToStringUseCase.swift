@@ -12,10 +12,10 @@ final class DefaultConvertDateToStringUseCase: ConvertDateToStringUseCase {
     
     // MARK: Methods
     func convert(startDate: Date, endDate: Date) -> String? {
-        let daate = startDate.toString(type: .monthAndDate2)
+        let date = startDate.toString(type: .monthAndDate2)
         let startTime = startDate.toString(type: .hourAndMinute)
         let endTime = endDate.toString(type: .hourAndMinute)
-        let dateInfo = "\(daate) \(startTime)-\(endTime)\n"
+        let dateInfo = "\(date) \(startTime)-\(endTime)\n"
         return dateInfo
     }
 }
