@@ -70,7 +70,7 @@ final class PhotographerListViewModel: ViewModelType {
             .disposed(by: disposeBag)
         
         let previews = Observable.combineLatest(
-            self.coordinate,
+            self.coordinate.skip(1),
             input.tagType.startWith(.all)
         )
             .withUnretained(self)
