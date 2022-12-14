@@ -37,7 +37,21 @@
 
 # ✨ 주요 기능
 
-|원하는 장소를 검색하고,<br>가까운 순서대로 작가를 모아볼 수 있어요!|작가의 정보를 확인하고<br>예약을 신청할 수 있어요.|채팅과 위치 공유를 통해서<br>손쉽게 만날 수 있어요.|예약 내역을<br>한 눈에 모아 볼 수 있어요.|
+### 🔎 원하는 장소를 검색하고, 가까운 순서대로 작가를 모아볼 수 있어요!
+![KakaoTalk_Photo_2022-12-14-17-26-41](https://user-images.githubusercontent.com/89574881/207619343-85d8843c-7550-473c-abf0-6460950fc314.jpeg)
+
+
+### 🧾 작가의 정보를 확인하고 예약을 신청할 수 있어요.
+![KakaoTalk_Photo_2022-12-14-17-26-49](https://user-images.githubusercontent.com/89574881/207619371-ff91a870-01ff-4cfa-9ee9-1db27da28762.jpeg)
+
+### 💬 채팅과 위치 공유를 통해서 손쉽게 만날 수 있어요.
+![KakaoTalk_Photo_2022-12-14-17-26-54](https://user-images.githubusercontent.com/89574881/207619389-58b9ae14-f3c5-4420-b046-f6b91f64e25c.jpeg)
+
+### 👀 예약 내역을 한 눈에 모아 볼 수 있어요.
+![Reservation_mockup](https://user-images.githubusercontent.com/89574881/207619423-d92c6a25-bc6f-4c02-a0fe-30a63047e6c9.png)
+
+### 📱작동 화면
+|장소 검색 및 작가 확인|작가 정보 확인 및 예약 신청|채팅및 위치 공유|예약 내역|
 |:-:|:-:|:-:|:-:|
 |![trinap1-resize](https://user-images.githubusercontent.com/27603734/207523349-000a8646-3a27-4a99-82cc-03ef9f36fab6.gif)|![trainp2-resize](https://user-images.githubusercontent.com/27603734/207523356-49a4d1cd-519c-4a78-8443-8d33f28cbc8b.gif)|![trinap3](https://user-images.githubusercontent.com/27603734/207523819-75f21ae5-161c-42ce-a196-f0ad5acc437c.gif)|![trinap4-resize](https://user-images.githubusercontent.com/27603734/207523504-b73c7bb0-a345-421c-889a-053cd002e7ab.gif)|
 
