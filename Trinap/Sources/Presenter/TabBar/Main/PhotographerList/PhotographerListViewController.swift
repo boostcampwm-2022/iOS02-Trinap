@@ -22,7 +22,6 @@ final class PhotographerListViewController: BaseViewController {
     
     private lazy var layout = UICollectionViewFlowLayout().than {
         let width = self.view.frame.width - (2 * trinapOffset)
-//        let height = 300.0
         let height = 0.8 * width
         $0.sectionInset = UIEdgeInsets(top: 24, left: 0, bottom: 24, right: 0)
         $0.minimumLineSpacing = 24
