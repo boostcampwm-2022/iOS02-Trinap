@@ -1,4 +1,4 @@
-<p align="center"><image alt="trinap" src="https://user-images.githubusercontent.com/27603734/207528269-4137b9a6-4daa-491a-a4fc-6fb2ef3aff35.jpeg" align="center"/></p>
+<p align="center"><image alt="trinap" src="https://user-images.githubusercontent.com/27603734/207543336-f8142646-ae32-46d1-86a5-a3d73bde1815.png" align="center"/></p>
 <p align="center">  
   <img src="https://img.shields.io/github/issues/boostcampwm-2022/iOS02-Trinap"/>
   <img src="https://img.shields.io/github/issues-closed/boostcampwm-2022/iOS02-Trinap"/>
