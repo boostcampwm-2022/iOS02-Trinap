@@ -36,7 +36,7 @@ final class DefaultFetchPhotographerUserUseCase: FetchPhotographerUserUseCase {
                 owner.photographerRepository.fetchDetailPhotographer(userId: user.userId)
                     .flatMap { photographer in
                         return owner.mapRepository.fetchLocationName(
-                            using: Coordinate(lat: photographer.latitude,lng: photographer.longitude)
+                            using: Coordinate(lat: photographer.latitude, lng: photographer.longitude)
                         )
                         .map { location in
                             PhotographerUser(user: user, photographer: photographer, location: location)
@@ -44,5 +44,4 @@ final class DefaultFetchPhotographerUserUseCase: FetchPhotographerUserUseCase {
                     }
             }
     }
-
 }
