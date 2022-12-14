@@ -24,7 +24,7 @@ struct FakePhotographerRepository: PhotographerRepository, FakeRepositoryType {
     func fetchPhotographers(type: TagType) -> Observable<[Photographer]> {
         var photographers: [Photographer] = []
         
-        for i in 1...3 { //Int.random(in: 20...40) {
+        for i in 1...Int.random(in: 20...40) {
             let photographer = Photographer.stub(
                 photographerId: "photographerId\(i)",
                 photographerUserId: "userId\(i)",
@@ -56,7 +56,7 @@ struct FakePhotographerRepository: PhotographerRepository, FakeRepositoryType {
     func fetchPhotographers(coordinate: Coordinate) -> Observable<[Photographer]> {
         var photographers: [Photographer] = []
         
-        for i in 1...3 { //Int.random(in: 20...40) {
+        for i in 1...Int.random(in: 20...40) {
             let photographer = Photographer.stub(
                 photographerId: "photographerId\(i)",
                 photographerUserId: "userId\(i)",

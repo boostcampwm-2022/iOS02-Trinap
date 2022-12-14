@@ -34,11 +34,12 @@ protocol FakeRepositoryType {
 
 extension FakeRepositoryType {
     
-    func execute<Value>(successValue: Value, error: Error = FakeError.unknown) -> Observable<Value> {
+    func execute<Value>(successValue: Value, error: Error = FakeError.errorAt(String(describing: Self.self))) -> Observable<Value> {
         return .create { observer in
             if isSucceedCase {
                 observer.onNext(successValue)
             } else {
+                Logger.print(error.localizedDescription)
                 observer.onError(error)
             }
             
