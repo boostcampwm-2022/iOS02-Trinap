@@ -36,11 +36,11 @@ final class PhotographerDetailViewModel: ViewModelType {
     private let fetchPhotographerUserUseCase: FetchPhotographerUserUseCase
     private let fetchReviewInformationUseCase: FetchReviewInformationUseCase
     
-    private let reloadTrigger = BehaviorSubject<Void>(value: ())
+    private let reloadTrigger = PublishRelay<Void>()
     
     private let searchCoordinate: Coordinate
     private let userId: String
-    private var reservationDate = BehaviorRelay<[Date]>(value: [])
+    private var reservationDates = BehaviorRelay<[Date]>(value: [])
     
     private weak var coordinator: PhotographerDetailCoordinator?
     
@@ -71,83 +71,12 @@ final class PhotographerDetailViewModel: ViewModelType {
 
     // MARK: - Methods
     func transform(input: Input) -> Output {
+        let photographer = fetchPhotographerUserUseCase.fetch(userId: userId)
+        let reviewInformation = fetchReviewInformationUseCase.fetch(photographerUserId: userId)
+        let buttonAvailable = reservationDates.map { $0.count == 2 }
         
-        input.viewWillAppear
-            .map { _ in }
-            .bind(to: reloadTrigger)
-            .disposed(by: disposeBag)
-        
-        let photographer = self.reloadTrigger
-            .withUnretained(self)
-            .flatMap { owner, _ in
-                owner.fetchPhotographerUserUseCase.fetch(userId: owner.userId)
-            }
-            .share()
-        
-        let reviewInformation = reloadTrigger
-            .withUnretained(self)
-            .flatMap { owner, _ in
-                owner.fetchReviewInformationUseCase.fetch(photographerUserId: owner.userId)
-            }
-            .share()
-        
-        let buttonAvailable = self.reservationDate
-            .map { date -> Bool in
-                return date.count == 2
-            }
-        
-        input.confirmTrigger
-            .withUnretained(self)
-            .flatMap { $0.0.showAlert() }
-            .filter { $0 }
-            .distinctUntilChanged()
-            .withLatestFrom(reservationDate.asObservable())
-            .withUnretained(self)
-            .flatMap { owner, dates -> Observable<String> in
-                guard
-                    let start = dates[safe: 0],
-                    let end = dates[safe: 1]
-                else { return Observable.just("") }
-                
-                return owner.createReservationUseCase.create(
-                    photographerUserId: owner.userId,
-                    startDate: start,
-                    endDate: end,
-                    coordinate: owner.searchCoordinate
-                )
-            }
-            .withUnretained(self)
-            .flatMap { owner, reservationId -> Observable<(String, String)> in
-                return owner.createChatroomUseCase.create(photographerUserId: owner.userId)
-                    .map { ($0, reservationId) }
-            }
-            .withUnretained(self)
-            .flatMap { owner, value -> Observable<String> in
-                let (chatroomId, reservationId) = value
-                return owner.sendFirstChatUseCase
-                    .send(chatroomId: chatroomId, reservationId: reservationId)
-                    .map { _ in return chatroomId }
-            }
-            .withLatestFrom(photographer, resultSelector: { chatroomId, photographer in
-                return (chatroomId, photographer.nickname)
-            })
-            .subscribe(onNext: { [weak self] chatroomId, nickname in
-                self?.coordinator?.connectChatDetailCoordinator(
-                    chatroomId: chatroomId,
-                    photographerNickname: nickname
-                )
-            })
-            .disposed(by: disposeBag)
-        
-        input.calendarTrigger
-            .withLatestFrom(photographer)
-            .throttle(.seconds(1), scheduler: MainScheduler.instance)
-            .withUnretained(self)
-            .subscribe(onNext: { owner, value in
-                let photographerUser = value
-                owner.coordinator?.showSelectReservationDateViewController(with: photographerUser.possibleDate, detailViewModel: self)
-            })
-            .disposed(by: disposeBag)
+        requestReservation(confirmTrigger: input.confirmTrigger)
+        showCalendar(calendarTrigger: input.calendarTrigger, photographer: photographer)
         
         let dataSource = Observable.combineLatest(input.tabState, photographer, reviewInformation)
             .map { [weak self] section, photographer, review -> [PhotographerDataSource] in
@@ -155,29 +84,31 @@ final class PhotographerDetailViewModel: ViewModelType {
                 
                 return self.mappingDataSource(isEditable: false, state: section, photographer: photographer, review: review)
             }
+            .asDriver(onErrorPresentAlertTo: coordinator, andReturn: []) { [weak self] in
+                self?.coordinator?.popViewController()
+            }
         
-        let reservationDates = self.reservationDate
-            .asDriver(onErrorJustReturn: [])
+        let reservationDates = reservationDates.asDriver(onErrorJustReturn: [])
             .map { [weak self] dates -> String in
                 guard
                     let start = dates[safe: 0],
                     let end = dates[safe: 1]
                 else { return "" }
+                
                 return self?.convertDateToStringUseCase.convert(startDate: start, endDate: end) ?? ""
             }
-            
 
         return Output(
             confirmButtonEnabled: buttonAvailable.asDriver(onErrorJustReturn: false),
             resevationDates: reservationDates,
-            dataSource: dataSource.asDriver(onErrorJustReturn: [])
+            dataSource: dataSource
         )
     }
     
     private func showAlert() -> Observable<Bool> {
         return Observable.create { [weak self] observable in
             guard
-                let dates = self?.reservationDate.value,
+                let dates = self?.reservationDates.value,
                 let startDate = dates[safe: 0],
                 let endDate = dates[safe: 1]
             else {
@@ -214,6 +145,87 @@ final class PhotographerDetailViewModel: ViewModelType {
     }
 }
 
+// MARK: - Privates
+private extension PhotographerDetailViewModel {
+    
+    func requestReservation(confirmTrigger: Observable<Void>) {
+        confirmAlert(confirmTrigger)
+            .withLatestFrom(reservationDates.asObservable())
+            .withUnretained(self)
+            .flatMap { $0.createAndSendReservationChat(at: $1) }
+            .subscribe(
+                onNext: { [weak self] chatroomId, nickname in
+                    self?.coordinator?.connectChatDetailCoordinator(
+                        chatroomId: chatroomId,
+                        photographerNickname: nickname
+                    )
+                },
+                onError: { [weak self] error in
+                    self?.coordinator?.presentErrorAlert(message: error.localizedDescription)
+                }
+            )
+            .disposed(by: disposeBag)
+    }
+    
+    func confirmAlert(_ confirmTrigger: Observable<Void>) -> Observable<Bool> {
+        return confirmTrigger
+            .withUnretained(self)
+            .flatMap { $0.0.showAlert() }
+            .filter { $0 }
+            .distinctUntilChanged()
+    }
+    
+    func createAndSendReservationChat(at dates: [Date]) -> Observable<(String, String)> {
+        return createReservation(dates: dates)
+            .withUnretained(self)
+            .flatMap { $0.createChatroom(reservationId: $1) }
+            .withUnretained(self)
+            .flatMap { $0.sendFirstChat(chatroomId: $1.0, reservationId: $1.1) }
+            .withUnretained(self)
+            .flatMap { owner, chatroomId in
+                return owner.fetchPhotographerUserUseCase.fetch(userId: owner.userId)
+                    .map { return (chatroomId, $0.nickname) }
+            }
+    }
+    
+    func createReservation(dates: [Date]) -> Observable<String> {
+        guard
+            let start = dates[safe: 0],
+            let end = dates[safe: 1]
+        else { return Observable.just("") }
+
+        return createReservationUseCase.create(
+            photographerUserId: userId,
+            startDate: start,
+            endDate: end,
+            coordinate: searchCoordinate
+        )
+    }
+    
+    func createChatroom(reservationId: String) -> Observable<(String, String)> {
+        return createChatroomUseCase.create(photographerUserId: userId)
+            .map { ($0, reservationId) }
+    }
+    
+    func sendFirstChat(chatroomId: String, reservationId: String) -> Observable<String> {
+        return sendFirstChatUseCase.send(chatroomId: chatroomId, reservationId: reservationId)
+            .map { _ in return chatroomId }
+    }
+    
+    func showCalendar(calendarTrigger: Observable<Void>, photographer: Observable<PhotographerUser>) {
+        calendarTrigger.withLatestFrom(photographer)
+            .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            .withUnretained(self)
+            .subscribe(onNext: { owner, value in
+                let photographerUser = value
+                owner.coordinator?.showSelectReservationDateViewController(
+                    with: photographerUser.possibleDate,
+                    detailViewModel: self
+                )
+            })
+            .disposed(by: disposeBag)
+    }
+}
 
 extension PhotographerDetailViewModel {
     
@@ -279,6 +291,6 @@ extension PhotographerDetailViewModel {
 extension PhotographerDetailViewModel: SelectReservationDateViewModelDelegate {
     
     func selectedReservationDate(startDate: Date, endDate: Date) {
-        self.reservationDate.accept([startDate, endDate])
+        self.reservationDates.accept([startDate, endDate])
     }
 }

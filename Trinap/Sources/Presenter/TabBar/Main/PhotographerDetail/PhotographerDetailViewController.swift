@@ -26,7 +26,10 @@ class PhotographerDetailViewController: BaseViewController {
         $0.backgroundColor = TrinapAsset.white.color
     }
     
-    private lazy var backgroundButtonView = UIView()
+    private lazy var backgroundButtonView = UIView().than {
+        $0.backgroundColor = TrinapAsset.white.color
+    }
+    
     private lazy var placeholderView = PhotographerPlaceholderView(isEditable: false)
     
     private lazy var calendarButton = TrinapButton(style: .primary, fillType: .border).than {
