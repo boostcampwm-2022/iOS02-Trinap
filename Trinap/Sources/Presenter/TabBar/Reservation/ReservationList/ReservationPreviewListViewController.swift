@@ -107,6 +107,8 @@ final class ReservationPreviewListViewController: BaseViewController {
                 self?.showReservationDetailViewController(at: indexPath)
             })
             .disposed(by: disposeBag)
+        
+        
     }
     
     private func showReservationDetailViewController(at indexPath: IndexPath) {
