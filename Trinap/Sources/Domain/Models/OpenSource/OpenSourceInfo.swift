@@ -9,7 +9,7 @@
 import Foundation
 
 struct OpenSourceInfo: Hashable {
-    let name: String
+    var name: String
     let version: String
     var url: URL?
 }

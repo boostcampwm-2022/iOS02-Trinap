@@ -27,10 +27,8 @@ final class OpenSourceListViewController: BaseViewController {
     }
     
     private lazy var openSourceListTableView = UITableView().than {
-        $0.allowsSelection = false
-        $0.separatorStyle = .none
         $0.rowHeight = 72.0
-        $0.register(OpenSourceCell.self)
+        $0.register(UITableViewCell.self)
     }
     
     private lazy var placeHolderView = PlaceHolderView(text: "오픈소스 내역이 없어요.")
@@ -68,6 +66,12 @@ final class OpenSourceListViewController: BaseViewController {
             make.top.equalTo(view.safeAreaLayoutGuide)
             make.height.equalTo(trinapOffset * 6)
         }
+        
+        openSourceListTableView.snp.makeConstraints { make in
+            make.top.equalTo(navigationBarView.snp.bottom)
+            make.leading.trailing.equalTo(self.view.safeAreaLayoutGuide)
+            make.bottom.equalToSuperview()
+        }
     }
     
     override func configureAttributes() {
@@ -96,6 +100,18 @@ final class OpenSourceListViewController: BaseViewController {
                 owner.dataSource?.apply(snapshot)
             })
             .disposed(by: disposeBag)
+        
+        openSourceListTableView.rx.itemSelected
+            .compactMap { [weak self] indexPath -> OpenSourceInfo? in
+                self?.openSourceListTableView.deselectRow(at: indexPath, animated: false)
+                
+                return self?.dataSource?.itemIdentifier(for: indexPath)
+            }
+            .map(\.url)
+            .bind(onNext: { [weak self] url in
+                self?.openURL(url)
+            })
+            .disposed(by: disposeBag)
     }
 }
 
@@ -105,12 +121,16 @@ private extension OpenSourceListViewController {
         self.dataSource = DataSource(
             tableView: openSourceListTableView,
             cellProvider: { tableView, indexPath, openSourceInfo in
-                guard
-                    let cell = tableView.dequeueCell(OpenSourceCell.self, for: indexPath)
-                else {
+                guard let cell = tableView.dequeueCell(UITableViewCell.self, for: indexPath) else {
                     return UITableViewCell()
                 }
-                cell.configureCell(openSourceInfo: openSourceInfo)
+                
+                var configuration = cell.defaultContentConfiguration()
+                
+                configuration.text = openSourceInfo.name
+                configuration.secondaryText = openSourceInfo.version
+                cell.contentConfiguration = configuration
+                cell.accessoryType = .disclosureIndicator
                 
                 return cell
             })
@@ -135,6 +155,14 @@ private extension OpenSourceListViewController {
             }
         } else {
             self.placeHolderView.removeFromSuperview()
+        }
+    }
+    
+    func openURL(_ url: URL?) {
+        guard let url else { return }
+        
+        if UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url)
         }
     }
 }

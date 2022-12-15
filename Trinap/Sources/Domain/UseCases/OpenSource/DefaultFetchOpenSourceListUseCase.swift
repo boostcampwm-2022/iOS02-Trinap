@@ -21,5 +21,16 @@ final class DefaultFetchOpenSourceListUseCase: FetchOpenSourceListUseCase {
     // MARK: - Methods
     func fetchOpenSource() -> [OpenSourceInfo] {
         return self.fetchOpenSourceListRepository.fetchOpenSourceList()
+            .map { info in
+                var mutableInfo = info
+                
+                mutableInfo.name = info.url?.absoluteString
+                    .components(separatedBy: "/")
+                    .last?
+                    .components(separatedBy: ".")
+                    .first ?? info.name
+                
+                return mutableInfo
+            }
     }
 }

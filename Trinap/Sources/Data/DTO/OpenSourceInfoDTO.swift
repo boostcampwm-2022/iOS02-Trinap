@@ -16,13 +16,14 @@ struct OpenSourceInfoDTO: Decodable {
     
     struct State: Decodable {
         let revision: String
-        let version: String
+        let version: String?
+        let branch: String?
     }
     
     func toModel() -> OpenSourceInfo {
         return OpenSourceInfo(
             name: self.identity,
-            version: self.state.version,
+            version: self.state.version ?? self.state.branch ?? "master",
             url: URL(string: self.location)
         )
     }
