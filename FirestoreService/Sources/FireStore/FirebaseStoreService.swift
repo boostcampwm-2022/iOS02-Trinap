@@ -37,4 +37,7 @@ public protocol FireStoreService {
     
     // functions 사용
     func useFunctions(functionName: String, data: FirebaseData) -> Single<[FirebaseData]>
+    
+    // MARK: - Chatroom
+    func deleteChatroom(document: String) -> Single<Void>
 }

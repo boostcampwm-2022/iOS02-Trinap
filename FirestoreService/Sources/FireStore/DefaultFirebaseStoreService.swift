@@ -383,3 +383,55 @@ public extension DefaultFireStoreService {
         }
     }
 }
+
+// MARK: - Leave Chatroom
+public extension DefaultFireStoreService {
+    
+    func deleteChatroom(document: String) -> Single<Void> {
+        return self.deleteSubcollection(collection: .chatrooms, document: document, subCollection: "chats")
+            .flatMap { [weak self] _ in
+                guard let self else { return Single.error(FireStoreError.unknown) }
+                
+                return self.deleteSubcollection(collection: .chatrooms, document: document, subCollection: "locations")
+            }
+            .flatMap { [weak self] in
+                guard let self else { return Single.error(FireStoreError.unknown) }
+                
+                return self.deleteDocument(collection: .chatrooms, document: document)
+            }
+    }
+    
+    private func deleteSubcollection(collection: FireStoreCollection, document: String, subCollection: String) -> Single<Void> {
+        let batch = self.database.batch()
+        
+        return Single.create { [weak self] result in
+            guard let self else { return Disposables.create() }
+            
+            self.database
+                .collection(collection.name)
+                .document(document)
+                .collection(subCollection)
+                .getDocuments { snapshot, error in
+                    if let error {
+                        result(.failure(error))
+                        return
+                    }
+                    
+                    snapshot?.documents.forEach { documentSnapshot in
+                        batch.deleteDocument(documentSnapshot.reference)
+                    }
+                    
+                    batch.commit { error in
+                        if let error {
+                            result(.failure(error))
+                            return
+                        }
+                        
+                        result(.success(()))
+                    }
+                }
+            
+            return Disposables.create()
+        }
+    }
+}
