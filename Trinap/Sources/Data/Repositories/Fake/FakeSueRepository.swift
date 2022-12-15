@@ -10,6 +10,7 @@ import Foundation
 
 import RxSwift
 
+#if DEBUG
 struct FakeSueRepository: SueRepository, FakeRepositoryType {
     
     // MARK: - Properties
@@ -52,3 +53,4 @@ extension Sue {
         )
     }
 }
+#endif

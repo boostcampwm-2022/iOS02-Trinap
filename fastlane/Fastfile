@@ -37,7 +37,7 @@ platform :ios do
     upload_to_testflight
 	slack(
 	  message: "New Version of Trinap uploaded successfully at App Store Connect",
-	  slack_url: "https://hooks.slack.com/services/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"
+	  slack_url: "https://hooks.slack.com/services/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"
 	)
   end
 
@@ -45,7 +45,7 @@ platform :ios do
     slack(
 	  message: "App Store Connect - Error detected: #{exception}",
       success: false,
-	  slack_url: "https://hooks.slack.com/services/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"
+	  slack_url: "https://hooks.slack.com/services/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"
 	)
   end
 end

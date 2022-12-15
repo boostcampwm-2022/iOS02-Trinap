@@ -11,6 +11,7 @@ import Foundation
 import RxSwift
 import RxRelay
 
+#if DEBUG
 struct FakeMapRepository: MapRepository, FakeRepositoryType {
     
     // MARK: - Properties
@@ -38,3 +39,4 @@ struct FakeMapRepository: MapRepository, FakeRepositoryType {
         return execute(successValue: "Location Name")
     }
 }
+#endif

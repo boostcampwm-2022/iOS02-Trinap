@@ -10,6 +10,7 @@ import Foundation
 
 import RxSwift
 
+#if DEBUG
 struct FakeReviewRepository: ReviewRepository, FakeRepositoryType {
     
     // MARK: - Properties
@@ -68,3 +69,4 @@ extension Review {
         )
     }
 }
+#endif

@@ -10,6 +10,7 @@ import Foundation
 
 import RxSwift
 
+#if DEBUG
 final class FakeChatroomRepository: ChatroomRepository, FakeRepositoryType {
     
     // MARK: - Properties
@@ -76,3 +77,4 @@ extension Chatroom {
         )
     }
 }
+#endif

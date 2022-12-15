@@ -10,6 +10,7 @@ import Foundation
 
 import RxSwift
 
+#if DEBUG
 struct FakePhotographerRepository: PhotographerRepository, FakeRepositoryType {
     
     // MARK: - Properties
@@ -130,3 +131,4 @@ extension Photographer {
         )
     }
 }
+#endif

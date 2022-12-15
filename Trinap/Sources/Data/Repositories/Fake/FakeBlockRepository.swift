@@ -10,6 +10,7 @@ import Foundation
 
 import RxSwift
 
+#if DEBUG
 struct FakeBlockRepository: BlockRepository, FakeRepositoryType {
     
     // MARK: - Properties
@@ -56,3 +57,4 @@ extension Block {
         return blocks
     }
 }
+#endif
