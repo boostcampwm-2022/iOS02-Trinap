@@ -89,7 +89,7 @@ extension DefaultFetchReviewInformationUseCase {
     private func mappingReviewOfPhotographer(reviews: [Review]) -> Observable<[UserReview]> {
         let userIds = reviews.map { $0.creatorUserId }.removingDuplicates()
         
-        return userIds.isEmpty ? .just([]) : userRepository.fetchUsers(userIds: userIds)
+        return userIds.isEmpty ? .just([]) : userRepository.fetchUsersWithMine(userIds: userIds)
             .withUnretained(self) { owner, users in
                 return owner.configureUserReview(reviews: reviews, users: users)
             }
@@ -121,4 +121,3 @@ extension DefaultFetchReviewInformationUseCase {
         return ReviewSummary(rating: round(averageRating * 10) / 10, count: reviewRatings.count)
     }
 }
-

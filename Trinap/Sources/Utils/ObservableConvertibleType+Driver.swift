@@ -12,15 +12,45 @@ import RxSwift
 extension ObservableConvertibleType {
     
     /**
-     Converts observable sequence to `Driver` trait.
+    Converts observable sequence to `Driver` trait.
      
-     - parameter onErrorPublishError: Publish error to given stream.
-     - returns: empty array.
-     */
-    func asDriver(onErrorAcceptTo relay: PublishRelay<Error>, justReturn element: Element) -> Driver<Element> {
+    - parameter onErrorPresentAlertTo: Coordinator which alert will present.
+    - returns: `element`.
+    */
+    func asDriver(
+        onErrorPresentAlertTo coordinator: Coordinator?,
+        message: String? = .errorDetected,
+        andReturn element: Element
+    ) -> Driver<Element> {
         let source = self
             .asDriver(onErrorRecover: { error in
-                relay.accept(error)
+                coordinator?.presentErrorAlert(message: error.localizedDescription)
+                return .just(element)
+            })
+        
+        return source
+    }
+    
+    /**
+    Converts observable sequence to `Driver` trait.
+
+    - parameters:
+      - onErrorPresentAlertTo: Coordinator which alert will present.
+      - message: Alert message.
+      - element: Value when error detected.
+      - action: Alert action
+
+    - returns: `element`.
+    */
+    func asDriver(
+        onErrorPresentAlertTo coordinator: Coordinator?,
+        message: String? = .errorDetected,
+        andReturn element: Element,
+        andPerform action: @escaping () -> Void
+    ) -> Driver<Element> {
+        let source = self
+            .asDriver(onErrorRecover: { error in
+                coordinator?.presentErrorAlert(message: error.localizedDescription, handler: action)
                 return .just(element)
             })
         

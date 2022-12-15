@@ -69,8 +69,7 @@ final class SearchViewController: BaseViewController {
     override func configureConstraints() {
         currentLocationButton.snp.makeConstraints { make in
             make.top.equalTo(self.view.safeAreaLayoutGuide).offset(16)
-            make.leading.equalToSuperview().offset(trinapOffset)
-            make.trailing.equalToSuperview().offset(-trinapOffset)
+            make.leading.trailing.equalToSuperview().inset(16)
             make.height.equalTo(36)
         }
         

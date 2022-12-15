@@ -25,6 +25,7 @@ protocol Coordinator: AnyObject {
     func finish()
     func popViewController()
     func dismissViewController()
+    func presentErrorAlert(title: String?, message: String?, handler: (() -> Void)?)
 }
 
 extension Coordinator {
@@ -40,5 +41,16 @@ extension Coordinator {
     
     func dismissViewController() {
         navigationController.dismiss(animated: true)
+    }
+    
+    func presentErrorAlert(
+        title: String? = nil,
+        message: String? = .errorDetected,
+        handler: (() -> Void)? = nil
+    ) {
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+            .appendingAction(title: "확인", handler: handler)
+        
+        navigationController.present(alertController, animated: true)
     }
 }

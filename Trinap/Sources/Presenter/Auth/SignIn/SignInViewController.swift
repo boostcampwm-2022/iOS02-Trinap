@@ -32,6 +32,12 @@ final class SignInViewController: BaseViewController {
         $0.titleLabel?.font = TrinapFontFamily.Pretendard.bold.font(size: 14)
     }
     
+    private lazy var privacyPolicyButton = UIButton().than {
+        $0.setTitle("개인정보처리방침", for: .normal)
+        $0.setTitleColor(TrinapAsset.subtext2.color, for: .normal)
+        $0.titleLabel?.font = TrinapFontFamily.Pretendard.regular.font(size: 12)
+    }
+    
     // MARK: - Properties
     private var currentNonce: String?
     private let viewModel: SignInViewModel
@@ -49,7 +55,11 @@ final class SignInViewController: BaseViewController {
     }
     
     override func configureHierarchy() {
-        [logoImageView, appleSignInButton].forEach { view.addSubview($0) }
+        self.view.addSubviews([
+            logoImageView,
+            appleSignInButton,
+            privacyPolicyButton
+        ])
     }
     
     override func configureConstraints() {
@@ -66,6 +76,11 @@ final class SignInViewController: BaseViewController {
             make.height.equalTo(48)
             make.top.equalTo(logoImageView.snp.centerY).multipliedBy(1.9)
         }
+        
+        privacyPolicyButton.snp.makeConstraints { make in
+            make.top.equalTo(appleSignInButton.snp.bottom).offset(30)
+            make.centerX.equalToSuperview()
+        }
     }
         
     override func bind() {
@@ -81,6 +96,12 @@ final class SignInViewController: BaseViewController {
             .subscribe { _ in
                 self.startSignInWithAppleFlow()
             }
+            .disposed(by: disposeBag)
+        
+        privacyPolicyButton.rx.tap
+            .bind(onNext: { [weak self] _ in
+                self?.openPrivacyPolicy()
+            })
             .disposed(by: disposeBag)
     }
 }
@@ -173,5 +194,17 @@ private extension SignInViewController {
         }
         
         return result
+    }
+}
+
+// MARK: - Privacy Policy
+private extension SignInViewController {
+    
+    func openPrivacyPolicy() {
+        guard let url = Private.privacyPolicyURL else { return }
+        
+        if UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url)
+        }
     }
 }

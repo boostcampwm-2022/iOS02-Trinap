@@ -86,7 +86,7 @@ extension DefaultFetchReviewUseCase {
         /// 중복된 id제거
         let userIds = reviews.map { $0.creatorUserId }.removingDuplicates()
         
-        return userIds.isEmpty ? .just([]) : userRepository.fetchUsers(userIds: userIds)
+        return userIds.isEmpty ? .just([]) : userRepository.fetchUsersWithMine(userIds: userIds)
             .withUnretained(self) { owner, users in
                 return owner.configureUserReview(reviews: reviews, users: users)
             }
