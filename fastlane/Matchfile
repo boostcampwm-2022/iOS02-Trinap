@@ -2,7 +2,7 @@ git_url("https://github.com/chansooo/TrinapCert")
 
 storage_mode("git")
 
-type("development") # The default type, can be: appstore, adhoc, enterprise or development
+type("appstore") # The default type, can be: appstore, adhoc, enterprise or development
 
 # app_identifier("com.tnzkm.Trinap")
 # username("yy0867") # Your Apple Developer Portal username
