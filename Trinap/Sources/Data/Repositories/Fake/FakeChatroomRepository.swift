@@ -56,6 +56,10 @@ final class FakeChatroomRepository: ChatroomRepository, FakeRepositoryType {
     func create(photographerUserId: String) -> Observable<String> {
         return execute(successValue: UUID().uuidString)
     }
+    
+    func leave(chatroomId: String) -> Single<Void> {
+        return execute(successValue: ()).asSingle()
+    }
 }
 
 extension Chatroom {
