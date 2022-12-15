@@ -60,11 +60,11 @@ extension AppCoordinator {
     }
     
     private func makeAuthRepository() -> AuthRepository {
-        #if DEBUG
-        if FakeRepositoryEnvironment.useFakeRepository {
-            return FakeAuthRepository()
-        }
-        #endif
+//        #if DEBUG
+//        if FakeRepositoryEnvironment.useFakeRepository {
+//            return FakeAuthRepository()
+//        }
+//        #endif
         return DefaultAuthRepository()
     }
 }
