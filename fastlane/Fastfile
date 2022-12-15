@@ -18,26 +18,22 @@ default_platform(:ios)
 platform :ios do
   desc "Push a new beta build to TestFlight"
   lane :beta do
-    get_provisioning_profile(
-	  app_identifier: "com.tnzkm.Trinap",
-	  filename: "trinap_distribution.mobileprovision",
-	  output_path: "./fastlane/profiles/"
-	)
     increment_build_number(xcodeproj: "Trinap.xcodeproj")
+	match(type: "development")
     build_app(
 	  workspace: "Trinap.xcworkspace", 
 	  scheme: "Trinap",
 	  export_method: "app-store",
 	  export_options: {
 	    provisioningProfiles: {
-		  "com.tnzkm.Trinap" => "trinap_distribution.mobileprovision"
+		  "com.tnzkm.Trinap" => "Development_com.tnzkm.Trinap.mobileprovision"
 		}
 	  }
 	)
     upload_to_testflight
 	slack(
 	  message: "New Version of Trinap uploaded successfully at App Store Connect",
-	  slack_url: "https://hooks.slack.com/services/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"
+	  slack_url: "https://hooks.slack.com/services/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"
 	)
   end
 
@@ -45,7 +41,7 @@ platform :ios do
     slack(
 	  message: "App Store Connect - Error detected: #{exception}",
       success: false,
-	  slack_url: "https://hooks.slack.com/services/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"
+	  slack_url: "https://hooks.slack.com/services/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"
 	)
   end
 end
