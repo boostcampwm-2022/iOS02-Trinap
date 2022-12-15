@@ -55,6 +55,8 @@ extension MyPageCoordinator {
             showBlockListViewController()
         case .dropout:
             showDropOutViewController()
+        case .opensource:
+            showOpenSourceListViewController()
         default:
             return
         }
@@ -86,7 +88,7 @@ extension MyPageCoordinator {
         let viewController = dependencies.makeSearchViewController(searchText: searchText, coordinate: coordinate)
         self.navigationController.pushViewController(viewController, animated: true)
     }
-
+    
     func showDetailImageView(urlString: String?) {
         guard let urlString, let url = URL(string: urlString) else {
             return
@@ -148,6 +150,12 @@ extension MyPageCoordinator {
     
     func showBlockListViewController() {
         let viewController = dependencies.makeBlockListViewController()
+        viewController.hidesBottomBarWhenPushed = true
+        self.navigationController.pushViewController(viewController, animated: true)
+    }
+    
+    func showOpenSourceListViewController() {
+        let viewController = dependencies.makeOpenSourceListViewController()
         viewController.hidesBottomBarWhenPushed = true
         self.navigationController.pushViewController(viewController, animated: true)
     }

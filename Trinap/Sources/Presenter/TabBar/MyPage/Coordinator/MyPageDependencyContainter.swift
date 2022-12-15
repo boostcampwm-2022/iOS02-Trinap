@@ -27,6 +27,7 @@ final class MyPageDependencyContainter {
     private let authRepository: AuthRepository
     private let uploadImageRepository: UploadImageRepository
     private let blockRepository: BlockRepository
+    private let openSourceListRepository: OpenSourceListRepository
     
     // MARK: Initializers
     init(mypageCoordinator: MyPageCoordinator?) {
@@ -40,6 +41,8 @@ final class MyPageDependencyContainter {
             self.authRepository = FakeAuthRepository()
             self.uploadImageRepository = FakeUploadImageRepository()
             self.blockRepository = FakeBlockRepository()
+            // TODO: fakeRepository으로 교체
+            self.openSourceListRepository = DefaultOpenSourceListRepository()
             
             return
         }
@@ -55,6 +58,7 @@ final class MyPageDependencyContainter {
             fireStoreService: fireStoreService,
             keychainManager: keychainManger
         )
+        self.openSourceListRepository = DefaultOpenSourceListRepository()
     }
     
     func makeMyPageViewController() -> MyPageViewController {
@@ -107,6 +111,12 @@ final class MyPageDependencyContainter {
     
     func makeBlockListViewController() -> BlockListViewController {
         return BlockListViewController(viewModel: makeBlockListViewModel())
+    }
+    
+    func makeOpenSourceListViewController() -> OpenSourceListViewController {
+        return OpenSourceListViewController(
+            viewModel: makeOpenSourceListViewModel()
+        )
     }
 }
 
@@ -207,6 +217,13 @@ private extension MyPageDependencyContainter {
             removeBlockUseCase: self.makeRemoveBlockUseCase()
         )
     }
+    
+    func makeOpenSourceListViewModel() -> OpenSourceListViewModel {
+        return OpenSourceListViewModel(
+            coordinator: self.mypageCoordinator,
+            fetchOpenSourceListUseCase: self.makeFetchOpenSourceListUseCase()
+        )
+    }
 }
 
 // MARK: - UseCase
@@ -284,6 +301,12 @@ private extension MyPageDependencyContainter {
     func makeRemoveBlockUseCase() -> RemoveBlockUseCase {
         return DefaultRemoveBlockUseCase(
             blockRepository: blockRepository
+        )
+    }
+    
+    func makeFetchOpenSourceListUseCase() -> FetchOpenSourceListUseCase {
+        return DefaultFetchOpenSourceListUseCase(
+            fetchOpenSourceListRepository: openSourceListRepository
         )
     }
 }
