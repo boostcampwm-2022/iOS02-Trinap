@@ -11,7 +11,9 @@ import RxCocoa
 
 final class ChatPreviewsViewModel: ViewModelType {
     
-    struct Input {}
+    struct Input {
+        var leaveTrigger: PublishRelay<Int>
+    }
     
     struct Output {
         var chatPreviews: Driver<[ChatPreview]>
@@ -23,21 +25,40 @@ final class ChatPreviewsViewModel: ViewModelType {
     private weak var coordinator: ChatCoordinator?
     private let observeChatPreviewsUseCase: ObserveChatPreviewsUseCase
     private let observeChatUseCase: ObserveChatUseCase
+    private let leaveChatroomUseCase: LeaveChatroomUseCase
     
     // MARK: - Initializer
     init(
         coordinator: ChatCoordinator,
         observeChatPreviewsUseCase: ObserveChatPreviewsUseCase,
-        observeChatUseCase: ObserveChatUseCase
+        observeChatUseCase: ObserveChatUseCase,
+        leaveChatroomUseCase: LeaveChatroomUseCase
     ) {
         self.coordinator = coordinator
         self.observeChatPreviewsUseCase = observeChatPreviewsUseCase
         self.observeChatUseCase = observeChatUseCase
+        self.leaveChatroomUseCase = leaveChatroomUseCase
     }
     
     // MARK: - Methods
     func transform(input: Input) -> Output {
-        return Output(chatPreviews: observeChatPreviews())
+        let previews = observeChatPreviews().share()
+        
+        input.leaveTrigger
+            .withLatestFrom(previews) { ($0, $1) }
+            .compactMap { index, chatPreviews in
+                return chatPreviews[safe: index]?.chatroomId
+            }
+            .withUnretained(self)
+            .flatMap { owner, chatroomId in
+                return owner.leaveChatroomUseCase.execute(chatroomId: chatroomId)
+            }
+            .subscribe(onError: { [weak self] _ in
+                self?.coordinator?.presentErrorAlert()
+            })
+            .disposed(by: disposeBag)
+        
+        return Output(chatPreviews: previews.asDriver(onErrorJustReturn: [.onError]))
     }
     
     func lastChatPreviewObserver(of chatPreview: ChatPreview) -> Driver<ChatPreview> {
@@ -55,10 +76,9 @@ final class ChatPreviewsViewModel: ViewModelType {
 // MARK: - Privates
 extension ChatPreviewsViewModel {
     
-    private func observeChatPreviews() -> Driver<[ChatPreview]> {
+    private func observeChatPreviews() -> Observable<[ChatPreview]> {
         return observeChatPreviewsUseCase.execute()
             .map { $0.sorted(by: >) }
-            .asDriver(onErrorJustReturn: [.onError])
     }
     
     private func mapChatToChatPreview(chat: Chat, baseChatPreview: ChatPreview) -> ChatPreview {

@@ -19,6 +19,7 @@ final class ChatCoordinator: Coordinator {
     private let chatRepository: ChatRepository
     private let observeChatPreviewsUseCase: ObserveChatPreviewsUseCase
     private let observeChatUseCase: ObserveChatUseCase
+    private let leaveChatroomUseCase: LeaveChatroomUseCase
     
     // MARK: - Initializers
     init(_ navigationController: UINavigationController) {
@@ -43,6 +44,8 @@ final class ChatCoordinator: Coordinator {
                 userRepository: userRepository
             )
             
+            self.leaveChatroomUseCase = DefaultLeaveChatroomUseCase(repository: chatroomRepository)
+            
             return
         }
         #endif
@@ -61,6 +64,8 @@ final class ChatCoordinator: Coordinator {
             chatRepository: chatRepository,
             userRepository: userRepository
         )
+        
+        self.leaveChatroomUseCase = DefaultLeaveChatroomUseCase(repository: chatroomRepository)
     }
     
     // MARK: - Methods
@@ -75,7 +80,8 @@ extension ChatCoordinator {
         let chatPreviewsViewModel = ChatPreviewsViewModel(
             coordinator: self,
             observeChatPreviewsUseCase: observeChatPreviewsUseCase,
-            observeChatUseCase: observeChatUseCase
+            observeChatUseCase: observeChatUseCase,
+            leaveChatroomUseCase: leaveChatroomUseCase
         )
         let viewController = ChatPreviewsViewController(viewModel: chatPreviewsViewModel)
         

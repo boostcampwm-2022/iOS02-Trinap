@@ -9,6 +9,7 @@
 import UIKit
 
 import RxCocoa
+import RxGesture
 import RxSwift
 import SnapKit
 
@@ -31,6 +32,7 @@ final class ChatPreviewsViewController: BaseViewController {
     
     // MARK: - Properties
     private let viewModel: ChatPreviewsViewModel
+    private let leaveTrigger = PublishRelay<Int>()
 
     // MARK: - Initializers
     init(viewModel: ChatPreviewsViewModel) {
@@ -64,7 +66,11 @@ final class ChatPreviewsViewController: BaseViewController {
     }
     
     override func bind() {
-        let output = viewModel.transform(input: ChatPreviewsViewModel.Input())
+        let input = ChatPreviewsViewModel.Input(
+            leaveTrigger: leaveTrigger
+        )
+        
+        let output = viewModel.transform(input: input)
         
         output.chatPreviews
             .compactMap { [weak self] chatPreviews in
@@ -80,6 +86,10 @@ final class ChatPreviewsViewController: BaseViewController {
         chatPreviewsTableView.rx
             .itemSelected
             .bind(onNext: { [weak self] indexPath in self?.showChatDetailViewController(at: indexPath) })
+            .disposed(by: disposeBag)
+        
+        chatPreviewsTableView.rx
+            .setDelegate(self)
             .disposed(by: disposeBag)
     }
     
@@ -130,26 +140,27 @@ private extension ChatPreviewsViewController {
     }
     
     func generateSnapshot(_ after: [ChatPreview]) -> NSDiffableDataSourceSnapshot<Section, ChatPreview> {
-        guard
-            let dataSource,
-            let target = after.first,
-            let before = dataSource.snapshot().itemIdentifiers.first(where: { $0.chatroomId == target.chatroomId })
-        else {
-            return defaultSnapshot(after)
-        }
-        
-        var snapshot = dataSource.snapshot()
-        
-        if snapshot.sectionIdentifiers.isEmpty {
-            snapshot.appendSections([.main])
-        }
-        
-        snapshot.deleteItems([before])
-        
-        guard let firstItem = snapshot.itemIdentifiers.first else { return defaultSnapshot(after) }
-        
-        snapshot.insertItems([target], beforeItem: firstItem)
-        return snapshot
+        return defaultSnapshot(after)
+//        guard
+//            let dataSource,
+//            let target = after.first,
+//            let before = dataSource.snapshot().itemIdentifiers.first(where: { $0.chatroomId == target.chatroomId })
+//        else {
+//            return defaultSnapshot(after)
+//        }
+//
+//        var snapshot = dataSource.snapshot()
+//
+//        if snapshot.sectionIdentifiers.isEmpty {
+//            snapshot.appendSections([.main])
+//        }
+//
+//        snapshot.deleteItems([before])
+//
+//        guard let firstItem = snapshot.itemIdentifiers.first else { return defaultSnapshot(after) }
+//
+//        snapshot.insertItems([target], beforeItem: firstItem)
+//        return snapshot
     }
     
     func defaultSnapshot(_ after: [ChatPreview]) -> NSDiffableDataSourceSnapshot<Section, ChatPreview> {
@@ -180,5 +191,32 @@ private extension ChatPreviewsViewController {
     
     func chatroomIds(of chatPreviews: [ChatPreview]) -> [String] {
         return chatPreviews.map { $0.chatroomId }
+    }
+}
+
+// MARK: UITableView Delegate
+extension ChatPreviewsViewController: UITableViewDelegate {
+    
+    public func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let deleteAction = UIContextualAction(style: .destructive, title: "나가기") { [weak self] _, _, completion in
+            self?.presentLeaveAlert(at: indexPath, completion: completion)
+        }
+        
+        let swipeAction = UISwipeActionsConfiguration(actions: [deleteAction])
+        
+        swipeAction.performsFirstActionWithFullSwipe = false
+        return swipeAction
+    }
+    
+    private func presentLeaveAlert(at indexPath: IndexPath, completion: @escaping (Bool) -> Void) {
+        let leaveMessage = "채팅방을 나가시겠습니까? 나간 채팅방의 대화 내역은 모두 사라지며, 복구할 수 없습니다."
+        let alert = UIAlertController(title: nil, message: leaveMessage, preferredStyle: .alert)
+            .appendingAction(title: "취소", style: .cancel)
+            .appendingAction(title: "나가기", style: .destructive) { [weak self] in
+                self?.leaveTrigger.accept(indexPath.row)
+                completion(true)
+            }
+        
+        self.present(alert, animated: true)
     }
 }
