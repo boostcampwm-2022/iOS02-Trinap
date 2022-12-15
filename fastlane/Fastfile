@@ -18,8 +18,15 @@ default_platform(:ios)
 platform :ios do
   desc "Push a new beta build to TestFlight"
   lane :beta do
-    increment_build_number(xcodeproj: "Trinap.xcodeproj")
-	match(type: "development")
+	increment_build_number({
+		build_number: latest_testflight_build_number + 1
+	})
+
+	update_code_signing_settings(
+		use_automatic_signing: false
+ 	)
+  
+	match(type: "appstore")
     build_app(
 	  workspace: "Trinap.xcworkspace", 
 	  scheme: "Trinap",
