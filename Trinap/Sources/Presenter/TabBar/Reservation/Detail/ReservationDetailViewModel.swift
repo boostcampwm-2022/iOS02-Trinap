@@ -65,7 +65,7 @@ final class ReservationDetailViewModel: ViewModelType {
             .withUnretained(self)
             .bind(onNext: { owner, _ in
                 guard
-                    let userId = owner.reservation?.customerUser.userId,
+                    let userId = owner.reservation?.photographerUser.userId,
                     let lat = owner.reservation?.latitude,
                     let lng = owner.reservation?.longitude
                 else {
