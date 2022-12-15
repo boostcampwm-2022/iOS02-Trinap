@@ -203,6 +203,21 @@ private extension ChatDetailViewController {
             .subscribe()
             .disposed(by: disposeBag)
     }
+    
+    func presentReportAlert() {
+        let alert = UIAlertController(title: "신고", message: "해당 채팅을 신고하시겠습니까?", preferredStyle: .alert)
+            .appendingAction(title: "신고", style: .destructive) { [weak self] in self?.presentReportSuccess() }
+            .appendingAction(title: "취소", style: .cancel)
+        
+        self.present(alert, animated: true)
+    }
+    
+    func presentReportSuccess() {
+        let alert = UIAlertController(title: "신고가 접수되었습니다.", message: nil, preferredStyle: .alert)
+            .appendingAction(title: "확인")
+        
+        self.present(alert, animated: true)
+    }
 }
 
 // MARK: - Diffable DataSource
@@ -236,6 +251,9 @@ extension ChatDetailViewController {
                 guard var snapshot = self.dataSource?.snapshot() else { return }
                 snapshot.reloadItems([item])
             }
+            cell.reportTrigger
+                .bind(onNext: { [weak self] _ in self?.presentReportAlert() })
+                .disposed(by: cell.disposeBag)
             
             self.observeTapActionIfPossible(cell, disposedBy: item.chatId)
             

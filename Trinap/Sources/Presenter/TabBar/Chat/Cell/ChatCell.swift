@@ -9,6 +9,8 @@
 import UIKit
 
 import SnapKit
+import RxRelay
+import RxSwift
 
 class ChatCell: BaseTableViewCell {
     
@@ -25,6 +27,8 @@ class ChatCell: BaseTableViewCell {
         return chatContentView
     }()
     
+    let reportTrigger = PublishRelay<Void>()
+    
     // MARK: - Initializer
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -36,7 +40,8 @@ class ChatCell: BaseTableViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         
-        profileImageView.image = nil
+        self.disposeBag = DisposeBag()
+        self.profileImageView.image = nil
     }
     
     override func configureHierarchy() {
@@ -54,6 +59,13 @@ class ChatCell: BaseTableViewCell {
         }
         
         configureLayoutAsOther(hasMyChatBefore: false)
+    }
+    
+    override func configureAttributes() {
+        super.configureAttributes()
+        
+        let reportInteraction = UIContextMenuInteraction(delegate: self)
+        chatContentView.addInteraction(reportInteraction)
     }
     
     func configureCell(by chat: Chat, hasMyChatBefore: Bool, completion: (() -> Void)? = nil) {
@@ -109,5 +121,21 @@ private extension ChatCell {
         } else {
             return 8
         }
+    }
+}
+
+// MARK: - UIContextMenu Interaction Delegate
+extension ChatCell: UIContextMenuInteractionDelegate {
+    
+    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
+        let config = UIContextMenuConfiguration(actionProvider: { _ in
+            let reportAction = UIAction(title: "신고하기", attributes: .destructive) { [weak self] _ in
+                self?.reportTrigger.accept(())
+            }
+            
+            return UIMenu(children: [reportAction])
+        })
+        
+        return config
     }
 }

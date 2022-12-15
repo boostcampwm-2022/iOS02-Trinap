@@ -19,7 +19,7 @@ class BaseTableViewCell: UITableViewCell {
     
     weak var delegate: BaseTableViewCellDelegate?
     // MARK: - Properties
-    let disposeBag = DisposeBag()
+    var disposeBag = DisposeBag()
     
     // MARK: - Methods
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
