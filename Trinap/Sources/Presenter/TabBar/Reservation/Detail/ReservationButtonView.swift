@@ -64,7 +64,7 @@ final class ReservationButtonView: BaseView {
         }
         
         primaryButton.fill = fillType
-        primaryButton.style = style
+        primaryButton.style = .primary
         primaryButton.setTitle(title, for: .normal)
         primaryButton.isEnabled = (style != .disabled)
     }

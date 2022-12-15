@@ -48,11 +48,16 @@ final class PhotographerListViewModel: ViewModelType {
     func transform(input: Input) -> Output {
         input.viewWillAppear
             .withUnretained(self)
-            .flatMap { owner, _ in owner.fetchCurrentLocationUseCase.fetchCurrentLocation()
-            }
-            .bind(onNext: { coor, _ in
-                self.coordinate.accept(coor)
-            })
+            .flatMap { owner, _ in owner.fetchCurrentLocationUseCase.fetchCurrentLocation() }
+            .subscribe(
+                onNext: { [weak self] coor, _ in
+                    self?.coordinate.accept(coor)
+                },
+                onError: { [weak self] _ in
+                    self?.coordinator?.presentErrorAlert(message: "현재 위치를 가져올 수 없습니다. 잠시 후 다시 시도해주세요.")
+                    self?.coordinate.accept(.seoulCoordinate)
+                }
+            )
             .disposed(by: disposeBag)
         
         input.searchTrigger
@@ -78,7 +83,7 @@ final class PhotographerListViewModel: ViewModelType {
                 let (coordinate, type) = val
                 return owner.previewsUseCase.fetch(coordinate: coordinate, type: type)
             }
-            .asDriver(onErrorJustReturn: [])
+            .asDriver(onErrorPresentAlertTo: coordinator, andReturn: [])
         
         return Output(previews: previews)
     }

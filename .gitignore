@@ -6,6 +6,9 @@
 Signing/
 GoogleService-Info.plist
 
+# Private
+Private.swift
+
 # Fastlane
 *.cer
 *.mobileprovision

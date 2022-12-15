@@ -11,8 +11,14 @@ import Foundation
 enum FakeError: LocalizedError {
     
     case unknown
+    case errorAt(String)
     
     var errorDescription: String? {
-        return "Fake Error"
+        switch self {
+        case .unknown:
+            return "Fake Error"
+        case .errorAt(let function):
+            return "Error from \(function)"
+        }
     }
 }

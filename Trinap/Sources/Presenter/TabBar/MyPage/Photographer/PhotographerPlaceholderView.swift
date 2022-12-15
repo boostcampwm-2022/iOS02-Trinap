@@ -68,12 +68,12 @@ final class PhotographerPlaceholderView: BaseView {
             make.top.centerX.equalToSuperview()
         }
         
-        self.subTitleLabel.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.top.equalTo(titleLabel.snp.bottom).offset(trinapOffset)
-        }
-        
         if isEditable {
+            self.subTitleLabel.snp.makeConstraints { make in
+                make.centerX.equalToSuperview()
+                make.top.equalTo(titleLabel.snp.bottom).offset(trinapOffset)
+            }
+            
             self.applyButton.snp.makeConstraints { make in
                 make.leading.trailing.equalToSuperview().inset(trinapOffset * 11)
                 make.top.equalTo(subTitleLabel.snp.bottom).offset(trinapOffset)

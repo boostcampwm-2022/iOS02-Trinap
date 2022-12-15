@@ -47,9 +47,9 @@ final class SignInViewModel: ViewModelType {
             .flatMap { owner, credential in
                 owner.signInUseCase.signIn(with: credential)
             }
-            .subscribe(onNext: { [weak self] reuslt in
+            .subscribe(onNext: { [weak self] result in
                 guard let self else { return }
-                switch reuslt {
+                switch result {
                 case.signUp:
                     self.coordinator?.showCreateUserViewController()
                 case .signIn:
@@ -59,7 +59,7 @@ final class SignInViewModel: ViewModelType {
                         })
                         .disposed(by: self.disposeBag)
                 case .failure:
-                    Logger.print("Sign 실패")
+                    self.coordinator?.presentErrorAlert()
                 }
             })
             .disposed(by: disposeBag)
