@@ -11,6 +11,7 @@ import Foundation
 import RxSwift
 import RxRelay
 
+#if DEBUG
 final class FakeChatRepository: ChatRepository, FakeRepositoryType {
     
     // MARK: - Properties
@@ -120,3 +121,4 @@ extension Chat {
         )
     }
 }
+#endif

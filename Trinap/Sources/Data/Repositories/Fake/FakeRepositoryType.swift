@@ -21,7 +21,6 @@ enum FakeRepositoryEnvironment {
         return ProcessInfo.processInfo.environment["is_succeed_case"] == "true"
     }
 }
-#endif
 
 protocol FakeRepositoryType {
     
@@ -47,6 +46,7 @@ extension FakeRepositoryType {
         }
     }
 }
+#endif
 
 extension String {
     

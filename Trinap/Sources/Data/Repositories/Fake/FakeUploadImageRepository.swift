@@ -10,6 +10,7 @@ import Foundation
 
 import RxSwift
 
+#if DEBUG
 struct FakeUploadImageRepository: UploadImageRepository, FakeRepositoryType {
     
     // MARK: - Properties
@@ -25,3 +26,4 @@ struct FakeUploadImageRepository: UploadImageRepository, FakeRepositoryType {
         return execute(successValue: "https://user-images.githubusercontent.com/27603734/200277055-fd64e53e-9901-4e8b-893a-1c028264500e.png")
     }
 }
+#endif

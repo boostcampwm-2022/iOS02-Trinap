@@ -10,6 +10,7 @@ import Foundation
 
 import RxSwift
 
+#if DEBUG
 struct FakeReservationRepository: ReservationRepository, FakeRepositoryType {
     
     // MARK: - Properties
@@ -90,3 +91,4 @@ extension Reservation.Mapper {
         )
     }
 }
+#endif

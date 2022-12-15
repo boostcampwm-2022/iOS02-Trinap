@@ -10,6 +10,7 @@ import Foundation
 
 import RxSwift
 
+#if DEBUG
 struct FakeUserRepository: UserRepository, FakeRepositoryType {
     // MARK: - Properties
     var isSucceedCase: Bool
@@ -120,3 +121,4 @@ extension Contact {
         )
     }
 }
+#endif

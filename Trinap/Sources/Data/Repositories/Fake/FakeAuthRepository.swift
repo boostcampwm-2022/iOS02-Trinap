@@ -11,6 +11,7 @@ import Foundation
 import FirebaseAuth
 import RxSwift
 
+#if DEBUG
 struct FakeAuthRepository: AuthRepository, FakeRepositoryType {
     
     // MARK: - Properties
@@ -62,3 +63,4 @@ struct FakeAuthRepository: AuthRepository, FakeRepositoryType {
         return execute(successValue: ())
     }
 }
+#endif
