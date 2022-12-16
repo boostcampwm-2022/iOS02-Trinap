@@ -26,7 +26,7 @@ extension ChatPreview: Hashable {
         return ChatPreview(
             chatroomId: UUID().uuidString,
             profileImage: nil,
-            nickname: "",
+            nickname: "오류",
             chatType: .text,
             content: "오류가 발생했습니다.",
             date: Date(),

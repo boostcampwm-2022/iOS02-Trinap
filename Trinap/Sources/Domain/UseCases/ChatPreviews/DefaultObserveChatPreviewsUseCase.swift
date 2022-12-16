@@ -29,6 +29,8 @@ final class DefaultObserveChatPreviewsUseCase: ObserveChatPreviewsUseCase {
         return chatroomRepository.observe()
             .withUnretained(self)
             .flatMap { owner, chatrooms -> Observable<[ChatPreview]> in
+                let chatrooms = chatrooms.filter { $0.status == .activate }
+                
                 let customerUserIds = chatrooms.map { $0.customerUserId }
                 let photographerUserIds = chatrooms.map { $0.photographerUserId }
                 

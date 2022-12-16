@@ -86,6 +86,10 @@ final class DefaultChatroomRepository: ChatroomRepository {
         
         return self.create(customerUserId: userId, photographerUserId: photographerUserId)
     }
+    
+    func leave(chatroomId: String) -> Single<Void> {
+        return firebaseStoreService.deleteChatroom(document: chatroomId)
+    }
 }
 
 private extension DefaultChatroomRepository {

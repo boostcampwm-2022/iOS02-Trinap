@@ -16,4 +16,5 @@ protocol ChatroomRepository {
     func updateDate(chatroomId: String) -> Observable<Void>
     func create(customerUserId: String, photographerUserId: String) -> Observable<String>
     func create(photographerUserId: String) -> Observable<String>
+    func leave(chatroomId: String) -> Single<Void>
 }
