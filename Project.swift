@@ -108,7 +108,10 @@ class BaseProjectFactory: ProjectFactory {
                 sources: ["\(projectName)/Sources/**"],
                 resources: "\(projectName)/Resources/**",
                 entitlements: "\(projectName).entitlements",
-                scripts: [.pre(path: "Scripts/SwiftLintRunScript.sh", arguments: [], name: "SwiftLint")],
+                scripts: [
+                    .pre(path: "Scripts/SwiftLintRunScript.sh", arguments: [], name: "SwiftLint"),
+                    .pre(path: "Scripts/UpdatePackageRunScript.sh", arguments: [], name: "OpenSource")
+                ],
                 dependencies: dependencies,
                 environment: [
                     "use_fake_repository": "false",
