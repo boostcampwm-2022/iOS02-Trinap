@@ -4,8 +4,8 @@ storage_mode("git")
 
 type("appstore") # The default type, can be: appstore, adhoc, enterprise or development
 
-# app_identifier("com.tnzkm.Trinap")
-# username("yy0867") # Your Apple Developer Portal username
+app_identifier("com.tnzkm.Trinap")
+# username("yy0867@gmail.com") # Your Apple Developer Portal username
 
 # For all available options run `fastlane match --help`
 # Remove the # in the beginning of the line to enable the other options
