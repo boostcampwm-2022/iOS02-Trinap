@@ -13,4 +13,5 @@ enum URLConstants {
     static let notificationAuthorization = "app-settings:root=NOTIFICATIONS_ID"
     static let photoAuthorization = "app-settings:root=Photos"
     static let locationAuthorization = "app-settings:root=LOCATION_SERVICES"
+    static let placeholderImage = "https://user-images.githubusercontent.com/27603734/208003346-efa615b9-7ef4-4462-b7ea-91b53a5730ab.png"
 }

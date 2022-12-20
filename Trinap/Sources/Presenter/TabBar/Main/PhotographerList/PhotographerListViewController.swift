@@ -30,7 +30,6 @@ final class PhotographerListViewController: BaseViewController {
     }
         
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout).than {
-        $0.allowsSelection = false
         $0.register(PhotographerPreviewCell.self)
         $0.backgroundColor = TrinapAsset.white.color
     }
@@ -121,6 +120,15 @@ final class PhotographerListViewController: BaseViewController {
                 self?.dataSource?.apply(snapshot, animatingDifferences: false)
             })
             .disposed(by: disposeBag)
+        
+        collectionView.rx.itemSelected
+            .compactMap { [weak self] indexPath in
+                return self?.dataSource?.itemIdentifier(for: indexPath)
+            }
+            .bind(onNext: { [weak self] preview in
+                self?.viewModel.showDetailPhotographer(userId: preview.photographerUserId)
+            })
+            .disposed(by: disposeBag)
     }
 }
 
@@ -144,12 +152,8 @@ extension PhotographerListViewController {
             else { return UICollectionViewCell() }
             
             cell.configureCell(itemIdentifier)
-            
-            cell.rx.tapGesture()
-                .asObservable()
-                .when(.recognized)
-                .throttle(.seconds(1), scheduler: MainScheduler.instance)
-                .subscribe(onNext: { [weak self] _ in
+            cell.thumbnailCollectionViewDidTap
+                .bind(onNext: { [weak self] _ in
                     self?.viewModel.showDetailPhotographer(userId: itemIdentifier.photographerUserId)
                 })
                 .disposed(by: cell.disposeBag)

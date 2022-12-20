@@ -83,6 +83,7 @@ final class EditPhotographerViewController: BaseViewController {
     override func bind() {
         
         self.isEditable
+            .filter { !$0 }
             .map { _ in [] }
             .bind(to: selectedPicture)
             .disposed(by: disposeBag)
@@ -95,6 +96,9 @@ final class EditPhotographerViewController: BaseViewController {
                     .pickImage()
                     .compactMap { $0.jpegData(compressionQuality: 0.7) }
             }
+            .do(onNext: { [weak self] _ in
+                self?.showFullSizeIndicator()
+            })
             .share()
         
         placeholderView.applyButton.rx.tap
@@ -142,16 +146,28 @@ final class EditPhotographerViewController: BaseViewController {
                 }
             })
             .disposed(by: disposeBag)
+        
         self.tabState
             .bind(to: placeholderView.rx.setState)
             .disposed(by: disposeBag)
         
+        self.isEditable
+            .withUnretained(self)
+            .bind(onNext: { owner, isEditable in
+                owner.collectionView.setCollectionViewLayout(
+                    owner.configureCollectionViewLayout(.portfolio, isEditable: isEditable),
+                    animated: false
+                )
+            })
+            .disposed(by: disposeBag)
+        
         output.dataSource
-            .compactMap { dataSource in
-                self.generateSnapShot(dataSource)
+            .compactMap { [weak self] dataSource in
+                self?.generateSnapShot(dataSource)
             }
-            .drive { snapshot in
-                self.dataSource?.apply(snapshot, animatingDifferences: false)
+            .drive { [weak self] snapshot in
+                self?.hideFullSizeIndicator()
+                self?.dataSource?.apply(snapshot, animatingDifferences: false)
             }
             .disposed(by: disposeBag)
         
@@ -315,12 +331,13 @@ extension EditPhotographerViewController {
                 guard let header = collectionView.dequeResuableView(EditPhotographerPhotoDeleteHeaderView.self, for: indexPath) else {
                     return UICollectionReusableView()
                 }
+                
                 header.containerView.rx.tapGesture()
                     .when(.recognized)
-                    .asObservable()
-                    .map { _ in }
-                    .bind(to: self.deleteTrigger)
-                    .disposed(by: header.disposeBag)
+                    .bind(onNext: { _ in
+                        self.presentDeleteAlert()
+                    })
+                    .disposed(by: self.disposeBag)
                 
                 self.selectedPicture
                     .map { $0.count }
@@ -339,5 +356,13 @@ extension EditPhotographerViewController {
         return UICollectionViewCompositionalLayout { index, _ -> NSCollectionLayoutSection? in
             return section.createLayout(index: index, isEditable: isEditable)
         }
+    }
+    
+    private func presentDeleteAlert() {
+        let alert = UIAlertController(title: nil, message: "사진을 삭제할까요?", preferredStyle: .alert)
+            .appendingAction(title: "확인", style: .destructive) { [weak self] in self?.deleteTrigger.onNext(()) }
+            .appendingAction(title: "취소", style: .cancel)
+        
+        self.present(alert, animated: true)
     }
 }

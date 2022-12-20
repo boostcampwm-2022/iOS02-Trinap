@@ -48,7 +48,7 @@ final class EditPhotographerPhotoDeleteHeaderView: BaseCollectionReusableView {
     
     override func configureConstraints() {
         containerView.snp.makeConstraints { make in
-            make.edges.equalToSuperview().inset(trinapOffset * 2)
+            make.edges.equalToSuperview()
         }
         
         countLabel.snp.makeConstraints { make in

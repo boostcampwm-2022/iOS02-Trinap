@@ -49,12 +49,10 @@ enum PhotographerLayout: Int, CaseIterable {
     
     /// 사진 수정모드
     private func generatePhotoLayout(isEditable: Bool) -> NSCollectionLayoutSection {
-        let inset = trinapOffset / 2
-        
         let item = CompositionalLayout.createItem(
             width: .fractionalWidth(1.0),
             height: .fractionalHeight(1.0),
-            inset: NSDirectionalEdgeInsets(top: inset, leading: inset, bottom: inset, trailing: inset)
+            inset: NSDirectionalEdgeInsets(top: 2, leading: 2, bottom: 2, trailing: 2)
         )
         
         let group = CompositionalLayout.createGroup(
@@ -69,12 +67,12 @@ enum PhotographerLayout: Int, CaseIterable {
         
         let header = CompositionalLayout.createBoundarySupplementaryItem(
             width: .fractionalWidth(1.0),
-            height: .absolute(trinapOffset * 8),
+            height: .absolute(32),
             kind: isEditable ? EditPhotographerPhotoDeleteHeaderView.reuseIdentifier : EditPhotographerPhotoHeaderView.reuseIdentifier,
             alignment: .top)
         
         section.boundarySupplementaryItems = [header]
-        section.contentInsets = NSDirectionalEdgeInsets(top: inset, leading: 0, bottom: 0, trailing: inset)
+        section.contentInsets = NSDirectionalEdgeInsets(top: 16, leading: 6, bottom: 0, trailing: 6)
         return section
     }
     
@@ -91,13 +89,12 @@ enum PhotographerLayout: Int, CaseIterable {
             heightDimension: .fractionalWidth(1 / 3)
         )
         
-        let inset = trinapOffset / 2
-        item.contentInsets = NSDirectionalEdgeInsets(top: inset, leading: inset, bottom: inset, trailing: inset)
+        item.contentInsets = NSDirectionalEdgeInsets(top: 2, leading: 2, bottom: 2, trailing: 2)
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitem: item, count: 3)
         
         let section = NSCollectionLayoutSection(group: group)
         
-        section.contentInsets = NSDirectionalEdgeInsets(top: inset, leading: 0, bottom: 0, trailing: inset)
+        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 6, bottom: 0, trailing: 6)
         return section
     }
     
@@ -114,7 +111,7 @@ enum PhotographerLayout: Int, CaseIterable {
 
         let offset = trinapOffset * 2
         let section = NSCollectionLayoutSection(group: group)
-        section.contentInsets = NSDirectionalEdgeInsets(top: offset, leading: offset, bottom: offset, trailing: offset)
+        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)
         return section
     }
     
@@ -130,13 +127,7 @@ enum PhotographerLayout: Int, CaseIterable {
 
         let section = NSCollectionLayoutSection(group: group)
         
-        let offset = trinapOffset * 2
-        section.contentInsets = NSDirectionalEdgeInsets(
-            top: offset,
-            leading: offset,
-            bottom: offset,
-            trailing: offset
-        )
+        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 16, trailing: 16)
         
         return section
     }
@@ -154,14 +145,8 @@ enum PhotographerLayout: Int, CaseIterable {
         
         let section = NSCollectionLayoutSection(group: group)
         
-        let offset = trinapOffset * 2
-        section.contentInsets = NSDirectionalEdgeInsets(
-            top: offset,
-            leading: offset,
-            bottom: offset,
-            trailing: offset
-        )
-        
+        section.interGroupSpacing = 32
+        section.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 16, bottom: 0, trailing: 16)
         return section
     }
 }

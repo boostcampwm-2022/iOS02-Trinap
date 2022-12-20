@@ -18,7 +18,9 @@ final class DropOutViewModel: ViewModelType {
         let backButtonTap: Signal<Void>
     }
     
-    struct Output { }
+    struct Output {
+        let droppedOut: Observable<Void>
+    }
     
     // MARK: - Properties
     weak var coordinator: MyPageCoordinator?
@@ -44,20 +46,19 @@ final class DropOutViewModel: ViewModelType {
             })
             .disposed(by: disposeBag)
         
-        input.dropOutButtonTap
+        let droppedOut = input.dropOutButtonTap
             .withUnretained(self)
             .flatMap { owner, _ in
                 return owner.dropOutUseCase.dropOut()
             }
-            .withUnretained(self)
-            .subscribe(onNext: { owner, isDropOut in
+            .do(onNext: { [weak self] isDropOut in
                 if isDropOut {
-                    owner.coordinator?.finish()
+                    self?.coordinator?.finish()
                 } else {
                     Logger.print(isDropOut)
                 }
             })
-            .disposed(by: disposeBag)
+            .map { _ in return }
         
         input.backButtonTap
             .emit(onNext: { [weak self] _ in
@@ -65,6 +66,6 @@ final class DropOutViewModel: ViewModelType {
             })
             .disposed(by: disposeBag)
         
-        return Output()
+        return Output(droppedOut: droppedOut)
     }
 }

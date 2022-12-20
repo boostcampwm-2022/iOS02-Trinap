@@ -172,11 +172,15 @@ private extension ChatDetailViewController {
         
         guard let imageData = downsampledImage.image.jpegData(compressionQuality: 1) else { return }
         
+        self.showFullSizeIndicator()
         self.viewModel.uploadImageAndSendChat(
             imageData,
             width: downsampledImage.size.width,
             height: downsampledImage.size.height
         )
+        .do(onNext: { [weak self] _ in
+            self?.hideFullSizeIndicator()
+        })
         .subscribe()
         .disposed(by: disposeBag)
     }

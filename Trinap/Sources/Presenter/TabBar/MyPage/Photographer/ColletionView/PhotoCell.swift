@@ -17,7 +17,8 @@ final class PhotoCell: BaseCollectionViewCell {
     }()
     
     private lazy var imageView = UIImageView().than {
-        $0.tintColor = TrinapAsset.white.color
+        $0.tintColor = TrinapAsset.black.color
+        $0.contentMode = .scaleAspectFill
     }
     
     private lazy var editButton = UIImageView().than {

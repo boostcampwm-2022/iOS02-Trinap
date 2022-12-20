@@ -26,7 +26,7 @@ final class EditPhotographerPhotoHeaderView: BaseCollectionReusableView {
     
     override func configureConstraints() {
         editButton.snp.makeConstraints { make in
-            make.edges.equalToSuperview().inset(trinapOffset * 2)
+            make.edges.equalToSuperview()
         }
     }
     
