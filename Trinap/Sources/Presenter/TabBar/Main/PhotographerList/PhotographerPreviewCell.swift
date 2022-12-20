@@ -42,11 +42,17 @@ final class PhotographerPreviewCell: BaseCollectionViewCell {
     }
     
     // MARK: Properties
+    var thumbnailCollectionViewDidTap: ControlEvent<IndexPath> {
+        return thumbnailImageView.thumbnailDidTap
+    }
     
     // MARK: Methods
     override func prepareForReuse() {
         super.prepareForReuse()
         
+        nicknameLabel.text = ""
+        ratingLabel.configure(rating: 0.0)
+        thumbnailImageView.configure(urlStrings: [])
         self.disposeBag = DisposeBag()
     }
     
