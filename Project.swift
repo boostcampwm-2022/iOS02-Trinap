@@ -76,10 +76,10 @@ class BaseProjectFactory: ProjectFactory {
                 ]
             ]
         ],
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "위치 확인을 위한 권한이 필요합니다.",
-        "NSLocationWhenInUseUsageDescription": "위치 확인을 위한 권한이 필요합니다",
-        "NSCameraUsageDescription": "카메라 권한이 필요합니다",
-        "NSPhotoLibraryUsageDescription": "앨범 권한이 필요합니다.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "작가 검색 및 위치 공유를 위해 위치 확인 권한이 필요합니다.",
+        "NSLocationWhenInUseUsageDescription": "작가 검색 및 위치 공유를 위해 위치 확인 권한이 필요합니다.",
+        "NSCameraUsageDescription": "포트폴리오 촬영을 위해 카메라 권한이 필요합니다.",
+        "NSPhotoLibraryUsageDescription": "포트폴리오 및 채팅으로 이미지 공유를 위해 앨범 접근 권한이 필요합니다.",
         "CFBundleURLTypes" : ["App-prefs"],
         "UIAppFonts": [
             "Item 0": "Pretendard-Medium.otf",
