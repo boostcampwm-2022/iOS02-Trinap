@@ -76,12 +76,6 @@ extension QueenfisherWrapper where Base: QFImageView {
         indicator?.removeFromSuperview()
     }
     
-//    private func imageCache(policy: ImageCache.Policy?) -> ImageCacheProtocol {
-//        guard let policy else { return NoImageCache() }
-//
-//        return ImageCache.policy(policy)
-//    }
-    
     private func imageCache(performance: ConfigType) -> ImageCacheProtocol {
         return ImageCache.instance(performance: performance)
     }

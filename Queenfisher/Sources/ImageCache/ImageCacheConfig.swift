@@ -11,7 +11,6 @@ import Foundation
 public struct Config {
     var totalCostLimit: Int =  150 * 1024 * 1024 // 메모리 캐시 최대 용량.
     var countLimit: Int = 50 // 메모리 캐시 최대 적재 개수.
-//        var imageCostLimit: Int = 30 * 1024 * 1024 // 하나의 이미지 최대 용량.
 }
 
 public enum ConfigType {
