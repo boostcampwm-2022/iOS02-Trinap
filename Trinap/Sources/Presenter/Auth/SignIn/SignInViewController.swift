@@ -88,16 +88,14 @@ final class SignInViewController: BaseViewController {
                 ASAuthorizationAppleIDProvider().rx.login(scope: [.email])
             }
             .withUnretained(self)
-            .map { owner, authorization in
+            .compactMap { owner, authorization in
                 return owner.generateOAuthCredential(authorization: authorization)
             }
-            .compactMap { $0 }
         
         let input = SignInViewModel.Input(
             credential: credential
         )
         let output = viewModel.transform(input: input)
-        
         
         privacyPolicyButton.rx.tap
             .bind(onNext: { [weak self] _ in
