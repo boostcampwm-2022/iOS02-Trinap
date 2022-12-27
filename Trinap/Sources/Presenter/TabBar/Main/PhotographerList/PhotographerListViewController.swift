@@ -125,10 +125,7 @@ final class PhotographerListViewController: BaseViewController {
             })
             .disposed(by: disposeBag)
         
-        collectionView.rx.itemSelected
-            .compactMap { [weak self] indexPath in
-                return self?.dataSource?.itemIdentifier(for: indexPath)
-            }
+        collectionView.rx.itemSelected(at: dataSource)
             .bind(onNext: { [weak self] preview in
                 self?.viewModel.showDetailPhotographer(userId: preview.photographerUserId)
             })
