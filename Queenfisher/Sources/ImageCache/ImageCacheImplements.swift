@@ -22,8 +22,7 @@ public final class DefaultImageCache: ImageCacheProtocol {
         totalCostLimit: Int,
         countLimit: Int
     ) {
-        memoryCache.countLimit = countLimit
-        memoryCache.totalCostLimit = totalCostLimit
+        self.config(totalCostLimit: totalCostLimit, countLimit: countLimit)
     }
     
     // MARK: - Methods
@@ -44,6 +43,14 @@ public final class DefaultImageCache: ImageCacheProtocol {
                 completion(fetchedData)
             })
         }
+    }
+    
+    func config(
+        totalCostLimit: Int,
+        countLimit: Int
+    ) {
+        memoryCache.countLimit = countLimit
+        memoryCache.totalCostLimit = totalCostLimit
     }
 
     private func key(for url: URL) -> NSString {
