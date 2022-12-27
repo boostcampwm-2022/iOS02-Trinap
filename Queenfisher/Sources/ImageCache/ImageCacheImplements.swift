@@ -8,26 +8,41 @@
 
 import Foundation
 
-public final class MemoryImageCache: ImageCacheProtocol {
+public final class DefaultImageCache: ImageCacheProtocol {
     
     // MARK: - Properties
-    private let cache = NSCache<NSString, NSData>()
+    private let memoryCache = NSCache<NSString, NSData>()
+    
+    private let diskCache = DiskImageCache()
+//    여기서 imageData 하나의 크기까지 지정해주려고 했는데 data 자체의 크기는 크지 않고, image로 바꾸는 연산이 들어가야하므로 빼기로 결정했습니다.
+//    private let imageCostLimit: Int
+    
+    // MARK: Initializers
+    init(
+        totalCostLimit: Int,
+        countLimit: Int
+    ) {
+        memoryCache.countLimit = countLimit
+        memoryCache.totalCostLimit = totalCostLimit
+    }
     
     // MARK: - Methods
     public func fetch(at url: URL, completion: @escaping (QFData?) -> Void) {
         let key = key(for: url)
-
-        if let data = cache.object(forKey: key) {
+        
+        if let data = memoryCache.object(forKey: key) {
             completion(data as QFData)
-        } else {
-            fetchImage(at: url) { [weak self] fetchedData in
+        }
+        else {
+            diskCache.fetch(at: url, completion: { [weak self] fetchedData in
                 guard let self, let fetchedData else {
                     completion(nil)
                     return
                 }
-                self.cache.setObject(fetchedData as NSData, forKey: key)
+                self.memoryCache.setObject(fetchedData as NSData, forKey: key) // memoryCache에 저장
+                
                 completion(fetchedData)
-            }
+            })
         }
     }
 
@@ -60,11 +75,22 @@ public final class DiskImageCache: ImageCacheProtocol {
                         completion(nil)
                         return
                     }
+                    self.write(item: fetchedData, at: url) // 받아온 값을 diskCache에 저장
                     
                     try? fetchedData.write(to: localPath)
                     completion(fetchedData)
                 }
             }
+        }
+    }
+    
+    public func write(item: QFData, at url: URL) {
+        DispatchQueue.global().async { [weak self] in
+            guard let self = self else { return }
+            
+            let localPath = self.path(for: url)
+            
+            try? item.write(to: localPath)
         }
     }
     
