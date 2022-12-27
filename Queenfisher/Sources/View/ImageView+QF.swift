@@ -14,7 +14,7 @@ extension QueenfisherWrapper where Base: QFImageView {
         at url: URL?,
         placeholder: QFImage? = nil,
         indicator: QFIndicator? = QFIndicator(),
-        cachePolicy: ImageCache.Policy? = .memory,
+        performance: ConfigType = .normal,
         downsampling: Bool = true,
         targetSize: CGSize? = nil,
         scale: CGFloat = 1.5,
@@ -26,7 +26,8 @@ extension QueenfisherWrapper where Base: QFImageView {
         }
         
         startIndicator(indicator)
-        let maybeCache = imageCache(policy: cachePolicy)
+        
+        let maybeCache = imageCache(performance: performance)
         
         maybeCache.fetch(at: url) { data in
             DispatchQueue.main.async {
@@ -75,10 +76,14 @@ extension QueenfisherWrapper where Base: QFImageView {
         indicator?.removeFromSuperview()
     }
     
-    private func imageCache(policy: ImageCache.Policy?) -> ImageCacheProtocol {
-        guard let policy else { return NoImageCache() }
-        
-        return ImageCache.policy(policy)
+//    private func imageCache(policy: ImageCache.Policy?) -> ImageCacheProtocol {
+//        guard let policy else { return NoImageCache() }
+//
+//        return ImageCache.policy(policy)
+//    }
+    
+    private func imageCache(performance: ConfigType) -> ImageCacheProtocol {
+        return ImageCache.instance(performance: performance)
     }
 }
 
