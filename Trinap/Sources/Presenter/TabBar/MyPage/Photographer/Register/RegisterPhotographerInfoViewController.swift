@@ -310,22 +310,16 @@ extension RegisterPhotographerInfoViewController {
     }
     
     private func collectionViewBinding() {        
-        tagCollectionView.rx.itemSelected
-            .withUnretained(self)
-            .compactMap { owner, indexPath in
-                return owner.dataSource?.itemIdentifier(for: indexPath)?.tag
-            }
+        tagCollectionView.rx.itemSelected(at: dataSource)
+            .map(\.tag)
             .withUnretained(self)
             .subscribe(onNext: { owner, tag in
                 owner.selectedTags.accept(owner.selectedTags.value + [tag])
             })
             .disposed(by: disposeBag)
 
-        tagCollectionView.rx.itemDeselected
-            .withUnretained(self)
-            .compactMap { owner, indexPath in
-                return owner.dataSource?.itemIdentifier(for: indexPath)?.tag
-            }
+        tagCollectionView.rx.itemDeselected(at: dataSource)
+            .map(\.tag)
             .withUnretained(self)
             .subscribe(onNext: { owner, tag in
                 let removedValue = owner.selectedTags.value.filter { $0 != tag }

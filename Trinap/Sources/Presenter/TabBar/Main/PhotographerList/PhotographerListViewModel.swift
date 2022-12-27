@@ -13,8 +13,8 @@ import RxSwift
 final class PhotographerListViewModel: ViewModelType {
     
     struct Input {
-        let viewWillAppear: Observable<Bool>
         let searchTrigger: Observable<Void>
+        let refresh: Observable<Void>
         var tagType: Observable<TagType>
     }
 
@@ -46,9 +46,7 @@ final class PhotographerListViewModel: ViewModelType {
 
     // MARK: - Methods
     func transform(input: Input) -> Output {
-        input.viewWillAppear
-            .withUnretained(self)
-            .flatMap { owner, _ in owner.fetchCurrentLocationUseCase.fetchCurrentLocation() }
+        fetchCurrentLocationUseCase.fetchCurrentLocation()
             .subscribe(
                 onNext: { [weak self] coor, _ in
                     self?.coordinate.accept(coor)
@@ -76,11 +74,12 @@ final class PhotographerListViewModel: ViewModelType {
         
         let previews = Observable.combineLatest(
             self.coordinate.skip(1),
-            input.tagType.startWith(.all)
+            input.tagType.startWith(.all),
+            input.refresh.startWith(())
         )
             .withUnretained(self)
             .flatMap { owner, val -> Observable<[PhotographerPreview]> in
-                let (coordinate, type) = val
+                let (coordinate, type, _) = val
                 return owner.previewsUseCase.fetch(coordinate: coordinate, type: type)
             }
             .asDriver(onErrorPresentAlertTo: coordinator, andReturn: [])

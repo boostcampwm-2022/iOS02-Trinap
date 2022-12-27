@@ -42,6 +42,7 @@ class BaseProjectFactory: ProjectFactory {
         .target(name: "Queenfisher"),
         .target(name: "FirestoreService"),
         .target(name: "Than"),
+        .target(name: "LocationCache"),
     ]
     
     let testDependencies: [TargetDependency] = [
@@ -152,6 +153,15 @@ class BaseProjectFactory: ProjectFactory {
                 bundleId: "com.tnzkm.\(projectName).Than",
                 infoPlist: .default,
                 sources: ["Than/Sources/**"],
+                dependencies: []
+            ),
+            Target(
+                name: "LocationCache",
+                platform: .iOS,
+                product: .framework,
+                bundleId: "com.tnzkm.\(projectName).LocationCache",
+                infoPlist: .default,
+                sources: ["LocationCache/Sources/**"],
                 dependencies: []
             )
         ]

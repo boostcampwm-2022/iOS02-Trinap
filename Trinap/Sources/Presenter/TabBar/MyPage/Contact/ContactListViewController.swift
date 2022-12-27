@@ -74,9 +74,7 @@ final class ContactListViewController: BaseViewController {
     override func bind() {
         let input = ContactListViewModel.Input(
             viewWillAppear: self.rx.viewWillAppear.map { _ in }.asObservable(),
-            cellDidSelect: tableView.rx.itemSelected
-                .compactMap { self.dataSource?.itemIdentifier(for: $0)?.contactId }
-                .asObservable(),
+            cellDidSelect: tableView.rx.itemSelected(at: dataSource).map(\.contactId),
             addContactTap: self.addButton.rx.tap.asSignal(),
             backButtonTap: self.navigationBarView.backButton.rx.tap.asSignal()
         )

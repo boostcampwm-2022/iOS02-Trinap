@@ -89,12 +89,7 @@ final class SearchViewController: BaseViewController {
             .bind(to: searchBar.textField.rx.text)
             .disposed(by: disposeBag)
         
-        let selectedSpace = searchTableView.rx.itemSelected
-            .asObservable()
-            .map { [weak self] index -> Space? in
-                self?.dataSource?.itemIdentifier(for: index)
-            }
-            .compactMap { $0 }
+        let selectedSpace = searchTableView.rx.itemSelected(at: dataSource)
 
         selectedSpace
             .map { $0.name }
