@@ -11,6 +11,7 @@ import Foundation
 
 import RxSwift
 import RxRelay
+import LocationCache
 
 final class DefaultMapRepository: NSObject, MapRepository {
 
@@ -51,18 +52,20 @@ final class DefaultMapRepository: NSObject, MapRepository {
 
     func fetchLocationName(using coordinate: Coordinate) -> Observable<String> {
   
-        return Observable.create { observable in
+        return Observable.create { observer in
             let location = CLLocation(latitude: coordinate.lat, longitude: coordinate.lng)
-            let geocoder = CLGeocoder()
             
-            geocoder.reverseGeocodeLocation(location, preferredLocale: .current) { placemarks, _ in
-                guard let placemark = placemarks?.first else {
-                    observable.onNext("위치 정보를 가져올 수 없습니다.")
+            CLGeocoder().useCache.reverseGeocodeLocation(location, preferredLocale: .current) { address, error in
+                if let error {
+                    observer.onNext(error.localizedDescription)
+                    observer.onCompleted()
                     return
                 }
                 
-                observable.onNext(placemark.address)
+                observer.onNext(address)
+                observer.onCompleted()
             }
+            
             return Disposables.create()
         }
     }
@@ -119,25 +122,5 @@ extension DefaultMapRepository: MKLocalSearchCompleterDelegate {
     
     func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
         print(error)
-    }
-}
-
-extension CLPlacemark {
-    
-    var address: String {
-        return fullLocationAddress
-    }
-    
-    var fullLocationAddress: String {
-        var placemarkData: [String] = []
-        
-        if let stateArea = subAdministrativeArea?.localizedCapitalized { placemarkData.append(stateArea) }
-        if let state = administrativeArea?.localizedCapitalized { placemarkData.append(state) }
-        if let city = locality?.localizedCapitalized { placemarkData.append(city) }
-        if let subCity = subLocality?.localizedCapitalized { placemarkData.append(subCity) }
-        if let street = thoroughfare?.localizedCapitalized { placemarkData.append(street) }
-        
-        placemarkData.removeDuplicates()
-        return placemarkData.joined(separator: " ")
     }
 }
