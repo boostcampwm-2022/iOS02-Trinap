@@ -102,19 +102,15 @@ final class ReservationPreviewListViewController: BaseViewController {
             })
             .disposed(by: disposeBag)
         
-        reservationListTableView.rx.itemSelected
-            .bind(onNext: { [weak self] indexPath in
-                self?.showReservationDetailViewController(at: indexPath)
+        reservationListTableView.rx.itemSelected(at: dataSource)
+            .bind(onNext: { [weak self] preview in
+                self?.showReservationDetailViewController(preview)
             })
             .disposed(by: disposeBag)
-        
-        
     }
     
-    private func showReservationDetailViewController(at indexPath: IndexPath) {
-        guard let reservationPreview = self.dataSource?.itemIdentifier(for: indexPath) else { return }
-        
-        viewModel.presentReservationDetail(reservationId: reservationPreview.reservationId)
+    private func showReservationDetailViewController(_ preview: Reservation.Preview) {
+        viewModel.presentReservationDetail(reservationId: preview.reservationId)
     }
 }
 
