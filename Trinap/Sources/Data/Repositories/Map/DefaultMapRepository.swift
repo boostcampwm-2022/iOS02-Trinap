@@ -52,27 +52,16 @@ final class DefaultMapRepository: NSObject, MapRepository {
     func fetchLocationName(using coordinate: Coordinate) -> Observable<String> {
   
         return Observable.create { observable in
-            let seoulCoor = Coordinate.seoulCoordinate
-
-            if coordinate.lat == seoulCoor.lat && coordinate.lng == seoulCoor.lng {
-                observable.onNext("서울시")
-                return Disposables.create()
-            }
-            
             let location = CLLocation(latitude: coordinate.lat, longitude: coordinate.lng)
             let geocoder = CLGeocoder()
             
             geocoder.reverseGeocodeLocation(location, preferredLocale: .current) { placemarks, _ in
-                guard let address = placemarks else {
-//                    observable.onNext("위도: \(coordinate.lat), 경도: \(coordinate.lng)")
-                    observable.onNext("알수없음")
+                guard let placemark = placemarks?.first else {
+                    observable.onNext("위치 정보를 가져올 수 없습니다.")
                     return
                 }
                 
-                let locality = address.first?.locality ?? ""
-                let subLocality = address.first?.subLocality ?? ""
-                
-                observable.onNext("\(locality) \(subLocality)")
+                observable.onNext(placemark.address)
             }
             return Disposables.create()
         }
@@ -133,18 +122,11 @@ extension DefaultMapRepository: MKLocalSearchCompleterDelegate {
     }
 }
 
-extension MKMapItem {
-    
-    var fullName: String {
-        guard let name = name, !placemark.fullLocationAddress.contains(name) else {
-            return placemark.fullLocationAddress
-        }
-        return (name + ", ") + placemark.fullLocationAddress
-    }
-    
-}
-
 extension CLPlacemark {
+    
+    var address: String {
+        return fullLocationAddress
+    }
     
     var fullLocationAddress: String {
         var placemarkData: [String] = []
@@ -153,17 +135,9 @@ extension CLPlacemark {
         if let state = administrativeArea?.localizedCapitalized { placemarkData.append(state) }
         if let city = locality?.localizedCapitalized { placemarkData.append(city) }
         if let subCity = subLocality?.localizedCapitalized { placemarkData.append(subCity) }
-        if let building = subThoroughfare?.localizedCapitalized { placemarkData.append(building)}
         if let street = thoroughfare?.localizedCapitalized { placemarkData.append(street) }
-        if let area = areasOfInterest?.first { placemarkData.append(area.localizedCapitalized) }
-//        if let county = country?.localizedCapitalized { placemarkData.append(county) }
+        
         placemarkData.removeDuplicates()
-//        placemarkData = [placemarkData[0], placemarkData[1]]
-        var result = ""
-        
-        placemarkData.forEach { result.append($0 + " ") }
-        result.removeLast() // remove last comma
-        
-        return result
+        return placemarkData.joined(separator: " ")
     }
 }
