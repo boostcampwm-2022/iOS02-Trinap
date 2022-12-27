@@ -13,7 +13,7 @@ import RxCocoa
 class ASAuthorizationControllerProxy: DelegateProxy<ASAuthorizationController, ASAuthorizationControllerDelegate>, DelegateProxyType {
     
     // MARK: - Properties
-    var presentationWindow = UIWindow()
+    private var presentationWindow = UIWindow()
     internal lazy var didComplete = PublishSubject<ASAuthorization>()
     
     

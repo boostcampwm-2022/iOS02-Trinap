@@ -105,13 +105,6 @@ final class SignInViewController: BaseViewController {
     }
 }
 
-// MARK: - ASAuthorizationControllerPresentationContextProviding
-extension SignInViewController: ASAuthorizationControllerPresentationContextProviding {
-    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
-        return self.view.window ?? ASPresentationAnchor()
-    }
-}
-
 // MARK: - private Function
 private extension SignInViewController {
     
