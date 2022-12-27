@@ -18,9 +18,7 @@ final class ThumbnailCollectionViewCell: BaseCollectionViewCell {
     private lazy var imageView = UIImageView().than {
         $0.contentMode = .scaleAspectFill
     }
-    
-    // MARK: Properties
-    
+
     // MARK: Initializers
     
     // MARK: Methods
