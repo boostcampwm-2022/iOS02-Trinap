@@ -11,6 +11,7 @@ import Foundation
 
 import RxSwift
 import RxRelay
+import LocationCache
 
 final class DefaultMapRepository: NSObject, MapRepository {
 
@@ -51,29 +52,20 @@ final class DefaultMapRepository: NSObject, MapRepository {
 
     func fetchLocationName(using coordinate: Coordinate) -> Observable<String> {
   
-        return Observable.create { observable in
-            let seoulCoor = Coordinate.seoulCoordinate
-
-            if coordinate.lat == seoulCoor.lat && coordinate.lng == seoulCoor.lng {
-                observable.onNext("서울시")
-                return Disposables.create()
-            }
-            
+        return Observable.create { observer in
             let location = CLLocation(latitude: coordinate.lat, longitude: coordinate.lng)
-            let geocoder = CLGeocoder()
             
-            geocoder.reverseGeocodeLocation(location, preferredLocale: .current) { placemarks, _ in
-                guard let address = placemarks else {
-//                    observable.onNext("위도: \(coordinate.lat), 경도: \(coordinate.lng)")
-                    observable.onNext("알수없음")
+            CLGeocoder().useCache.reverseGeocodeLocation(location, preferredLocale: .current) { address, error in
+                if let error {
+                    observer.onNext(error.localizedDescription)
+                    observer.onCompleted()
                     return
                 }
                 
-                let locality = address.first?.locality ?? ""
-                let subLocality = address.first?.subLocality ?? ""
-                
-                observable.onNext("\(locality) \(subLocality)")
+                observer.onNext(address)
+                observer.onCompleted()
             }
+            
             return Disposables.create()
         }
     }
@@ -130,40 +122,5 @@ extension DefaultMapRepository: MKLocalSearchCompleterDelegate {
     
     func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
         print(error)
-    }
-}
-
-extension MKMapItem {
-    
-    var fullName: String {
-        guard let name = name, !placemark.fullLocationAddress.contains(name) else {
-            return placemark.fullLocationAddress
-        }
-        return (name + ", ") + placemark.fullLocationAddress
-    }
-    
-}
-
-extension CLPlacemark {
-    
-    var fullLocationAddress: String {
-        var placemarkData: [String] = []
-        
-        if let stateArea = subAdministrativeArea?.localizedCapitalized { placemarkData.append(stateArea) }
-        if let state = administrativeArea?.localizedCapitalized { placemarkData.append(state) }
-        if let city = locality?.localizedCapitalized { placemarkData.append(city) }
-        if let subCity = subLocality?.localizedCapitalized { placemarkData.append(subCity) }
-        if let building = subThoroughfare?.localizedCapitalized { placemarkData.append(building)}
-        if let street = thoroughfare?.localizedCapitalized { placemarkData.append(street) }
-        if let area = areasOfInterest?.first { placemarkData.append(area.localizedCapitalized) }
-//        if let county = country?.localizedCapitalized { placemarkData.append(county) }
-        placemarkData.removeDuplicates()
-//        placemarkData = [placemarkData[0], placemarkData[1]]
-        var result = ""
-        
-        placemarkData.forEach { result.append($0 + " ") }
-        result.removeLast() // remove last comma
-        
-        return result
     }
 }

@@ -8,6 +8,7 @@
 
 import UIKit
 
+import RxCocoa
 import Than
 
 final class ThumbnailCollectionView: BaseView {
@@ -34,6 +35,10 @@ final class ThumbnailCollectionView: BaseView {
     }
     
     // MARK: Properties
+    var thumbnailDidTap: ControlEvent<IndexPath> {
+        return collectionView.rx.itemSelected
+    }
+    
     private var urlStrings: [String] = []
     
     private var dataSource: DataSource?
@@ -68,7 +73,10 @@ final class ThumbnailCollectionView: BaseView {
     
     func configure(urlStrings: [String]) {
         thumbnailPageControl.numberOfPages = urlStrings.count
-        let snaphot = generateSnapshot(imageStrings: urlStrings)
+        
+        let imageURLs = urlStrings.isEmpty ? [URLConstants.placeholderImage] : urlStrings
+        
+        let snaphot = generateSnapshot(imageStrings: imageURLs)
         dataSource?.apply(snaphot)
     }
 }
@@ -83,7 +91,6 @@ extension ThumbnailCollectionView: UICollectionViewDelegateFlowLayout {
     
     private func configureCollectionView() {
         self.collectionView.register(ThumbnailCollectionViewCell.self)
-        self.collectionView.allowsSelection = false
         self.collectionView.showsHorizontalScrollIndicator = false
         self.collectionView.delegate = self
     }

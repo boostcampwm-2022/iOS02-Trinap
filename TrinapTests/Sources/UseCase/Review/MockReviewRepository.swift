@@ -37,6 +37,7 @@ final class MockReviewRepository: ReviewRepository {
             creatorUserId: "d7MTE9ZYLNg6JQOK4dQ0",
             contents: "리뷰리뷰",
             status: "activate",
+            createdAt: Date(),
             rating: 4
         )
         
@@ -55,6 +56,7 @@ final class MockReviewRepository: ReviewRepository {
             creatorUserId: "d7MTE9ZYLNg6JQOK4dQ0",
             contents: "리뷰리뷰",
             status: "activate",
+            createdAt: Date(),
             rating: 4
         )
         return .just([review])

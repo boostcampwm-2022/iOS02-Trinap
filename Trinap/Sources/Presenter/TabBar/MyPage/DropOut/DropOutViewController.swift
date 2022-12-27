@@ -104,13 +104,24 @@ final class DropOutViewController: BaseViewController {
     }
     
     override func bind() {
+        let dropOutButtonTap = self.dropOutButton.rx.tap
+            .do(onNext: { [weak self] _ in
+                self?.showFullSizeIndicator()
+            })
+        
         let input = DropOutViewModel.Input(
-            dropOutButtonTap: self.dropOutButton.rx.tap.asObservable(),
+            dropOutButtonTap: dropOutButtonTap,
             cancelButtonTap: self.cancelButton.rx.tap.asObservable(),
             backButtonTap: self.navigationBarView.backButton.rx.tap.asSignal()
         )
         
-        _ = self.viewModel.transform(input: input)
+        let output = self.viewModel.transform(input: input)
+        
+        output.droppedOut
+            .subscribe(onNext: { [weak self] _ in
+                self?.hideFullSizeIndicator()
+            })
+            .disposed(by: disposeBag)
     }
     
     override func configureHierarchy() {

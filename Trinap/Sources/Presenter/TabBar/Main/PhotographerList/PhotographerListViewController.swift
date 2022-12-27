@@ -28,10 +28,12 @@ final class PhotographerListViewController: BaseViewController {
         $0.estimatedItemSize = CGSize(width: width, height: height)
         $0.scrollDirection = .vertical
     }
+    
+    private lazy var refreshControl = UIRefreshControl()
         
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout).than {
-        $0.allowsSelection = false
         $0.register(PhotographerPreviewCell.self)
+        $0.refreshControl = refreshControl
         $0.backgroundColor = TrinapAsset.white.color
     }
     
@@ -52,9 +54,6 @@ final class PhotographerListViewController: BaseViewController {
         super.viewWillAppear(animated)
         
         configureNavigationBar()
-        
-        collectionView.isSkeletonable = true
-        collectionView.showSkeleton()
     }
     
     override func configureHierarchy() {
@@ -81,6 +80,9 @@ final class PhotographerListViewController: BaseViewController {
 
     override func configureAttributes() {
         dataSource = configureDataSource()
+        
+        collectionView.isSkeletonable = true
+        collectionView.showSkeleton()
     }
 
     override func bind() {
@@ -103,10 +105,10 @@ final class PhotographerListViewController: BaseViewController {
             .when(.recognized)
             .asObservable()
             .map { _ in }
-                
+        
         let input = PhotographerListViewModel.Input(
-            viewWillAppear: self.rx.viewWillAppear.asObservable(),
             searchTrigger: searchTrigger,
+            refresh: refreshControl.rx.controlEvent(.valueChanged).asObservable(),
             tagType: type
         )
         
@@ -117,8 +119,15 @@ final class PhotographerListViewController: BaseViewController {
                 self?.generateSnapshot(sources: previews)
             }
             .drive(onNext: { [weak self] snapshot in
+                self?.refreshControl.endRefreshing()
                 self?.collectionView.hideSkeleton()
                 self?.dataSource?.apply(snapshot, animatingDifferences: false)
+            })
+            .disposed(by: disposeBag)
+        
+        collectionView.rx.itemSelected(at: dataSource)
+            .bind(onNext: { [weak self] preview in
+                self?.viewModel.showDetailPhotographer(userId: preview.photographerUserId)
             })
             .disposed(by: disposeBag)
     }
@@ -144,12 +153,8 @@ extension PhotographerListViewController {
             else { return UICollectionViewCell() }
             
             cell.configureCell(itemIdentifier)
-            
-            cell.rx.tapGesture()
-                .asObservable()
-                .when(.recognized)
-                .throttle(.seconds(1), scheduler: MainScheduler.instance)
-                .subscribe(onNext: { [weak self] _ in
+            cell.thumbnailCollectionViewDidTap
+                .bind(onNext: { [weak self] _ in
                     self?.viewModel.showDetailPhotographer(userId: itemIdentifier.photographerUserId)
                 })
                 .disposed(by: cell.disposeBag)

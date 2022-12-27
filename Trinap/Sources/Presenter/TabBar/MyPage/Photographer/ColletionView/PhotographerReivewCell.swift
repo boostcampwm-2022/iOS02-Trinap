@@ -8,6 +8,8 @@
 
 import UIKit
 
+import SnapKit
+
 final class PhotographerReivewCell: BaseCollectionViewCell {
     
     // MARK: - Properties
@@ -49,32 +51,31 @@ final class PhotographerReivewCell: BaseCollectionViewCell {
         super.configureConstraints()
         
         profileImageView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(trinapOffset * 2)
-            make.top.equalToSuperview().offset(trinapOffset * 3)
-            make.width.height.equalTo(trinapOffset * 5)
+            make.top.leading.equalToSuperview()
+            make.width.height.equalTo(40)
         }
         
         nicknameLabel.snp.makeConstraints { make in
-            make.leading.equalTo(profileImageView.snp.trailing).offset(trinapOffset)
+            make.leading.equalTo(profileImageView.snp.trailing).offset(8)
             make.top.equalTo(profileImageView.snp.top)
         }
         
         dateLabel.snp.makeConstraints { make in
-            make.leading.equalTo(profileImageView.snp.trailing).offset(trinapOffset)
+            make.leading.equalTo(nicknameLabel.snp.leading)
             make.bottom.equalTo(profileImageView.snp.bottom)
         }
         
         ratingView.snp.makeConstraints { make in
             make.width.equalTo(68)
-            make.trailing.equalToSuperview().inset(trinapOffset * 2)
+            make.trailing.equalToSuperview()
             make.centerY.equalTo(profileImageView)
         }
         
         contentLabel.snp.makeConstraints { make in
             make.leading.equalTo(profileImageView.snp.leading)
             make.trailing.equalTo(ratingView.snp.trailing)
-            make.top.equalTo(profileImageView.snp.bottom).offset(trinapOffset * 2)
-            make.bottom.equalToSuperview().inset(trinapOffset * 3)
+            make.top.equalTo(profileImageView.snp.bottom).offset(16)
+            make.bottom.equalToSuperview()
         }
     }
 
