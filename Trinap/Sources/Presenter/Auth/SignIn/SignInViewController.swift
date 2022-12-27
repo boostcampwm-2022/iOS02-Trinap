@@ -39,7 +39,6 @@ final class SignInViewController: BaseViewController {
     }
     
     // MARK: - Properties
-    private var currentNonce: String?
     private let viewModel: SignInViewModel
     private let credentialSub = PublishSubject<(OAuthCredential, String)>()
     
@@ -84,19 +83,22 @@ final class SignInViewController: BaseViewController {
     }
         
     override func bind() {
+        appleSignInButton.rx.tap
+            .asObservable()
+            .flatMap {
+                ASAuthorizationAppleIDProvider().rx.login(scope: [.email])
+            }
+            .withUnretained(self)
+            .subscribe(onNext: { owner, authorization in
+                owner.generateOAuthCredential(authorization: authorization)
+            })
+            .disposed(by: disposeBag)
+        
         let input = SignInViewModel.Input(
-            signInButtonTap: appleSignInButton.rx.tap.asObservable(),
             credential: credentialSub.asObservable()
         )
         let output = viewModel.transform(input: input)
         
-        
-        output.presentSignInWithApple
-            .asObservable()
-            .subscribe { _ in
-                self.startSignInWithAppleFlow()
-            }
-            .disposed(by: disposeBag)
         
         privacyPolicyButton.rx.tap
             .bind(onNext: { [weak self] _ in
@@ -106,13 +108,20 @@ final class SignInViewController: BaseViewController {
     }
 }
 
-// MARK: - ASAuthorizationControllerDelegate
-extension SignInViewController: ASAuthorizationControllerDelegate {
-    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+// MARK: - ASAuthorizationControllerPresentationContextProviding
+extension SignInViewController: ASAuthorizationControllerPresentationContextProviding {
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        return self.view.window ?? ASPresentationAnchor()
+    }
+}
+
+// MARK: - private Function
+private extension SignInViewController {
+    
+    private func generateOAuthCredential(authorization: ASAuthorization) {
         if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
-            guard let nonce = currentNonce else {
-                fatalError("Invalid state: A login callback was received, but no login request was sent.")
-            }
+            let nonce = generateRandomNonce().toSha256()
+            
             guard let appleIDToken = appleIDCredential.identityToken else {
                 Logger.print("Unable to fetch identity token")
                 return
@@ -133,35 +142,6 @@ extension SignInViewController: ASAuthorizationControllerDelegate {
             let credential = OAuthProvider.credential(withProviderID: "apple.com", idToken: idTokenString, rawNonce: nonce)
             credentialSub.onNext((credential, codeString))
         }
-    }
-}
-
-// MARK: - ASAuthorizationControllerPresentationContextProviding
-extension SignInViewController: ASAuthorizationControllerPresentationContextProviding {
-    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
-        return self.view.window ?? ASPresentationAnchor()
-    }
-}
-
-// MARK: - private Function
-private extension SignInViewController {
-    func startSignInWithAppleFlow() {
-        let (request, nonce) = createRequest()
-        self.currentNonce = nonce
-        
-        let authorizationController = ASAuthorizationController(authorizationRequests: [request])
-        authorizationController.delegate = self
-        authorizationController.presentationContextProvider = self
-        authorizationController.performRequests()
-    }
-    
-    func createRequest() -> (ASAuthorizationAppleIDRequest, String) {
-        let nonce = self.generateRandomNonce()
-        let request = ASAuthorizationAppleIDProvider().createRequest()
-        request.requestedScopes = [.fullName, .email]
-        request.nonce = nonce.toSha256()
-        
-        return (request, nonce)
     }
     
     // Adapted from https://auth0.com/docs/api-auth/tutorials/nonce#generate-a-cryptographically-random-nonce

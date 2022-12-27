@@ -16,12 +16,10 @@ import RxSwift
 final class SignInViewModel: ViewModelType {
     
     struct Input {
-        let signInButtonTap: Observable<Void>
         let credential: Observable<(OAuthCredential, String)>
     }
     
     struct Output {
-        let presentSignInWithApple: Signal<Void>
         let signInFailure: Signal<Void>
     }
     
@@ -65,7 +63,6 @@ final class SignInViewModel: ViewModelType {
             .disposed(by: disposeBag)
         
         return Output(
-            presentSignInWithApple: input.signInButtonTap.asSignal(onErrorSignalWith: .empty()),
             signInFailure: signInFailure.asSignal()
         )
     }
