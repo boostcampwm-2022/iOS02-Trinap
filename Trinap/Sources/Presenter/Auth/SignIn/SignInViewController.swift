@@ -40,7 +40,6 @@ final class SignInViewController: BaseViewController {
     
     // MARK: - Properties
     private let viewModel: SignInViewModel
-    private let credentialSub = PublishSubject<(OAuthCredential, String)>()
     
     // MARK: - Initializers
     init(viewModel: SignInViewModel) {
@@ -81,21 +80,21 @@ final class SignInViewController: BaseViewController {
             make.centerX.equalToSuperview()
         }
     }
-        
+    
     override func bind() {
-        appleSignInButton.rx.tap
+        let credential = appleSignInButton.rx.tap
             .asObservable()
             .flatMap {
                 ASAuthorizationAppleIDProvider().rx.login(scope: [.email])
             }
             .withUnretained(self)
-            .subscribe(onNext: { owner, authorization in
-                owner.generateOAuthCredential(authorization: authorization)
-            })
-            .disposed(by: disposeBag)
+            .map { owner, authorization in
+                return owner.generateOAuthCredential(authorization: authorization)
+            }
+            .compactMap { $0 }
         
         let input = SignInViewModel.Input(
-            credential: credentialSub.asObservable()
+            credential: credential
         )
         let output = viewModel.transform(input: input)
         
@@ -118,17 +117,17 @@ extension SignInViewController: ASAuthorizationControllerPresentationContextProv
 // MARK: - private Function
 private extension SignInViewController {
     
-    private func generateOAuthCredential(authorization: ASAuthorization) {
+    private func generateOAuthCredential(authorization: ASAuthorization) -> (OAuthCredential, String)? {
         if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
             let nonce = generateRandomNonce().toSha256()
             
             guard let appleIDToken = appleIDCredential.identityToken else {
                 Logger.print("Unable to fetch identity token")
-                return
+                return nil
             }
             guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
                 Logger.print("Unable to serialize token string from data: \(appleIDToken.debugDescription)")
-                return
+                return nil
             }
             
             guard
@@ -136,12 +135,14 @@ private extension SignInViewController {
                 let codeString = String(data: authorizationCode, encoding: .utf8)
             else {
                 Logger.print("Unable to serialize token string from authorizationCode")
-                return
+                return nil
             }
             
             let credential = OAuthProvider.credential(withProviderID: "apple.com", idToken: idTokenString, rawNonce: nonce)
-            credentialSub.onNext((credential, codeString))
+            
+            return (credential, codeString)
         }
+        return nil
     }
     
     // Adapted from https://auth0.com/docs/api-auth/tutorials/nonce#generate-a-cryptographically-random-nonce
