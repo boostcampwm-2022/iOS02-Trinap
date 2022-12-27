@@ -54,8 +54,9 @@ final class DefaultMapRepository: NSObject, MapRepository {
   
         return Observable.create { observer in
             let location = CLLocation(latitude: coordinate.lat, longitude: coordinate.lng)
+            let koreanLocale = Locale(identifier: "ko_KR")
             
-            CLGeocoder().useCache.reverseGeocodeLocation(location, preferredLocale: .current) { address, error in
+            CLGeocoder().useCache.reverseGeocodeLocation(location, preferredLocale: koreanLocale) { address, error in
                 if let error {
                     observer.onNext(error.localizedDescription)
                     observer.onCompleted()
