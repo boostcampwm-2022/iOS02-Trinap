@@ -68,11 +68,7 @@ final class DefaultFetchPhotographerPreviewsUseCase: FetchPhotographerPreviewsUs
                 if photographers.isEmpty {
                     return Observable.just([])
                 }
-//                let asd = Observable.from(photographers.map { owner.convertPreview(photographer: $0) }).merge()
-//                return asd.toArray().asObservable().map { previews in
-//                    previews.filter { !$0.name.isEmpty }
-//                }
-//
+                
                 let photographerList = photographers.map {
                     return owner.convertPreview(photographer: $0)
                 }
