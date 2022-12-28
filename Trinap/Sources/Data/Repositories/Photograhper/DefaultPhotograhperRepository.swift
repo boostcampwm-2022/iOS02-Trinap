@@ -27,19 +27,33 @@ final class DefaultPhotographerRepository: PhotographerRepository {
     
     // MARK: Methods
     func fetchPhotographers(type: TagType) -> Observable<[Photographer]> {
+        guard let userId = tokenManager.getToken(with: .userId) else {
+            return .error(TokenManagerError.notFound)
+        }
+        
         return fireStoreService.getDocument(collection: .photographers)
             .map { $0.compactMap { $0.toObject(PhotographerDTO.self)?.toModel() } }
+            .map { $0.filter { $0.photographerUserId != userId } }
             .asObservable()
     }
     
     func fetchPhotographers(ids: [String]) -> Observable<[Photographer]> {
+        guard let userId = tokenManager.getToken(with: .userId) else {
+            return .error(TokenManagerError.notFound)
+        }
+        
         return fireStoreService.getDocument(collection: .photographers, field: "photographerId", in: ids)
             .map { $0.compactMap { $0.toObject(PhotographerDTO.self)?.toModel() } }
+            .map { $0.filter { $0.photographerUserId != userId } }
             .asObservable()
     }
     
     func fetchPhotographers(coordinate: Coordinate) -> Observable<[Photographer]> {
+        guard let userId = tokenManager.getToken(with: .userId) else {
+            return .error(TokenManagerError.notFound)
+        }
         guard let data = coordinate.asDictionary else { return Observable.just([]) }
+        
         return fireStoreService.useFunctions(
             functionName: "nearPhotographer",
             data: data
@@ -47,6 +61,7 @@ final class DefaultPhotographerRepository: PhotographerRepository {
         .map {
             $0.compactMap { $0.toObject(PhotographerDTO.self)?.toModel() }
         }
+        .map { $0.filter { $0.photographerUserId != userId } }
         .asObservable()
     }
     
