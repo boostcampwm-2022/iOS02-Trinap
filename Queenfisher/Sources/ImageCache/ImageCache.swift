@@ -13,22 +13,16 @@ public final class ImageCache {
     // MARK: - Properties
     private static let shared = ImageCache()
     
-    private let memoryImageCache: DefaultImageCache
+    private let hybridImageCache: DefaultImageCache
         
     // MARK: Initializers
     init(performance: ConfigType = .normal) {
-        memoryImageCache = DefaultImageCache(
-            totalCostLimit: performance.config.totalCostLimit,
-            countLimit: performance.config.countLimit
-        )
+        hybridImageCache = DefaultImageCache(configType: performance)
     }
     
     // MARK: - Methods
     public static func instance(performance: ConfigType = .normal) -> ImageCacheProtocol {
-        self.shared.memoryImageCache.config(
-            totalCostLimit: performance.config.totalCostLimit,
-            countLimit: performance.config.totalCostLimit
-        )
-        return self.shared.memoryImageCache
+        self.shared.hybridImageCache.config(performance)
+        return self.shared.hybridImageCache
     }
 }
