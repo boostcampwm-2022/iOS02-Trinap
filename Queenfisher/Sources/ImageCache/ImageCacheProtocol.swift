@@ -10,15 +10,35 @@ import Foundation
 
 public protocol ImageCacheProtocol {
     
-    func fetch(at url: URL, completion: @escaping (QFData?) -> Void)
+//    func fetch(at url: URL, etag: String?, completion: @escaping (QFData?) -> Void)
+    func fetch(at url: URL, completion: @escaping (CacheableImage?) -> Void)
 }
 
 extension ImageCacheProtocol {
-    
-    func fetchImage(at url: URL, completion: @escaping (QFData?) -> Void) {
-        DispatchQueue.global().async {
-            let data = try? Data(contentsOf: url)
-            completion(data)
+
+    func fetchImage(at url: URL, etag: String?, completion: @escaping (Result<CacheableImage, ImageCacheError>) -> Void) {
+        var urlRequest = URLRequest(url: url)
+        
+        if let etag = etag {
+            urlRequest.addValue(etag, forHTTPHeaderField: "If-None-Match")
+        }
+        
+        URLSession.shared.dataTask(with: urlRequest) { data, response, error in
+            guard let response = response as? HTTPURLResponse else {
+                completion(.failure(.httpResponseTransformError))
+                return
+            }
+            switch response.statusCode {
+            case (200...299):
+                guard let data else { completion(.failure(.unknownError)); return }
+                let etag = response.allHeaderFields["Etag"] as? String ?? ""
+                let image = CacheableImage(imageData: data, etag: etag)
+                completion(.success(image))
+            case 304:
+                completion(.failure(.imageNotModifiedError))
+            default:
+                completion(.failure(.unknownError))
+            }
         }
     }
 }
