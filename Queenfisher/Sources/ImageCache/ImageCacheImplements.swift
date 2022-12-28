@@ -11,50 +11,40 @@ import Foundation
 public final class DefaultImageCache: ImageCacheProtocol {
     
     // MARK: - Properties
-    private let memoryCache = NSCache<NSString, NSData>()
+    private let memoryCache = MemoryCacheStorage()
+    private let diskCache = DiskCacheStorage()
     
-    private let diskCache = DiskImageCache()
 //    여기서 imageData 하나의 크기까지 지정해주려고 했는데 data 자체의 크기는 크지 않고, image로 바꾸는 연산이 들어가야하므로 빼기로 결정했습니다.
 //    private let imageCostLimit: Int
     
     // MARK: Initializers
-    init(
-        totalCostLimit: Int,
-        countLimit: Int
-    ) {
-        self.config(totalCostLimit: totalCostLimit, countLimit: countLimit)
+    init(configType: ConfigType) {
+        self.config(configType)
     }
     
     // MARK: - Methods
-    public func fetch(at url: URL, completion: @escaping (QFData?) -> Void) {
-        let key = key(for: url)
-        
-        if let data = memoryCache.object(forKey: key) {
-            completion(data as QFData)
-        }
-        else {
-            diskCache.fetch(at: url, completion: { [weak self] fetchedData in
-                guard let self, let fetchedData else {
-                    completion(nil)
-                    return
+    public func fetch(at url: URL, completion: @escaping (CacheableImage?) -> Void) {
+        memoryCache.fetch(at: url) { [weak self] cacheableImage in
+            if let cacheableImage {
+                completion(cacheableImage)
+                return
+            }
+            
+            // disk cache fetch
+            self?.diskCache.fetch(at: url) { [weak self] diskImage in
+                self?.executeDiskCacheLogic(diskImage: diskImage, url: url) { image in
+                    completion(image)
                 }
-                self.memoryCache.setObject(fetchedData as NSData, forKey: key) // memoryCache에 저장
-                
-                completion(fetchedData)
-            })
+            }
         }
     }
     
-    func config(
-        totalCostLimit: Int,
-        countLimit: Int
-    ) {
-        memoryCache.countLimit = countLimit
-        memoryCache.totalCostLimit = totalCostLimit
-    }
-
-    private func key(for url: URL) -> NSString {
-        return url.absoluteString as NSString
+    func config(_ configType: ConfigType) {
+        memoryCache.config(
+            countLimit: configType.memoryConfig.countLimit,
+            totalCostLimit: configType.memoryConfig.totalCostLimit
+        )
+        diskCache.config(diskConfig: configType.diskConfig)
     }
 }
 
