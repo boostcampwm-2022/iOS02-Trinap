@@ -28,17 +28,18 @@ extension QueenfisherWrapper where Base: QFImageView {
         startIndicator(indicator)
         
         let maybeCache = imageCache(performance: performance)
-        
-        maybeCache.fetch(at: url) { data in
+
+        maybeCache.fetch(at: url) { cacheableImage in
             DispatchQueue.main.async {
                 defer { self.stopIndicator(indicator) }
                 completion?(.zero)
                 
-                guard let data else {
+                guard let cacheableImage else {
                     base.image = placeholder
                     completion?(base.image?.size ?? .zero)
                     return
                 }
+                let data = cacheableImage.imageData
                 
                 if downsampling {
                     self.base.image = data.imageWithDownsampling(
@@ -82,8 +83,16 @@ extension QueenfisherWrapper where Base: QFImageView {
 }
 
 private final class NoImageCache: ImageCacheProtocol {
-    
-    func fetch(at url: URL, completion: @escaping (Data?) -> Void) {
-        self.fetchImage(at: url, completion: completion)
+    func fetch(at url: URL, completion: @escaping (CacheableImage?) -> Void) {
+        self.fetchImage(at: url, etag: nil) { result in
+            switch result {
+            case .success(let success):
+                completion(success)
+                return
+            case .failure:
+                completion(nil)
+                return
+            }
+        }
     }
 }
