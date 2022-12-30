@@ -10,6 +10,7 @@ import UIKit
 
 import SnapKit
 import Kingfisher
+import Queenfisher
 
 final class ImageChatCell: ChatCell {
     
@@ -24,8 +25,9 @@ final class ImageChatCell: ChatCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         
-        self.imageContentView.kf.cancelDownloadTask()
-        self.imageContentView.kf.setImage(with: URL(string: ""))
+//        self.imageContentView.kf.cancelDownloadTask()
+        self.imageContentView.qf.cancelDownloadTask()
+//        self.imageContentView.kf.setImage(with: URL(string: ""))
         self.imageContentView.image = nil
     }
     
@@ -55,13 +57,16 @@ final class ImageChatCell: ChatCell {
         
         let url = URL(string: chat.content)
         let defaultSize = CGSize(width: width, height: height)
-        self.imageContentView.kf.setImage(
-            with: url,
-            placeholder: UIView.placeholder(width: width, height: height),
-            options: [.processor(DownsamplingImageProcessor(size: defaultSize))]
-        ) { [weak self] _ in
+        self.imageContentView.qf.setImage(at: url, placeholder: UIView.placeholder(width: width, height: height)) { [weak self] _ in
             self?.layoutIfNeeded()
         }
+//        self.imageContentView.kf.setImage(
+//            with: url,
+//            placeholder: UIView.placeholder(width: width, height: height),
+//            options: [.processor(DownsamplingImageProcessor(size: defaultSize))]
+//        ) { [weak self] _ in
+//            self?.layoutIfNeeded()
+//        }
     }
 }
 
