@@ -17,17 +17,15 @@ public final class MemoryCacheStorage {
     
     // MARK: Methods
     
-    public func fetch(at url: URL, completion: @escaping (CacheableImage?) -> Void) {
+    public func fetch(at url: URL) -> CacheableImage? {
         let key = key(for: url)
 
         if let data = memoryCache.object(forKey: key) {
             let image = try? JSONDecoder().decode(CacheableImage.self, from: data as Data)
-            completion(image)
-            return
+            return image
         }
         else {
-            completion(nil)
-            return
+            return nil
         }
     }
     
@@ -71,20 +69,26 @@ public final class DiskCacheStorage {
         self.limitCount = diskConfig
     }
     
-    public func fetch(at url: URL, completion: @escaping (CacheableImage?) -> Void) {
-        DispatchQueue.global().async { [weak self] in
-            guard let self else { return }
-            
-            let localPath = self.path(for: url)
-            guard
-                let data = try? QFData(contentsOf: localPath),
-                let decoded = try? JSONDecoder().decode(CacheableImage.self, from: data)
-            else {
-                completion(nil)
-                return
-            }
-            completion(decoded)
-        }
+    public func fetch(at url: URL) -> CacheableImage? {
+//        DispatchQueue.global().async { [weak self] in
+//            guard let self else { return }
+//
+//            let localPath = self.path(for: url)
+//            guard
+//                let data = try? QFData(contentsOf: localPath),
+//                let decoded = try? JSONDecoder().decode(CacheableImage.self, from: data)
+//            else {
+//                completion(nil)
+//                return
+//            }
+//            completion(decoded)
+//        }
+        let localPath = self.path(for: url)
+        guard
+            let data = try? QFData(contentsOf: localPath),
+            let decoded = try? JSONDecoder().decode(CacheableImage.self, from: data)
+        else { return nil }
+        return decoded
     }
     
     public func save(of cacheableImage: CacheableImage, at url: URL) {
