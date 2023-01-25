@@ -1,8 +1,6 @@
 <p align="center"><image alt="trinap" src="https://user-images.githubusercontent.com/27603734/207543336-f8142646-ae32-46d1-86a5-a3d73bde1815.png" align="center"/></p>
 <p align="center">  
-  <img src="https://img.shields.io/github/issues/boostcampwm-2022/iOS02-Trinap"/>
-  <img src="https://img.shields.io/github/issues-closed/boostcampwm-2022/iOS02-Trinap"/>
-  <img src="https://img.shields.io/github/commit-activity/w/boostcampwm-2022/iOS02-Trinap">
+  AppStore: https://apps.apple.com/kr/app/trinap/id6444876356?l=en
   <br><br>
 </p>
 
